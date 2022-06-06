@@ -1,0 +1,52 @@
+<footer>
+  <div class="container">
+    <div class="row">
+	    <div class="col-sm-5 visible-xs">
+		    <ul class="list-inline bott">
+              <li><a href="/kontakty">Контакты</a></li>
+              <li><a href="/gallery">Фотогалерея</a></li>
+              <li><a href="/vacancy">Вакансии</a></li>
+              <li><a href="/documents">Документы</a></li>
+            </ul>
+		</div>
+		<div class="col-sm-4 pull-left">
+			<div class="footer__copy">
+				<div class="footer__copy-text">
+					{{ meta_footer }}
+				</div>
+				<div class="footer__copy-label">
+					{{ meta_copy }}
+				</div>
+				<div class="footer__copy-links">
+					<span class="footer__copy-link">{{ text_copy }}</span>
+					<a href="#" class="footer__copy-link openText">{{ text_nooferta }}</a>
+				</div>
+			</div>
+		</div>
+        <div class="col-sm-5 pull-left hidden-xs hidden-sm">
+            <ul class="list-inline bott">
+              <li><a href="/kontakty">Контакты</a></li>
+              <li><a href="/gallery">Фотогалерея</a></li>
+              <li><a href="/vacancy">Вакансии</a></li>
+              <li><a href="/documents">Документы</a></li>
+            </ul>
+        </div>
+		<div class="col-sm-3 footer__social">
+			<a href="https://vk.com/mnogo_stankov" target="_blank"><img src="image/icons/icon__vk.svg" /> </a>
+			<a href="https://youtube.com/channel/UCh5-kQHrXT9f-7_ZPknp3Dw" target="_blank"><img src="image/icons/icon__youtube.svg" class="icon__youtube"></a>
+			<a href="http://wa.me/79230461768" target="_blank"><img src="image/icons/icon__whatsApp.svg" /> </a> 
+        </div>
+        
+    </div>
+    
+  </div>
+</footer>
+
+{% for style in styles %}
+<link href="{{ style.href }}" type="text/css" rel="{{ style.rel }}" media="{{ style.media }}" />
+{% endfor %}
+{% for script in scripts %}
+<script src="{{ script }}" type="text/javascript"></script>
+{% endfor %}
+
+</body></html>

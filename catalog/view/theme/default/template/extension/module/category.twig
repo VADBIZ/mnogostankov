@@ -1,0 +1,16 @@
+<div class="cat_verh">Каталог</div>
+<nav id="menuVertical">
+    <ul>
+        {% for category in categories %}
+        <li><a href="{{ category.href }}" class="list-group-item">{{ category.name }}</a> 
+            {% if category.children %}
+                <ul>
+                    {% for child in category.children %}
+                        <li><a href="{{ child.href }}" class="list-group-item">{{ child.name }}</a></li>
+                    {% endfor %}
+                </ul>    
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>    
+</nav>

@@ -1,0 +1,174 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-name">{{ entry_name }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="name" value="{{ name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control" />
+              {% if error_name %}
+              <div class="text-danger">{{ error_name }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <h3><hr style="border-top: 1px solid #8e07fd;"></h3>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-limit1">{{ entry_limit }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="limit1" value="{{ limit1 }}" placeholder="{{ entry_limit }}" id="input-limit1" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-width1">{{ entry_width }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="width1" value="{{ width1 }}" placeholder="{{ entry_width }}" id="input-width1" class="form-control" />
+              {% if error_width1 %}
+              <div class="text-danger">{{ error_width1 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-height1">{{ entry_height }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="height1" value="{{ height1 }}" placeholder="{{ entry_height }}" id="input-height1" class="form-control" />
+              {% if error_height1 %}
+              <div class="text-danger">{{ error_height1 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-top1">{{ entry_top1 }}</label>
+                <div class="col-sm-10">
+                  <div class="checkbox">
+                    <label>
+                      {% if top1 %}
+                      <input type="checkbox" name="top1" value="1" checked="checked" id="input-top1" />
+                      {% else %}
+                      <input type="checkbox" name="top1" value="1" id="input-top1" />
+                      {% endif %}
+                      &nbsp; </label>
+                  </div>
+                </div>
+          </div>
+          <h3><hr style="border-top: 1px solid #8e07fd;"></h3>    
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-limit2">{{ entry_limit }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="limit2" value="{{ limit2 }}" placeholder="{{ entry_limit }}" id="input-limit2" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-width2">{{ entry_width }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="width2" value="{{ width2 }}" placeholder="{{ entry_width }}" id="input-width2" class="form-control" />
+              {% if error_width2 %}
+              <div class="text-danger">{{ error_width2 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-height2">{{ entry_height }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="height2" value="{{ height2 }}" placeholder="{{ entry_height }}" id="input-height2" class="form-control" />
+              {% if error_height2 %}
+              <div class="text-danger">{{ error_height2 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-top2">{{ entry_top2 }}</label>
+                <div class="col-sm-10">
+                  <div class="checkbox">
+                    <label>
+                      {% if top2 %}
+                      <input type="checkbox" name="top2" value="1" checked="checked" id="input-top2" />
+                      {% else %}
+                      <input type="checkbox" name="top2" value="1" id="input-top2" />
+                      {% endif %}
+                      &nbsp; </label>
+                  </div>
+                </div>
+          </div>
+          <h3><hr style="border-top: 1px solid #8e07fd;"></h3>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-limit3">{{ entry_limit }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="limit3" value="{{ limit3 }}" placeholder="{{ entry_limit }}" id="input-limit3" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-width3">{{ entry_width }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="width3" value="{{ width3 }}" placeholder="{{ entry_width }}" id="input-width3" class="form-control" />
+              {% if error_width3 %}
+              <div class="text-danger">{{ error_width3 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-height3">{{ entry_height }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="height3" value="{{ height3 }}" placeholder="{{ entry_height }}" id="input-height3" class="form-control" />
+              {% if error_height3 %}
+              <div class="text-danger">{{ error_height3 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-top">{{ entry_top3 }}</label>
+                <div class="col-sm-10">
+                  <div class="checkbox">
+                    <label>
+                      {% if top3 %}
+                      <input type="checkbox" name="top3" value="1" checked="checked" id="input-top3" />
+                      {% else %}
+                      <input type="checkbox" name="top3" value="1" id="input-top3" />
+                      {% endif %}
+                      &nbsp; </label>
+                  </div>
+                </div>
+          </div>
+          <h3><hr style="border-top: 1px solid #8e07fd;"></h3>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+            <div class="col-sm-10">
+              <select name="status" id="input-status" class="form-control">
+                {% if status %}
+                <option value="1" selected="selected">{{ text_enabled }}</option>
+                <option value="0">{{ text_disabled }}</option>
+                {% else %}
+                <option value="1">{{ text_enabled }}</option>
+                <option value="0" selected="selected">{{ text_disabled }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{{ footer }}

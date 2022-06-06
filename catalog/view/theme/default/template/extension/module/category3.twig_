@@ -1,0 +1,16 @@
+<div class="row home_banner">
+    <div class="bl-1 col-lg-7 col-md-7 col-sm-7 col-xs-12" style="{{ css1 }} {% if image1 %}background-image: url('{{ image1 }}');{% endif %}">
+	    <a href="{{ link1 }}" class="l-1">{{ title1 }}</a>
+		<p class="l-3">{{ text1 }}</p>
+        <a href="{{ link1 }}"><img src="{{ images1 }}" class="img-responsive"></a>
+		<a href="{{ link1 }}" class="l-2 btn btn-primary">{{ button1 }}</a>
+    </div>
+    <div class="bl-2 col-lg-5 col-md-5 col-sm-5 col-xs-12">
+        <div class="colsm-50">
+		    <img src="/image/Rectangle 86-2.png" class="img-responsive">
+		</div>
+        <div class="colsm-50">
+		    <img src="/image/Rectangle 86-2.png" class="img-responsive">
+		</div>
+    </div>
+</div>

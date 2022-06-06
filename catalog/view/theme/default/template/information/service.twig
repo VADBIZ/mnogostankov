@@ -1,0 +1,42 @@
+{{ header }}
+<div id="information-contact" class="container">
+ 
+  <div class="row">{{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}">{{ content_top }}
+    
+	 <ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+    {% endfor %}
+  </ul>
+      <h1 class="verx">{{ heading_title }}</h1>
+      <div class="serq_4">
+          <div class="its">
+              <div class="bl_1"><img src="image/001/001.png"></div>
+              <div class="bl_2"><h3>Проверка станка перед поставкой</h3><p>Проверка комплектности, функционирования всех механизмов, подготовка технической документации (инструкция, тех.паспорт)</p></div>
+          </div>
+          <div class="its">
+              <div class="bl_1"><img src="image/001/002.png"></div>
+              <div class="bl_2"><h3>Пусконаладка и шефмонтаж</h3><p>Установка по уровню, подключение, монтаж, подключение доп. устройств (барфидеры и др.), изготовление тестовых деталей</p></div>
+          </div>
+          <div class="its">
+              <div class="bl_1"><img src="image/001/003.png"></div>
+              <div class="bl_2"><h3>Обслуживание после поставки</h3><p>Гарантийное обслуживание, обратная связь по возникающим вопросам, дистанционная и выездная помощь</p></div>
+          </div>
+          <div class="its">
+              <div class="bl_1"><img src="image/001/004.png"></div>
+              <div class="bl_2"><h3>Дополнительный сервис</h3><p>Обслуживание разного оборудования, поставка инструментов,
+помощь в продаже б/у оборудования</p></div>
+          </div>
+      </div>
+      {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+{{ footer }}

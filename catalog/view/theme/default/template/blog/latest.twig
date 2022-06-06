@@ -1,0 +1,89 @@
+{{ header }}
+<div class="container">
+  <ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+    {% endfor %}
+  </ul>
+  <div class="row">{{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }} showcase-list">{{ content_top }}
+      <h1>{{ heading_title }}</h1>
+      {% if articles %}
+      <div class="row">
+        <div class="col-sm-3">
+          
+        </div>
+        <div class="col-sm-1 col-sm-offset-2 text-right">
+          <label class="control-label" for="input-sort">{{ text_sort }}</label>
+        </div>
+        <div class="col-sm-3 text-right">
+         <select id="input-sort" class="form-control" onchange="location = this.value;">
+              {% for sorts in sorts %}
+              {% if sorts.value == '%s-%s'|format(sort, order) %}
+              <option value="{{ sorts.href }}" selected="selected">{{ sorts.text }}</option>
+              {% else %}
+              <option value="{{ sorts.href }}">{{ sorts.text }}</option>
+              {% endif %}
+              {% endfor %}
+            </select>
+        </div>
+        <div class="col-sm-1 text-right">
+          <label class="control-label" for="input-limit">{{ text_limit }}</label>
+        </div>
+        <div class="col-sm-2 text-right">
+          <select id="input-limit" class="form-control" onchange="location = this.value;">
+              {% for limits in limits %}
+              {% if limits.value == limit %}
+              <option value="{{ limits.href }}" selected="selected">{{ limits.text }}</option>
+              {% else %}
+              <option value="{{ limits.href }}">{{ limits.text }}</option>
+              {% endif %}
+              {% endfor %}
+            </select>
+        </div>
+      </div>
+      <br />
+      <div class="row">  
+        <div class="main-posts post-list">
+        {% for article in articles %} 
+        <div class="post-layout">
+          <div class="post-thumb">
+            <div class="image">
+                <span class="p-date p-date-image">{{ article.date_added }}</span>
+                <a href="{{ article['href'] }}"><img src="{{ article['thumb'] }}" alt="{{ article['name'] }}" title="{{ article['name'] }}" class="img-responsive" /></a>
+            </div>
+            <div class="caption">
+                <div class="post-stats"></div>
+                <div class="name"><a href="{{ article['href'] }}">{{ article['name'] }}</a></div>
+                <div class="description">{{ article['description'] }}</div>
+                <div class="button-group">
+                    <a class="btn btn-read-more" href="{{ article.href }}"><span class="btn-text">{{ button_more }}</span></a>
+                </div>
+            </div>
+            
+          </div>
+        </div>
+       {% endfor %}
+       </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6 text-left">{{ pagination }}</div>
+      </div>
+      {% else %}
+      <p>{{ text_empty }}</p>
+      <div class="buttons">
+        <div class="pull-right"><a href="{{ continue }}" class="btn btn-primary">{{ button_continue }}</a></div>
+      </div>
+      {% endif %}
+      {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+
+{{ footer }}

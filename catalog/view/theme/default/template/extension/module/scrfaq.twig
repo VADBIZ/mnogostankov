@@ -1,0 +1,38 @@
+<div class="faq-accordion faq-accordion-{{ module_id }}">
+    <h3>{{ scrfaq_title }}</h3>
+    {% if scrfaq_descr %}
+        <p>{{ scrfaq_descr }}</p>
+    {% endif %}
+    <div class="row">
+        {% if answers %}
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                {% for answer in answers %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="heading{{ answer['id'] }}">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion"
+                                   href="#collapse{{ answer['id'] }}" aria-expanded="true" aria-controls="collapseOne"
+                                   class="link-collapse">
+                                    <i class="fa fa-plus"></i> {{ answer['title'] }}
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapse{{ answer['id'] }}" class="panel-collapse collapse" role="tabpanel"
+                             aria-labelledby="heading{{ answer['id'] }}">
+                            <div class="panel-body">
+                                {% if answer['description'] %}
+                                    {{ answer['description'] | raw }}
+                                {% else %}
+                                    {{ answer_empty }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>{{ questions_empty }}</p>
+        {% endif %}
+    </div>
+</div>

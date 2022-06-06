@@ -1,0 +1,123 @@
+{{ header }}{{ column_left }}
+<div id="content">
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="pull-right float-right">
+				<button type="submit" form="form-review" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+			<a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default btn-light"><i class="fa fa-reply"></i></a>
+			{% if helpcheck %}
+				<a href="{{ helplink }}" target="_blank" id="button-pts-help" class="btn"><img src="{{ helpimage }}" alt="Help" width="85" height="43"></a>
+			{% endif %}
+			</div>
+			<h1>{{ heading_title }}</h1>
+			<ul class="breadcrumb">
+				{% for breadcrumb in breadcrumbs %}
+				<li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="container-fluid">
+		{% if error_warning %}
+		<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+		{% endif %}
+		<div class="panel panel-default card">
+			<div class="panel-heading ">
+				<h3 class="panel-title card-header"><i class="fa fa-pencil fas fa-edit"></i> {{ text_form }}</h3>
+			</div>
+			<div class="panel-body card-body">
+				<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-review" class="form-horizontal">
+					<div class="form-group row required">
+						<label class="col-sm-2 control-label col-form-label" for="input-post_id">{{ entry_post }}</label>
+						<div class="col-sm-10">
+								<select name="post_id" id="input-status" class="form-control">
+								  <option value="">{{ text_select_post }}</option>
+								  {% for sellerBlogPost in sellerBlogPosts %}
+									{% if post_id == sellerBlogPost.blog_post_id %}
+									<option value="{{ sellerBlogPost.blog_post_id }}" selected="selected">{{ sellerBlogPost.title }}</option>
+									{% else %}													
+									<option value="{{ sellerBlogPost.blog_post_id }}">{{ sellerBlogPost.title }}</option>						
+									{% endif %}
+									{% endfor %}
+								</select>
+							{% if error_post %}
+							<div class="text-danger">{{ error_post }}</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="form-group row required">
+						<label class="col-sm-2 control-label col-form-label" for="input-name">{{ entry_name }}</label>
+						<div class="col-sm-10">
+							<input type="text" name="name" value="{{ name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control" />  
+							{% if error_name %}
+							<div class="text-danger">{{ error_name }}</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="form-group row required">
+						<label class="col-sm-2 control-label col-form-label" for="input-email">{{ entry_email }}</label>
+						<div class="col-sm-10">
+							<input type="text" name="email_id" value="{{ email_id }}" placeholder="{{ entry_email }}" id="input-email" class="form-control" />  
+							{% if error_email %}
+							<div class="text-danger">{{ error_email }}</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="form-group row required">
+						<label class="col-sm-2 control-label col-form-label" for="input-text">{{ entry_text }}</label>
+						<div class="col-sm-10">
+							<textarea name="text" cols="60" rows="8" placeholder="{{ entry_text }}" id="input-text" class="form-control">{{ text }}</textarea>
+							{% if error_text %}
+							<div class="text-danger">{{ error_text }}</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 control-label col-form-label" for="input-date-added">{{ entry_date_added }}</label>
+						<div class="col-sm-3">
+							<div class="input-group datetime">
+								<input type="text" name="date_added" value="{{ date_added }}" placeholder="{{ entry_date_added }}" data-date-format="YYYY-MM-DD HH:mm:ss" id="input-date-added" class="form-control" />
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default btn-light"><i class="fa fa-calendar"></i></button>
+								</span>
+							</div>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 control-label col-form-label" for="input-status">{{ entry_status }}</label>
+						<div class="col-sm-10">
+							<select name="status" id="input-status" class="form-control">
+								{% if status %}
+								<option value="1" selected="selected">{{ text_enabled }}</option>
+								<option value="0">{{ text_disabled }}</option>
+								{% else %}
+								<option value="1">{{ text_enabled }}</option>
+								<option value="0" selected="selected">{{ text_disabled }}</option>
+								{% endif %}
+							</select>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript"><!--
+		var x='{{ ver }}';
+		if(x=='3.1.0.0_b')
+		{
+			$('.datetime').datetimepicker({
+				'format': 'YYYY-MM-DD',
+				'locale': '{{ datepicker }}',
+				'allowInputToggle': true
+			});
+			} else {
+			$('.datetime').datetimepicker({
+				pickDate: true,
+				pickTime: true
+			});
+		}
+	//--></script>
+</div>
+{{ footer }}

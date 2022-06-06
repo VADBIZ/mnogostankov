@@ -1,0 +1,16 @@
+<h3>{{ heading_title }}</h3>
+<div class="row">
+ {% for article in articles %}
+  <div class="product-layout product-list col-lg-6 col-md-6 col-sm-6 col-xs-12">
+    <div class="product-thumb transition">
+      <div class="image"><a href="{{ article.href }}"><img src="{{ article.thumb }}" alt="{{ article.name }}" title="{{ article.name }}" class="img-responsive" /></a></div>
+      <div class="caption">
+        <h4><a href="{{ article.href }}">{{ article.name }}</a></h4>
+        <p>{{ article.description }}</p>
+      
+      </div>
+	  
+    </div>
+  </div>
+  {% endfor %}
+</div>

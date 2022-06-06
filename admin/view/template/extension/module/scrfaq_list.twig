@@ -1,0 +1,135 @@
+{{ header }}{{ column_left }}
+<div id="content">
+    <!-- Header-->
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <button type="button" form="form-module" data-toggle="tooltip" title="{{ button_save }}"
+                        onclick="$('#form-module').submit()"
+                        class="btn btn-primary"><i class="fa fa-save"></i></button>
+                {% if isEdit %}
+                <a href="{{ add }}" data-toggle="tooltip" title="{{ button_add }}" class="btn btn-primary"><i
+                            class="fa fa-plus"></i></a>
+                {% endif %}
+                <button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger"
+                        onclick="confirm('{{ text_confirm }}') ? $('#form-article').submit() : false;"><i
+                            class="fa fa-trash-o"></i></button>
+            </div>
+            <h1>{{ heading_title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                    <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!-- /Header-->
+    <!-- Content -->
+    <div class="container-fluid">
+        {% if error_warning %}
+            <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+        {% endif %}
+        {% if success %}
+            <div class="alert alert-success"><i class="fa fa-check-circle"></i> {{ success }}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+        {% endif %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_list }}</h3>
+            </div>
+            <div class="panel-body">
+                <!-- Filter -->
+                <div class="well">
+                    <div class="row">
+                        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="input-name">{{ entry_name }}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="name" value="{{ name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control" />
+                                {% if error_name %}
+                                    <div class="text-danger">{{ error_name }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                            <div class="form-group">
+                            <label class="col-sm-2 control-label" for="input-name">{{ entry_descr }}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="descr" value="{{ descr }}" placeholder="{{ entry_descr }}" id="input-descr" class="form-control" />
+                                {% if error_descr %}
+                                    <div class="text-danger">{{ error_descr }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+                            <div class="col-sm-10">
+                                <select name="status" id="input-status" class="form-control">
+                                    {% if status %}
+                                        <option value="1" selected="selected">{{ text_enabled }}</option>
+                                        <option value="0">{{ text_disabled }}</option>
+                                    {% else %}
+                                        <option value="1">{{ text_enabled }}</option>
+                                        <option value="0" selected="selected">{{ text_disabled }}</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- /Filter -->
+                <!-- ListContent -->
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-article">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <td style="width: 1px;" class="text-center"><input type="checkbox"
+                                                                                   onclick="$('input[name*=\'selected\']').prop('checked', this.checked);"/>
+                                </td>
+                                <td class="text-left">{{ column_title }}</td>
+                                <td class="text-left">{% if (sort == 'p.status') %}
+                                        <a href="{{ sort_status }}" class="{{ order }}">{{ column_status }}</a>
+                                    {% else %}
+                                        <a href="{{ sort_status }}">{{ column_status }}</a>
+                                    {% endif %}</td>
+                                <td class="text-right">{{ column_action }}</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if questions %}
+                                {% for question in questions %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <input type="checkbox" name="selected[]" value="{{ question['id'] }}"/>
+                                        </td>
+                                        <td class="text-left">{{ question['title'] }}</td>
+                                        <td class="text-left">{{ question['status'] }}</td>
+                                        <td class="text-right"><a href="{{ question['edit'] }}" data-toggle="tooltip"
+                                                                  title="{{ button_edit }}" class="btn btn-primary"><i
+                                                        class="fa fa-pencil"></i></a></td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td class="text-center" colspan="4">{{ text_no_results }}</td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+                <!-- /ListContent -->
+                <div class="row">
+                    <div class="col-sm-6 text-left">{{ pagination }}</div>
+                    <div class="col-sm-6 text-right">{{ results }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Content -->
+</div>
+{{ footer }}

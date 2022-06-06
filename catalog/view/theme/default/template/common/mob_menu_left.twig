@@ -1,0 +1,60 @@
+<nav id="menu-mobile-ns" class="navmenu navmenu-default navmenu-fixed-left">
+	<ul class="nav navbar-nav">
+		<li class="btn-close-menu">{{ text_category }} 
+		<span class="toggle-close-mm" data-toggle="close_mob_menu"><i class="fa fa-close"></i></span></li>
+		{% for item in items %} 
+			<li><a href="{{ item['href'] }}" rel="nofollow">
+				{% if (item['children']) %}<span class="show-sc-mobile" data-toggle="collapse"><i class="fa fa-plus plus"></i></span>{% endif %} 
+					{% if (item['thumb']) %} 
+						<img alt="{{ item['name'] }}" class="mobile-menu-icon {% if (item['thumb_hover']) %}pitem-icon{% endif %}" src="{{ item['thumb']}}"/>
+					{% endif %} 
+					{% if (item['thumb_hover']) %} 
+						<img alt="{{ item['name'] }}" class="mobile-menu-icon hitem-icon" src="{{ item['thumb_hover']}}"/>
+					{% endif %} 
+					{% if (item['sticker_parent'] is not empty) %} 
+						<span style="color:#{{ item['spctext'] }}; background-color:#{{ item['spbg'] }}" class="cat-label cat-label-label">{{ item['sticker_parent'] }}</span>
+					{% endif %} 
+					{{ item['name'] }} 
+					</a>
+					{% if (item['type'] == "html") %} 
+						<div class="collapse mob-submenu-list">
+							<div class="mob-html-block">
+								{{ item['html'] }} 
+							</div>
+					   </div>
+					{% endif %} 
+					{% if (item['children'] is not empty and (item['type'] != 'html')) %} 
+						<div class="collapse mob-submenu-list">
+							<ul class="list-unstyled">
+								{% for child in item['children'] %} 
+									<li>
+										<a href="{{ child['href'] }}" rel="nofollow">{{ child['name'] }} 
+											{% if (child['children'] is not empty) %}<span class="show-sc-mobile" data-toggle="collapse"><i class="fa fa-plus plus"></i></span>{% endif %} 
+										</a>
+										{% if (child['children'] is not empty) %} 
+											<div class="collapse mob-submenu-list-3lev">
+												<ul class="list-unstyled">
+													{% for subchild in child['children'] %} 
+													{% if (item['type'] == "freelink") %} 
+														<li><a href="{{ subchild['link'] }}"> - {{ subchild['title'] }}</a></li>
+													{% else %} 
+														<li><a href="{{ subchild['href'] }}"> - {{ subchild['name'] }}</a></li>
+													{% endif %} 
+													{% endfor %} 
+												</ul>
+											</div>
+										{% endif %} 
+									</li>
+								{% endfor %} 
+							</ul>
+							{% if (item['add_html'] is defined) %}
+								<div class="mob-html-block">
+									{{ item['add_html'] }} 
+								</div>
+							{% endif %} 
+						</div>
+					{% endif %} 
+				</li>
+			{% endfor %} 
+		  </ul>
+</nav>

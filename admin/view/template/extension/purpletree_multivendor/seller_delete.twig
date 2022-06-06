@@ -1,0 +1,63 @@
+{{ header }}
+{{ column_left }}
+<div id="content">
+	<div class="page-header">
+		<div class="container-fluid">
+		{% if helpcheck %}
+			<div class="pull-right float-right">
+				<a href="{{ helplink }}" target="_blank" id="button-pts-help" class="btn"><img src="{{ helpimage }}" alt="Help" width="85" height="43"></a>
+			</div>
+		{% endif %}
+			<h1>{{ heading_title }}</h1>
+			<ul class="breadcrumb">
+				{% for breadcrumb in breadcrumbs %}
+				<li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="container-fluid">
+		{% if error_warning %}
+		<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> 
+			{{ error_warning }}
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+		{% endif %}
+		{% if success %}
+		<div class="alert alert-success"><i class="fa fa-check-circle"></i> {{ success }}
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+		{% endif %}
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title"><i class="fa fa-list"></i> {{ text_heading }}</h3>
+			</div>
+			<div class="panel-body">
+				<form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-customer">
+					<div class="well">
+						<div class="row">
+							<ul class="pts-delete-seller-detail">
+								<li> {{ text_seller_sub_plan }}</li>
+								<li>{{ text_seller_product }}</li>
+								<li>{{ text_seller_order }}</li>
+								<li>{{ text_commission_invoice_seller }}</li>
+								<li>{{ text_blogs_seller }}</li>
+								<li>{{ text_seller_download }}</li>
+								<li>{{ text_seller_review }}</li>
+								<li>{{ text_seller_cust_seller }}</li>
+								<li>{{ text_shipping_rate }}</li>
+							</ul>
+						</div>
+						<label for="check-1" class="ptsc-delete-seller-marlef">
+						<input type="checkbox" id="chek-1 "name="delete_product" value="1"> {{ text_delete_product }}</label> 
+					</div>
+					<button type="submit" id="confirm-seller-delete" data-toggle="tooltip"  title="{{ "Delete Confirm" }}" class="btn btn-danger">{{ text_delete_confirm }}</button>
+				</form>
+			</div>       
+		</div>
+	</div>
+</div>
+{{ footer }} 
+<script>
+	$('#confirm-seller-delete').click(function (e) { if(!confirm('Do you want to delete all the information of seller?')){ e.preventDefault(); } });
+</script>

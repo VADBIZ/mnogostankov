@@ -1,0 +1,446 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+	    <button type="button" data-toggle="tooltip" title="{{ text_version }} {{ version }}" class="btn btn-default">{{ version }}</button>
+	    <button onclick="$('#input-apply').attr('value', '1'); $('#' + $('#content form').attr('id')).submit();" data-toggle="tooltip" title="{{ button_apply }}" class="btn btn-success"><i class="fa fa-save"></i></button>
+        <button type="submit" form="form-options-category" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+		{% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+	{% if success %}
+    <div class="alert alert-success"><i class="fa fa-check-circle"></i> {{ success }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-options-category" class="form-horizontal">
+		  <input type="hidden" name="module_options_category_apply" id="input-apply" value="0" />
+		  <input type="hidden" name="module_options_category_status" value="1" />
+		  <ul class="nav nav-tabs">
+		    <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+		    <li><a href="#tab-view" data-toggle="tab">{{ tab_view }}</a></li>
+			<li><a href="#tab-show" data-toggle="tab">{{ tab_show }}</a></li>
+			<li><a href="#tab-contact" data-toggle="tab">{{ tab_contact }}</a></li>
+	      </ul>
+		  <div class="tab-content">
+            <div class="tab-pane active" id="tab-general">
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-autoselect">{{ entry_autoselect }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_autoselect" id="input-autoselect" class="form-control">
+					{% if module_options_category_autoselect %}
+					<option value="1" selected="selected">{{ text_enabled }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="1">{{ text_enabled }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-show-no-stock">{{ entry_show_no_stock }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_show_no_stock" id="input-show-no-stock" class="form-control">
+					{% if module_options_category_show_no_stock %}
+					<option value="1" selected="selected">{{ text_enabled }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="1">{{ text_enabled }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-no-stock-disabled">{{ entry_no_stock_disabled }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_no_stock_disabled" id="input-no-stock-disabled" class="form-control">
+					{% if module_options_category_no_stock_disabled %}
+					<option value="1" selected="selected">{{ text_enabled }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="1">{{ text_enabled }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-datetimepicker">{{ entry_datetimepicker }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_datetimepicker" id="input-datetimepicker" class="form-control">
+					{% if module_options_category_datetimepicker %}
+					<option value="1" selected="selected">{{ text_enabled }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="1">{{ text_enabled }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-special-mode">{{ entry_special_mode }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_special_mode" id="input-special-mode" class="form-control">
+					{% if module_options_category_special_mode == '3' %}
+					<option value="3" selected="selected">{{ text_enabled }}</option>
+					<option value="2">{{ text_option_group }}</option>
+					<option value="1">{{ text_option_group_value }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% elseif module_options_category_special_mode == '2' %}
+					<option value="3">{{ text_enabled }}</option>
+					<option value="2" selected="selected">{{ text_option_group }}</option>
+					<option value="1">{{ text_option_group_value }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% elseif module_options_category_special_mode == '1' %}
+					<option value="3">{{ text_enabled }}</option>
+					<option value="2">{{ text_option_group }}</option>
+					<option value="1" selected="selected">{{ text_option_group_value }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="3">{{ text_enabled }}</option>
+					<option value="2">{{ text_option_group }}</option>
+					<option value="1">{{ text_option_group_value }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-image-select">{{ entry_image_select }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_image_select" id="input-image-select" class="form-control">
+					{% if module_options_category_image_select %}
+					<option value="1" selected="selected">{{ text_enabled }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="1">{{ text_enabled }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			</div>
+			<div class="tab-pane" id="tab-view">
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-theme">{{ entry_theme }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_theme" id="input-theme" class="form-control">
+					{% if module_options_category_theme %}
+					<option value="1" selected="selected">{{ text_theme_button }}</option>
+					<option value="0">{{ text_no_theme }}</option>
+					{% else %}
+					<option value="1">{{ text_theme_button }}</option>
+					<option value="0" selected="selected">{{ text_no_theme }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-quantity">{{ entry_quantity }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_quantity" id="input-quantity" class="form-control">
+					{% if module_options_category_quantity %}
+					<option value="1" selected="selected">{{ text_enabled }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="1">{{ text_enabled }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-quantity-product">{{ entry_quantity_product }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_quantity_product" id="input-quantity-product" class="form-control">
+					{% if module_options_category_quantity_product %}
+					<option value="1" selected="selected">{{ text_enabled }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="1">{{ text_enabled }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			   <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-position">{{ entry_position }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_position" id="input-position" class="form-control">
+					{% if module_options_category_position %}
+					<option value="1" selected="selected">{{ text_top }}</option>
+					<option value="0">{{ text_bottom }}</option>
+					{% else %}
+					<option value="1">{{ text_top }}</option>
+					<option value="0" selected="selected">{{ text_bottom }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-name-tooltip">{{ entry_name_tooltip }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_name_tooltip" id="input-name-tooltip" class="form-control">
+					{% if module_options_category_name_tooltip %}
+					<option value="1" selected="selected">{{ text_enabled }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="1">{{ text_enabled }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-image">{{ entry_image }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_image" id="input-image" class="form-control">
+					{% if module_options_category_image %}
+					<option value="1" selected="selected">{{ text_enabled }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="1">{{ text_enabled }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-image-width">{{ entry_image_size }}</label>
+				<div class="col-sm-9">
+				  <div class="row">
+					<div class="col-sm-6">
+					  <input type="text" name="module_options_category_image_width" value="{{ module_options_category_image_width }}" placeholder="{{ entry_width }}" id="input-image-width" class="form-control" />
+					</div>
+					<div class="col-sm-6">
+					  <input type="text" name="module_options_category_image_height" value="{{ module_options_category_image_height }}" placeholder="{{ entry_height }}" id="input-image-height" class="form-control" />
+					</div>
+				  </div>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-image-popup">{{ entry_image_popup }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_image_popup" id="input-image-popup" class="form-control">
+					{% if module_options_category_image_popup %}
+					<option value="1" selected="selected">{{ text_enabled }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="1">{{ text_enabled }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-image-popup-width">{{ entry_image_popup_size }}</label>
+				<div class="col-sm-9">
+				  <div class="row">
+					<div class="col-sm-6">
+					  <input type="text" name="module_options_category_image_popup_width" value="{{ module_options_category_image_popup_width }}" placeholder="{{ entry_width }}" id="input-image-popup-width" class="form-control" />
+					</div>
+					<div class="col-sm-6">
+					  <input type="text" name="module_options_category_image_popup_height" value="{{ module_options_category_image_popup_height }}" placeholder="{{ entry_height }}" id="input-image-popup-height" class="form-control" />
+					</div>
+				  </div>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-sku">{{ entry_sku }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_sku" id="input-sku" class="form-control">
+					{% if module_options_category_sku %}
+					<option value="1" selected="selected">{{ text_enabled }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="1">{{ text_enabled }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-show-quantity">{{ entry_show_quantity }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_show_quantity" id="input-show-quantity" class="form-control">
+					{% if module_options_category_show_quantity %}
+					<option value="1" selected="selected">{{ text_enabled }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="1">{{ text_enabled }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-show-price">{{ entry_show_price }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_show_price" id="input-show-price" class="form-control">
+					{% if module_options_category_show_price %}
+					<option value="1" selected="selected">{{ text_enabled }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="1">{{ text_enabled }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-points">{{ entry_points }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_points" id="input-points" class="form-control">
+					{% if module_options_category_points %}
+					<option value="1" selected="selected">{{ text_enabled }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="1">{{ text_enabled }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-weight">{{ entry_weight }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_weight" id="input-weight" class="form-control">
+					{% if module_options_category_weight %}
+					<option value="1" selected="selected">{{ text_enabled }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="1">{{ text_enabled }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			</div>
+			<div class="tab-pane" id="tab-show">
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-show-mode">{{ entry_show_mode }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_show_mode" id="input-show-mode" class="form-control">
+					{% if module_options_category_show_mode == '2' %}
+					<option value="2" selected="selected">{{ text_option_product_selected }}</option>
+					<option value="1">{{ text_option_selected }}</option>
+					<option value="0">{{ text_all }}</option>
+					{% elseif module_options_category_show_mode == '1' %}
+					<option value="2">{{ text_option_product_selected }}</option>
+					<option value="1" selected="selected">{{ text_option_selected }}</option>
+					<option value="0">{{ text_all }}</option>
+					{% else %}
+					<option value="2">{{ text_option_product_selected }}</option>
+					<option value="1">{{ text_option_selected }}</option>
+					<option value="0" selected="selected">{{ text_all }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label">{{ entry_options }}</label>
+				<div class="col-sm-9">
+				  <div class="well well-sm" style="height: 150px; overflow: auto;">
+					{% if options %}
+					{% for option in options %}
+					<div class="checkbox">
+					  <label>
+					  {% if option.option_id in module_options_category_show %}
+						<input type="checkbox" name="module_options_category_show[]" value="{{ option.option_id }}" checked="checked" />
+						{{ option.name }}
+						{% else %}
+						<input type="checkbox" name="module_options_category_show[]" value="{{ option.option_id }}"/>
+						{{ option.name }}
+						{% endif %}
+					  </label>
+					</div>
+					{% endfor %}
+					{% endif %}
+				  </div>
+				  <a class="btn btn-primary" onclick="$(this).parent().find(':checkbox').prop('checked', true);">{{ text_select_all }}</a>
+				  <a class="btn btn-primary" onclick="$(this).parent().find(':checkbox').prop('checked', false);">{{ text_unselect_all }}</a>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label" for="input-value-show-mode">{{ entry_value_show_mode }}</label>
+				<div class="col-sm-9">
+				  <select name="module_options_category_value_show_mode" id="input-value-show-mode" class="form-control">
+					{% if module_options_category_value_show_mode == '2' %}
+					<option value="2" selected="selected">{{ text_option_product_selected }}</option>
+					<option value="1">{{ text_option_selected }}</option>
+					<option value="0">{{ text_all }}</option>
+					{% elseif module_options_category_value_show_mode == '1' %}
+					<option value="2">{{ text_option_product_selected }}</option>
+					<option value="1" selected="selected">{{ text_option_selected }}</option>
+					<option value="0">{{ text_all }}</option>
+					{% else %}
+					<option value="2">{{ text_option_product_selected }}</option>
+					<option value="1">{{ text_option_selected }}</option>
+					<option value="0" selected="selected">{{ text_all }}</option>
+					{% endif %}
+				  </select>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-sm-3 control-label">{{ entry_option_values }}</label>
+				<div class="col-sm-9">
+				  <div class="well well-sm" style="height: 300px; overflow: auto;">
+					{% if options %}
+					{% for option in options %}
+					{% if option.type == 'select' or option.type == 'radio' or option.type == 'checkbox' %}
+					<div style="margin-bottom: 10px;">
+					  <div><strong>{{ option.name }}</strong></div>
+					  {% for option_value in option.option_values %}
+					  <div class="checkbox">
+						<label>
+						{% if option_value.option_value_id in module_options_category_value_show %}
+						  <input type="checkbox" name="module_options_category_value_show[]" value="{{ option_value.option_value_id }}" checked="checked" />
+						  {{ option_value.name }}
+						  {% else %}
+						  <input type="checkbox" name="module_options_category_value_show[]" value="{{ option_value.option_value_id }}"/>
+						  {{ option_value.name }}
+						  {% endif %}
+						</label>
+					  </div>
+					{% endfor %}
+					</div>
+					{% endif %}
+					{% endfor %}
+					{% endif %}
+				  </div>
+				  <a class="btn btn-primary" onclick="$(this).parent().find(':checkbox').prop('checked', true);">{{ text_select_all }}</a>
+				  <a class="btn btn-primary" onclick="$(this).parent().find(':checkbox').prop('checked', false);">{{ text_unselect_all }}</a>
+				</div>
+			  </div>
+			</div>
+			<div class="tab-pane" id="tab-contact">
+			  <div>{{ text_contact }}</div>
+			</div>
+		  </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{{ footer }}

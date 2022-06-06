@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html dir="{{ direction }}" lang="{{ lang }}">
+<head>
+<meta charset="UTF-8" />
+<title>{{ title }}</title>
+<base href="{{ base }}" />
+<link href="catalog/view/javascript/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="all" />
+<script src="catalog/view/javascript/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<style>
+.schet-box{font-family:'Arial',sans-serif;}
+.info-schet{margin-top:5px;font-size:8px;}
+.table-example td{font-size:10px;border:1px solid #222 !important;padding:4px !important;}
+.table-products{font-size:10px;border:2px solid #222;margin-bottom:5px !important;}
+.table-products td{border:1px solid #222 !important;padding:4px !important;}
+.info-blank{margin-top:5px;font-size:8px;}
+.info-blanks{margin-top:15px;font-size:8px;}
+.table-schet-data{border-top:2px solid #222;font-size:10px;}
+.table-schet-data td{padding:4px 0 0 0 !important;border:0 !important;}
+.buyer td{padding-top:15px !important;}
+.table-schet-total td{padding:4px 0 0 0 !important;border:0 !important;font-size:10px;}
+.text-items{font-size:11px;}
+.text-totals{font-size:11px;border-bottom:2px solid #222;padding-bottom:30px;margin-bottom:40px;}
+.text-director{margin:10px 0;font-size:11px;}
+.text-director span{margin:0 10px;text-decoration:underline;}
+#print-button{
+	text-align: center;
+	margin: 10px;
+	font-size: 20px;
+}
+@media print {
+	#print-button,.info-schet{
+		display: none;
+	}
+}
+</style>
+<script type="text/javascript"><!--
+function print1()
+{
+ window.print();
+}
+//--></script>
+
+
+</head>
+<body>
+<div id="print-button">
+	<button class="btn btn-primary" onclick="print1();">Распечатать</button>
+
+</div>
+
+
+<div class="container schet-box">
+  <div class="row">
+    <div class="alert alert-info info-schet">{{ text_info_schet }}</div>
+    <h6 class="text-center">{{ text_example_pay }}</h6>
+    <table class="table table-bordered table-example">
+      <tr>
+	    <td class="text-left" width="40%">{{ text_inn }} {{ payment_schet_inn }}</td>
+	    <td class="text-left" width="20%">{{ text_kpp }} {{ payment_schet_kpp }}</td>
+	    <td class="text-left" rowspan="2" width="10%">{{ text_shet_id }}</td>
+	    <td class="text-left" rowspan="2" width="30%">{{ payment_schet_account }}</td>
+	  </tr>
+	  <tr>
+	    <td class="text-left" colspan="2">{{ payment_schet_supplier }}<div class="info-blank">{{ text_recipient }}</div></td>
+	  </tr>
+	  <tr>
+	    <td class="text-left" colspan="2" rowspan="2">{{ payment_schet_bank_supplier }}<div class="info-blanks">{{ text_bank }}</div></td>
+	    <td class="text-left">{{ text_bik }}</td>
+	    <td class="text-left" rowspan="2">{{ payment_schet_bik }}<br /><br />{{ payment_schet_corschet }}</td>
+	  </tr>
+	  <tr>
+	    <td class="text-left">{{ text_shet_id }}</td>
+	  </tr>
+    </table>
+	<h4 class="text-left">{{ text_payment_schet_title }}</h4>
+	<table class="table table-schet-data">
+	  <tr>
+	    <td class="text-left" width="20%">{{ text_supplier }}</td>
+		<td class="text-left" width="80%">{{ payment_schet_supplier }}</td>
+	  </tr>
+	  {% if payment_schet_legal_address %}
+<!-- 	  <tr>
+	    <td class="text-left" width="20%">{{ text_legal_address }}</td>
+		<td class="text-left" width="80%">{{ payment_schet_legal_address }}</td>
+	  </tr> -->
+	  {% endif %}
+	  {% if payment_schet_actual_address %}
+<!-- 	  <tr>
+	    <td class="text-left" width="20%">{{ text_actual_address }}</td>
+		<td class="text-left" width="80%">{{ payment_schet_actual_address }}</td>
+	  </tr> -->
+	  {% endif %}
+	  {% if payment_schet_telephone  or  payment_schet_mobilephone %}
+	  <tr>
+	    <td class="text-left" width="20%">{{ text_telephone }}</td>
+		<td class="text-left" width="80%">{% if payment_schet_telephone %}{{ payment_schet_telephone }}, {% endif %}{% if payment_schet_mobilephone %}{{ payment_schet_mobilephone }}{% endif %}</td>
+	  </tr>
+	  {% endif %}
+	  <tr class="buyer">
+	    <td class="text-left" width="20%">{{ text_buyer }}</td>
+		<td class="text-left" width="80%">{{ buyer }}</td>
+	  </tr>
+	</table>
+	<table class="table table-bordered table-products">
+	  <thead>
+		<tr>
+		  <td class="text-center" width="1%">№</td>
+		  <td class="text-left" width="44%">{{ column_name }}</td>
+		  <td class="text-right" width="10%">{{ column_price_new }}</td>
+		  <td class="text-right" width="5%"><nobr>{{ column_quantities }}</nobr></td>
+		  
+		  <td class="text-right" width="13%">{{ column_price }}</td>
+		  <td class="text-center" width="7%">{{ column_tax_proc }}</td>
+		  <td class="text-right" width="10%">{{ column_tax }}</td>
+		  <td class="text-right" width="10%">{{ column_total }}</td>
+		</tr>
+	  </thead>
+	  <tbody>
+		{% set product_row = 1 %}
+		{% for product in products %}
+		  <tr>
+			<td class="text-center">{{ product_row }}</td>
+			<td class="text-left">{{ product.name }}
+			  {% for option in product.option %}
+			  <br />
+			  &nbsp;<small> - {{ option.name }}: {{ option.value }}</small>
+			  {% endfor %}
+			</td>
+			<td class="text-right"><nobr>{{ product.price_new }}</nobr></td>
+			<td class="text-right">{{ product.quantity }}</td>
+			
+			<td class="text-right"><nobr>{{ product.price }}</nobr></td>
+			<td class="text-center">{{ product.tax_proc }}</td>
+			<td class="text-right"><nobr>{{ product.tax }}</nobr></td>
+			<td class="text-right"><nobr>{{ product.total }}</nobr></td>
+		  </tr>
+		  {% set product_row = product_row + 1 %}
+		{% endfor %}
+		{% for voucher in vouchers %}
+		  <tr>
+			<td class="text-left"></td>
+			<td class="text-left">{{ voucher.description }}</td>
+			<td class="text-left"></td>
+			<td class="text-right">1</td>
+			<td class="text-right"><nobr>{{ voucher.amount }}</nobr></td>
+			<td class="text-left"></td>
+			<td class="text-right"><nobr>{{ voucher.amount }}</nobr></td>
+		  </tr>
+		{% endfor %}
+		  <tr>
+			<td class="text-left" colspan="3"><nobr><b>ИТОГО:</b></nobr></td>
+			<td class="text-right"><nobr><b>{{ total4 }}</b></nobr></td>
+			<td class="text-right"><nobr><b>{{ total1 }}</b></nobr></td>
+			<td class="text-right"></td>
+			<td class="text-right"><nobr><b>{{ total2 }}</b></nobr></td>
+			<td class="text-right"><nobr><b>{{ total3 }}</b></nobr></td>
+		  </tr>
+	  </tbody>
+	</table>
+	<!--<table class="table table-schet-total">
+	  {% for total in totals %}
+		<tr>
+		  <td class="text-right" width="85%">{{ total.title }}:</td>
+		  <td class="text-right" width="15%"><nobr><strong>{{ total.text }}</strong></nobr></td>
+		</tr>
+	  {% endfor %}
+	</table>-->
+	<div class="text-left text-items">{{ items }}</div>
+	<div class="text-left text-totals"><strong>{{ amount }}</strong></div>
+	<div class="pull-left text-director">{{ text_director }}{% if payment_schet_image_signature %}<span><img src="{{ payment_schet_image_signature }}" /></span>{% endif %}<span>{{ payment_schet_director }}</span></div>
+	{% if payment_schet_image_stamp %}
+	  <div class="pull-right" style="margin-top:-20px;"><img src="{{ payment_schet_image_stamp }}" /></div>
+	{% endif %}
+	{% if payment_schet_accountant %}
+	  <div class="pull-left text-director">{{ text_accountant }}{% if payment_schet_image_signature_accountant %}<span><img src="{{ payment_schet_image_signature_accountant }}" /></span>{% endif %}<span>{{ payment_schet_accountant }}</span></div>
+	{% endif %}
+  </div>
+</div>
+</body>
+</html>

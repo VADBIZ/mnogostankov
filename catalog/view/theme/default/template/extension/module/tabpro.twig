@@ -1,0 +1,129 @@
+<div class="row"><div class="col-sm-12">
+<ul class="nav nav-tabs">
+  {% if products_latest and top1 %}
+    <li><a href="#tab-latest-{{ module }}" data-toggle="tab">{{ heading_title1 }}</a></li>
+  {% endif %}
+  {% if products_bestseller and top2 %}
+    <li><a href="#tab-bestseller-{{ module }}" data-toggle="tab">{{ heading_title2 }}</a></li>
+  {% endif %}
+  {% if products_special and top3 %}
+    <li><a href="#tab-special-{{ module }}" data-toggle="tab">{{ heading_title3 }}</a></li>
+  {% endif %}
+</ul>
+<div class="tab-content">
+    {% if products_latest and top1 %}
+        <div class="row tab-pane" id="tab-latest-{{ module }}">
+            {% for product in products_latest %}
+                <div class="product-layout col-lg-2 col-md-2 col-sm-3 col-xs-6">
+                    <div class="product-thumb transition">
+                        <div class="image"><a href="{{ product.href }}"><img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" class="img-responsive" /></a></div>
+                        <div class="caption">
+                            <h4><a href="{{ product.href }}">{{ product.name }}</a></h4>
+                            <div class="atr">
+                                {% if product.ean %} <span class="price-ean">{{ text_ean }} {{ product.ean }}</span> {% endif %} 
+                                {% if product.stock %} <span class="price-stock">{{ product.stock }}</span> {% endif %} 
+							</div>
+							<div class="compare">
+                                <label onclick="compare.add('{{ product.product_id }}');"><input type="checkbox" data-id="{{ product.product_id }}" {% if product.compare %}checked{% endif %}><span>{{ button_compare }}</span></label>
+                            </div>
+                            <div class="niz">
+                                <div class="price"> 
+									{% if product.price %}
+									    {% if not product.special %}
+                                            {{ product.price }} / шт.
+                                        {% else %} 
+										    {{ product.special }}
+											<div class="price-old">{{ product.price }} / шт.</div> 
+										{% endif %}
+									{% endif %}
+                                </div>
+                                <div class="bottoms">
+								    <button type="button" data-toggle="tooltip" title="{{ button_cart }}" onclick="cart.add('{{ product.product_id }}');"><i class="fa fa-shopping-cart"></i></button>
+								    <button type="button" data-toggle="tooltip" title="{{ button_wishlist }}" onclick="wishlist.add('{{ product.product_id }}');"><i class="fa fa-heart"></i></button>
+								</div>
+                            </div>
+                        </div>
+                     </div>
+                 </div>
+             {% endfor %} 
+        </div>
+    {% endif %}
+    {% if products_bestseller and top2 %}
+        <div class="row tab-pane" id="tab-bestseller-{{ module }}">
+            {% for product in products_bestseller %}
+                <div class="product-layout col-lg-2 col-md-2 col-sm-3 col-xs-6">
+                    <div class="product-thumb transition">
+                        <div class="image"><a href="{{ product.href }}"><img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" class="img-responsive" /></a></div>
+                        <div class="caption">
+                            <h4><a href="{{ product.href }}">{{ product.name }}</a></h4>
+							<div class="atr">
+                                {% if product.ean %} <span class="price-ean">{{ text_ean }} {{ product.ean }}</span> {% endif %} 
+                                {% if product.stock %} <span class="price-stock">{{ product.stock }}</span> {% endif %} 
+							</div>
+                            <div class="compare">
+                                <label onclick="compare.add('{{ product.product_id }}');"><input type="checkbox" data-id="{{ product.product_id }}" {% if product.compare %}checked{% endif %}><span>{{ button_compare }}</span></label>
+                            </div>
+                            <div class="niz">
+                                <div class="price"> 
+									{% if product.price %}
+									    {% if not product.special %}
+                                            {{ product.price }} / шт.
+                                        {% else %} 
+										    {{ product.special }}
+											<div class="price-old">{{ product.price }} / шт.</div>  
+										{% endif %}
+									{% endif %}
+                                </div>
+                                <div class="bottoms">
+								    <button type="button" data-toggle="tooltip" title="{{ button_cart }}" onclick="cart.add('{{ product.product_id }}');"><i class="fa fa-shopping-cart"></i></button>
+								    <button type="button" data-toggle="tooltip" title="{{ button_wishlist }}" onclick="wishlist.add('{{ product.product_id }}');"><i class="fa fa-heart"></i></button>
+								</div>
+                            </div>
+                        </div>
+                     </div>
+                 </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% if products_special and top3 %}
+        <div class="row tab-pane" id="tab-special-{{ module }}">
+            {% for product in products_special %}
+                <div class="product-layout col-lg-2 col-md-2 col-sm-3 col-xs-6">
+                    <div class="product-thumb transition">
+                        <div class="image"><a href="{{ product.href }}"><img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" class="img-responsive" /></a></div>
+                        <div class="caption">
+                            <h4><a href="{{ product.href }}">{{ product.name }}</a></h4>
+                            <div class="atr">
+                                {% if product.ean %} <span class="price-ean">{{ text_ean }} {{ product.ean }}</span> {% endif %} 
+                                {% if product.stock %} <span class="price-stock">{{ product.stock }}</span> {% endif %} 
+							</div>
+                            <div class="compare">
+                                <label onclick="compare.add('{{ product.product_id }}');"><input type="checkbox" data-id="{{ product.product_id }}" {% if product.compare %}checked{% endif %}><span>{{ button_compare }}</span></label>
+                            </div>
+                            <div class="niz">
+                                <div class="price"> 
+									{% if product.price %}
+									    {% if not product.special %}
+                                            {{ product.price }} / шт.
+                                        {% else %} 
+										    {{ product.special }}
+											<div class="price-old">{{ product.price }} / шт.</div> 
+										{% endif %}
+									{% endif %}
+                                </div>
+                                <div class="bottoms">
+								    <button type="button" data-toggle="tooltip" title="{{ button_cart }}" onclick="cart.add('{{ product.product_id }}');"><i class="fa fa-shopping-cart"></i></button>
+								    <button type="button" data-toggle="tooltip" title="{{ button_wishlist }}" onclick="wishlist.add('{{ product.product_id }}');"><i class="fa fa-heart"></i></button>
+								</div>
+                            </div>
+                        </div>
+                     </div>
+                 </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+<script type="text/javascript"><!--
+$('.nav-tabs a:first').tab('show');
+//--></script>
+</div></div>

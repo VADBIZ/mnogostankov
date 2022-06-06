@@ -1,0 +1,383 @@
+{{ header }}
+<div id="product-compare" class="container">
+  
+  {% if success %}
+  <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+  </div>
+  {% endif %}
+  <div class="row">{{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}">{{ content_top }}
+	  <ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+    {% endfor %}
+  </ul>
+      <h1>{{ heading_title }}</h1>
+      {% if products %}
+        <div class="comparison__inner">
+            <div class="comparison__box">
+			    <div class="comparison__box">
+              <a href="" class="comparison__btn">
+                
+                
+              </a>
+              
+            </div>
+			</div>
+			<div class="comparison__box">
+			    {% for product in products %}
+			        <div class="comparison__item" data-post-id="{{ product.product_id }}">
+				        <div class="product-thumb transition">
+                            <div class="image">
+							<a href="{{ product.href }}"><img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" class="img-responsive" /></a>
+							<a href="{{ product.remove }}" class="cl_os"><img src="/image/close.svg" /></a>
+							</div>
+                            <div class="caption">
+							    <h4><a href="{{ product.href }}">{{ product.name }}</a></h4>
+                                <p class="brend">{{ product.manufacturer }}</p>
+                                {% if product.price %}
+                                    <p class="price"> {% if not product.special %}
+                                        {{ product.price }}
+                                    {% else %} <span class="price-new">{{ product.special }}</span> <span class="price-old">{{ product.price }}</span> {% endif %}
+                                    </p>
+                                {% endif %}
+							</div>
+							<div class="qt">
+                                <button type="button" class="ct3" onclick="window.location.href='{{ product.href }}'">Подробнее</button>
+                                <button type="button" class="ct2" data-toggle="tooltip" title="{{ button_wishlist }}" onclick="wishlist.add('{{ product.product_id }}'); $(this).toggleClass('activ');"> </button>
+                                <button type="button" class="ct2 activ" data-toggle="tooltip" title="{{ button_compare }}" onclick="compare.add('{{ product.product_id }}'); $(this).toggleClass('activ');"> </button>
+                            </div>
+						</div>	
+				    </div>
+			    {% endfor %}
+			</div>
+        </div>  
+        <div class="comparison__table-wrap">
+            <div class="comparison__table-inner">
+                <table class="comparison__table">
+                    <tbody>
+					    <tr>
+						    <td class="zag">{{ text_model }}</td>
+                            {% for product in products %}
+                                <td>{{ product.model }}</td>
+                            {% endfor %}
+						</tr>
+						<tr>
+                            <td class="zag">{{ text_manufacturer }}</td>
+                            {% for product in products %}
+                                <td>{{ product.manufacturer }}</td>
+                            {% endfor %} 
+						</tr>
+                        {% for attribute_group in attribute_groups %}
+                            {% for key, attribute in attribute_group.attribute %}
+                                <tr>
+                                    <td class="zag">{{ attribute.name }}</td>
+                                    {% for product in products %}
+                                        {% if product.attribute[key] %}
+                                            <td> {{ product.attribute[key] }}</td>
+                                        {% else %}
+                                            <td></td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+							{% endfor %}
+						{% endfor %}	
+					</tbody>
+                </table>
+			</div>
+		</div>
+		
+                  <table class="table" style="display:none">
+                    <tbody>
+                        
+                            <tr><td></td>
+                               {% for product in products %}
+                                   <td class="text-center col-lg-3 col-md-3 col-sm-6 col-xs-6">
+								   
+        <div class="product-layout yiy">
+            <div class="product-thumb transition">
+                <div class="image"><a href="{{ product.href }}"><img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" class="img-responsive" /></a></div>
+                <div class="caption">
+                    <h4><a href="{{ product.href }}">{{ product.name }}</a></h4>
+                    <p class="brend">{{ product.manufacturer }}</p>
+        
+                    {% if product.price %}
+                    <p class="price"> {% if not product.special %}
+                    {{ product.price }}
+                    {% else %} <span class="price-new">{{ product.special }}</span> <span class="price-old">{{ product.price }}</span> {% endif %}
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="qt">
+                    <button type="button" class="ct3" onclick="window.location.href='{{ product.href }}'">Подробнее</button>
+                    <button type="button" class="ct2" data-toggle="tooltip" title="{{ button_wishlist }}" onclick="wishlist.add('{{ product.product_id }}'); $(this).toggleClass('activ');"> </button>
+                    <button type="button" class="ct2 activ" data-toggle="tooltip" title="{{ button_compare }}" onclick="compare.add('{{ product.product_id }}'); $(this).toggleClass('activ');"> </button>
+                </div>
+            </div>
+          </div>
+        
+								   
+								   </td>
+                               {% endfor %} </tr>
+                        
+                       <tr>
+                           <td class="zag">{{ text_model }}</td>
+                           {% for product in products %}
+            <td>{{ product.model }}</td>
+            {% endfor %} </tr>
+          <tr>
+            <td class="zag">{{ text_manufacturer }}</td>
+            {% for product in products %}
+            <td>{{ product.manufacturer }}</td>
+            {% endfor %} </tr>
+          
+        
+          
+        
+        {% for attribute_group in attribute_groups %}
+        
+        {% for key, attribute in attribute_group.attribute %}
+        
+          <tr>
+            <td class="zag">{{ attribute.name }}</td>
+            {% for product in products %}
+            {% if product.attribute[key] %}
+            <td> {{ product.attribute[key] }}</td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            {% endfor %}
+          </tr>
+        </tbody>
+        {% endfor %}
+        {% endfor %}
+        
+      </table>
+     
+     
+      
+      {% else %}
+      <p>{{ text_empty }}</p>
+      <div class="buttons">
+        <div class="pull-right"><a href="{{ continue }}" class="btn btn-default">{{ button_continue }}</a></div>
+      </div>
+      {% endif %}
+      {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+<script type="text/javascript"><!--
+  $('#lan a:first').tab('show');
+  //--></script>
+  <style>
+.comparison__inner {
+  margin-bottom: 50px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.comparison__box:nth-child(2) {
+  margin-left: 5px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  overflow-x: scroll;
+	flex: auto;
+	scrollbar-color: #5071D0 #F9F9F9;
+	scrollbar-width: thin;
+}
+.comparison__item {
+  margin-left: 2px;
+  min-width: 230px;
+  max-width: 230px;
+}
+
+.comparison__btn {
+  position: relative;
+  margin-bottom: 90px;
+  padding: 40px 15px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: 230px;
+  height: 180px;
+ 
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.comparison__table-wrap {
+  position: relative;
+	overflow: hidden;
+}
+.comparison__table-wrap::before {
+      content: "";
+      position: absolute;
+      background-color: transparent;
+      top: 3px;
+      left: 0;
+      width: 230px;
+      bottom: 40px;
+      z-index: 1;
+      box-shadow: 7px 1px 11px -1px rgba(34, 60, 80, 0.20);
+    }
+    
+
+.comparison__table-inner {
+  overflow-x: scroll;
+  overflow-y: visible;
+  padding-bottom: 40px;
+  width: calc(100% - 230px);
+  margin-left: 230px;
+  scrollbar-color: #5071D0 #F9F9F9;
+  scrollbar-width: thin;
+}
+
+.comparison__table td:first-child {
+  position: absolute;
+  left: 0;
+  width: 230px;
+}
+
+.comparison .tab__white-bg {
+  background-color: #fff;
+}
+
+.comparison__table {
+/*  width: 100%;*/
+  border-collapse: collapse;
+}
+
+.comparison__table .large-height td {
+  min-height: 88px;
+}
+
+.comparison__table .largest-height td {
+  min-height: 107px;
+}
+
+.comparison__table-inner .comparison__table thead tr:first-child,
+.comparison__table-inner .comparison__table thead tr:first-child td,
+.comparison__table tr:nth-child(even),
+.comparison__table tr:nth-child(even) td{
+  background-color: #fff;
+}
+
+.comparison__table tr:nth-child(odd),
+.comparison__table tr:nth-child(odd) td{
+  background-color: #f8f8f8;
+}
+
+.comparison__table tr {
+    height: 45px;
+}
+
+.comparison__table tr.hide {
+	display: none;
+}
+
+.comparison__table thead tr td {
+  background-color: #fff;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 16px;
+  color: #262A2B;
+}
+
+.comparison__table thead tr td:nth-child(1) {
+  font-weight: 300;
+}
+
+.comparison__table td {
+  padding: 15px 15px;
+  border: 1px solid #e0e0e0;
+  text-align: center;
+  font-size: 14px;
+  line-height: 16px;
+  color: #262a2b;
+  min-width: 230px;
+	max-width: 230px;
+	width: 230px;
+}
+
+.comparison__table td:nth-child(1) {
+  text-align: left;
+  padding: 15px 30px;
+	height: 100%;
+}
+
+.comparison__table tfoot tr td:first-child {
+  border: none;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+}
+
+.comparison__table-link {
+  max-width: 220px;
+  width: 100%;
+  margin: 20px auto 10px;
+  padding: 7px 15px;
+  text-transform: uppercase;
+  font-size: 16px;
+  line-height: 36px;
+}
+
+.comparison__table-btn {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 36px;
+  text-align: center;
+  -webkit-text-decoration-line: underline;
+          text-decoration-line: underline;
+  color: #C4C4C4;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+@media(max-width: 700px){
+    .comparison__table-wrap::before {
+	    width: 160px;
+	}
+    .comparison__item {
+        min-width: 160px;
+        max-width: 160px;
+    }
+    .comparison__btn {width: 160px;}
+	.comparison__table-inner {width: calc(100% - 160px);margin-left: 160px;}
+    .comparison__table td {min-width: 160px;max-width: 160px;width: 160px;}
+    .comparison__table td:first-child {width: 160px;}
+	.comparison__table td:nth-child(1) {padding: 15px 10px;}
+}
+</style>
+<script>
+$('.comparison__box').scroll(function() {
+    $(".comparison__table-inner").scrollLeft($(this).scrollLeft());
+  });
+
+  $('.comparison__table-inner').scroll(function() {
+    $(".comparison__box").scrollLeft($(this).scrollLeft());
+  });
+</script>
+{{ footer }} 

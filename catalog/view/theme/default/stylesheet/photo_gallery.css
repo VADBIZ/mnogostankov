@@ -1,0 +1,7 @@
+.photo-gallery-wrapper .photo-grid {
+  display: grid;
+  grid-template-columns: 0.25fr 0.25fr 0.25fr 0.25fr;
+  grid-column-gap: 30px;
+  grid-row-gap: 30px;
+  padding: 0 0px 115px 0px;
+}

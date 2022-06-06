@@ -1,0 +1,600 @@
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+	<div class="modal-header">
+		<button id="button-close" class="pull-right btn btn-danger btn-sm" type="button">x</button>
+		<h4 class="modal-title">{{ namemenu[lang_id] }}</h4>
+	</div>
+	<div id="body-edit-product-name" class="modal-body">
+		<form class="form-horizontal" id="form-edit-menu-type" enctype="multipart/form-data" method="post">
+			<div class="form-group required">
+				<label class="col-sm-3 control-label">{{ ns_text_type }}</label>
+				<div class="col-sm-9">
+					<select onChange="sel_type_category()" name="menuvh[menu_type]" id="input-menu-type" class="form-control">											
+						<option value="0">{{ text_select }}</option>
+						<option value="category" {% if (menuvh['menu_type'] is defined and (menuvh['menu_type'] == 'category')) %} selected="selected" {% endif %}>{{ ns_text_type_category }}</option>
+						<option value="html" {% if (menuvh['menu_type'] is defined and (menuvh['menu_type'] == 'html')) %} selected="selected" {% endif %}>{{ ns_text_type_html }}</option>
+						<option value="manufacturer" {% if (menuvh['menu_type'] is defined and (menuvh['menu_type'] == 'manufacturer')) %} selected="selected" {% endif %}>{{ ns_text_type_manufacturer }}</option>
+						<option value="information" {% if (menuvh['menu_type'] is defined and (menuvh['menu_type'] == 'information')) %} selected="selected" {% endif %}>{{ ns_text_type_information }}</option>
+						<option value="product" {% if (menuvh['menu_type'] is defined and (menuvh['menu_type'] == 'product')) %} selected="selected" {% endif %}>{{ ns_text_type_product }}</option>											
+						<option value="freelink" {% if (menuvh['menu_type'] is defined and (menuvh['menu_type'] == 'freelink')) %} selected="selected" {% endif %}>{{ ns_text_type_freelink }}</option>											
+						<option value="link" {% if (menuvh['menu_type'] is defined and (menuvh['menu_type'] == 'link')) %} selected="selected" {% endif %}>{{ ns_text_type_link }}</option>
+					</select>
+				</div>
+			</div>
+			<div class="show_elements show_elements_category">			
+				<div class="form-group">
+					<label class="col-sm-3 control-label" for="input_variant_category">{{ ns_type_dropdown_list }}</label>
+					<div class="col-sm-3">
+						<select onChange="sel_type_category()" name="menuvh[category_setting][variant_category]" id="input_variant_category" class="form-control">
+							<option value="simple" {% if (variant_category is defined and (variant_category == 'simple')) %} selected="selected" {% endif %}>{{ ns_type_dropdown_simple }}</option>
+							<option value="full" {% if (variant_category is defined and (variant_category == 'full')) %} selected="selected" {% endif %}>{{ ns_type_dropdown_full }}</option>
+							<option value="full_image" {% if (variant_category is defined and (variant_category == 'full_image')) %} selected="selected" {% endif %}>{{ ns_type_dropdown_full_image }}</option>
+							<option value="full_masonry" {% if (variant_category is defined and (variant_category == 'full_masonry')) %} selected="selected" {% endif %}>{{ ns_type_dropdown_full_masonry }}</option>
+							<option value="full_image_masonry" {% if (variant_category is defined and (variant_category == 'full_image_masonry')) %} selected="selected" {% endif %}>{{ ns_type_dropdown_full_masonry_image }}</option>
+							<option value="full_3_level" {% if (variant_category is defined and (variant_category == 'full_3_level')) %} selected="selected" {% endif %}>{{ ns_type_dropdown_full_3_level }}</option>
+							<option value="full_3_level_image" {% if (variant_category is defined and (variant_category == 'full_3_level_image')) %} selected="selected" {% endif %}>{{ ns_type_dropdown_full_3_level_image }}</option>
+						</select>
+					</div>
+					<label class="col-sm-3 control-label" for="input-category_show_subcategory">{{ ns_show_sub_categories }}</label>
+					<div class="col-sm-3">
+						<select id="input-category_show_subcategory" name="menuvh[category_setting][show_sub_category]" class="form-control">
+							{% if (show_sub_category) %} 
+								<option value="1" selected="selected">{{ text_enabled }}</option>
+								<option value="0">{{ text_disabled }}</option>
+							{% else %} 
+								<option value="1">{{ text_enabled }}</option>
+								<option value="0" selected="selected">{{ text_disabled }}</option>
+							{% endif %} 
+						</select>										
+					</div>
+				</div>
+				<div class="form-group type_full_show">
+						<label class="col-sm-3 control-label">{{ limit_subcategories }}</label>
+						<div class="col-sm-9">
+							<input type="text" name="menuvh[category_setting][limit_subcat]" value="{{ limit_subcat is defined ? limit_subcat : 8 }}" class="form-control" />									 
+						</div>
+					</div>
+					<div class="form-group number_column_sc">
+						<label class="col-sm-3 control-label" for="input-category_show_subcategory">{{ number_of_column_sc }}</label>
+						<div class="col-sm-9">
+							<select id="input-category_show_subcategory" name="menuvh[category_setting][number_column_sc]" class="form-control">
+								{% if (number_column_sc is defined and (number_column_sc == 6)) %} 
+									<option value="6" selected="selected">2</option>
+									<option value="4">3</option>
+									<option value="3">4</option>
+									<option value="1-5">5</option>
+								{% elseif (number_column_sc == 4) %} 
+									<option value="6">2</option>
+									<option value="4" selected="selected">3</option>
+									<option value="3">4</option>
+									<option value="1-5">5</option>
+								{% elseif (number_column_sc == 3) %} 
+									<option value="6">2</option>
+									<option value="4">3</option>
+									<option value="3" selected="selected">4</option>
+									<option value="1-5">5</option>
+								{% else %} 
+									<option value="6">2</option>
+									<option value="4">3</option>
+									<option value="3">4</option>
+									<option value="1-5" selected="selected">5</option>
+								{% endif %} 
+							</select>										
+						</div>
+					</div>
+				<div class="form-group type_full_show_img">
+					<label class="col-sm-3 control-label">{{ ns_text_product_width }}</label>
+					<div class="col-sm-3">
+						<input type="text" name="menuvh[category_setting][category_img_width]" value="{{ category_img_width is defined ? category_img_width : 50 }}" placeholder="{{ ns_text_product_width }}" class="form-control" />									 
+					</div>
+					<label class="col-sm-3 control-label">{{ ns_text_product_height }}</label>
+					<div class="col-sm-3">
+						<input type="text" name="menuvh[category_setting][category_img_height]" value="{{ category_img_height is defined ? category_img_height : 50 }}" placeholder="{{ ns_text_product_height }}" class="form-control" />									 
+					</div>
+				</div>		
+				
+				<div class="form-group">
+					<label class="col-sm-3 control-label" for="input-category">{{ ns_text_category }}</label>
+					<div class="col-sm-9">
+						<input type="text" name="category" value="" placeholder="{{ ns_text_category }}" id="input-category" class="form-control" />
+						<div id="category-category" class="well well-sm" style="height: 150px; overflow: auto;">
+							{% if (category_list_sel is not empty) %} 
+								{% for category_list in category_list_sel %} 
+									<div class="row-category-menu" id="category-item-{{ category_list['category_id'] }}">
+										<i class="del-cat fa fa-minus-circle"></i>
+										{{ category_list['name'] }} 
+										<input type="hidden" name="menuvh[category_setting][category_list][]" value="{{ category_list['category_id'] }}" />
+									</div>
+								{% endfor %}	
+							{% endif %}	
+						</div>
+					</div>
+				</div>							
+			</div>
+			<div class="show_elements show_elements_html">
+				<div class="col-sm-12">
+					<ul class="nav nav-tabs" id="language_html">
+						{% for language in languages %} 
+							<li><a href="#language_html_{{ language['language_id'] }}" data-toggle="tab"><img src="language/{{ language['code'] }}/{{ language['code'] }}.png" title="{{ language['name'] }}" /> {{ language['name'] }}</a></li>
+						{% endfor %} 
+					</ul>
+					<div class="tab-content">
+						{% for language in languages %} 
+							<div class="tab-pane" id="language_html_{{ language['language_id'] }}">
+								<div class="form-group">
+									<textarea data-toggle="summernote" data-lang="{{ summernote }}" class="form-control" name="menuvh[html_block][{{ language['language_id'] }}]" id="html_description_{{ language['language_id'] }}">{{ html_block[language['language_id']] is defined ? html_block[language['language_id']] : '' }}</textarea>
+								</div>
+							</div>
+						{% endfor %} 
+					</div>	
+				</div>	
+			</div>
+			<div class="show_elements show_elements_manufacturer">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">{{ ns_type_dropdown_list }}</label>
+					<div class="col-sm-9">
+						<select name="menuvh[manufacturers_setting][type_manuf]" class="form-control">
+							<option {% if (type_manuf is defined and (type_manuf == 'type_image')) %} selected="selected" {% endif %} value="type_image">{{ ns_type_manuf_image }}</option>
+							<option {% if (type_manuf is defined and (type_manuf == 'type_alphabet')) %} selected="selected" {% endif %} value="type_alphabet">{{ ns_type_manuf_alphabet_image }}</option>
+							
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label">{{ ns_text_manufacturer }}</label>
+					<div class="col-sm-9">
+						<div class="well well-sm">
+							{% for manufacturer in manufacturers_list %}
+								<div class="checkbox">
+									<label>
+										{% if manufacturer.manufacturer_id in manufacturers_sel_id %} 
+											<input checked="checked" type="checkbox" name="menuvh[manufacturers_setting][manufacturers_list][]" value="{{ manufacturer['manufacturer_id']}}"/> {{ manufacturer['name']}} 
+										{% else %} 
+											<input type="checkbox" name="menuvh[manufacturers_setting][manufacturers_list][]" value="{{ manufacturer['manufacturer_id']}}"/> {{ manufacturer['name']}} 
+										{% endif %} 
+									</label>
+								</div>
+							{% endfor %} 
+						</div>
+					</div>
+				</div>	
+			</div>
+			
+			<div class="show_elements show_elements_information">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">{{ ns_text_information }}</label>
+					<div class="col-sm-9">
+						<div class="well well-sm">
+							{% for information in informations_list %} 
+								<div class="checkbox">
+									<label>
+										{% if information.information_id in menuvh['informations_sel_id'] %}
+											<input checked="checked" type="checkbox" name="menuvh[informations_list][]" value="{{ information['information_id'] }}"/> {{ information['title'] }} 
+										{% else %} 
+											<input type="checkbox" name="menuvh[informations_list][]" value="{{ information['information_id'] }}"/> {{ information['title'] }} 
+										{% endif %} 
+									</label>
+								</div>
+							{% endfor %}                
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="show_elements show_elements_product">
+				<div class="form-group">
+					<label class="col-sm-3 control-label" for="input-product_width">{{ ns_text_product_width }}</label>
+					<div class="col-sm-3">
+						<input type="text" name="menuvh[product][product_width]" value="{{ product_width is defined ? product_width : 50 }}" placeholder="{{ ns_text_product_width }}" id="input-product_width" class="form-control" />									 
+					</div>
+					<label class="col-sm-3 control-label" for="input-product_height">{{ ns_text_product_height }}</label>
+					<div class="col-sm-3">
+						<input type="text" name="menuvh[product][product_height]" value="{{ product_height is defined ? product_height : 50 }}" placeholder="{{ ns_text_product_height }}" id="input-product_height" class="form-control" />									 
+					</div>
+				</div>		
+					
+				<div class="form-group">
+					<label class="col-sm-3 control-label" for="input-product">{{ ns_text_product }}</label>
+					<div class="col-sm-9">
+						<input type="text" name="product" value="" placeholder="{{ ns_text_product }}" id="input-product" class="form-control" />
+						<div id="product-product" class="well well-sm" style="height: 150px; overflow: auto;">
+							{% if (products_list_sel is not empty) %} 
+								{% for products_list in products_list_sel %} 
+								<div id="product-item-{{ products_list['product_id'] }}"><i class="fa fa-minus-circle"></i> {{ products_list['name'] }} 
+									<input type="hidden" name="menuvh[product][products_list][]" value="{{ products_list['product_id'] }}" />
+								</div>
+								{% endfor %} 
+							{% endif %} 
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="show_elements show_elements_link">
+				<div class="form-group">
+					<label class="col-sm-3 control-label" for="input-product">{{ ns_text_link_options }}</label>
+					<div class="col-sm-9">
+						<select id="input-use_target_blank" name="menuvh[use_target_blank]" class="form-control">
+							{% if (use_target_blank) %} 
+								<option value="1" selected="selected">{{ text_enabled }}</option>
+								<option value="0">{{ text_disabled }}</option>
+							{% else %} 
+								<option value="1">{{ text_enabled }}</option>
+								<option value="0" selected="selected">{{ text_disabled }}</option>
+							{% endif %} 
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="show_elements show_elements_freelink">
+				<div class="form-group required">
+					<label class="col-sm-3 control-label" for="input_variant_category">{{ ns_type_dropdown_list }}</label>
+					<div class="col-sm-9">
+						<select onChange="sel_type_category()" name="menuvh[sfl][variant_category]" id="input_variant_freelink" class="form-control">
+							<option {% if (sfl['variant_category'] is defined and (sfl['variant_category'] == 'simple')) %} selected="selected" {% endif %} value="simple">{{ ns_type_dropdown_simple }}</option>
+							<option {% if (sfl['variant_category'] is defined and (sfl['variant_category'] == 'full')) %} selected="selected" {% endif %} value="full">{{ ns_type_dropdown_full }}</option>
+							<option {% if (sfl['variant_category'] is defined and (sfl['variant_category'] == 'full_image')) %} selected="selected" {% endif %} value="full_image">{{ ns_type_dropdown_full_image }}</option>
+							<option {% if (sfl['variant_category'] is defined and (sfl['variant_category'] == 'full_masonry')) %} selected="selected" {% endif %} value="full_masonry">{{ ns_type_dropdown_full_masonry }}</option>
+							<option {% if (sfl['variant_category'] is defined and (sfl['variant_category'] == 'full_image_masonry')) %} selected="selected" {% endif %} value="full_image_masonry">{{ ns_type_dropdown_full_masonry_image }}</option>
+							<option {% if (sfl['variant_category'] is defined and (sfl['variant_category'] == 'full_3_level')) %} selected="selected" {% endif %} value="full_3_level">{{ ns_type_dropdown_full_3_level }}</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group freelink_number_column_sc">
+						<label class="col-sm-3 control-label">{{ number_of_column_sc }}</label>
+						<div class="col-sm-9">
+							<select id="input-category_show_subcategory" name="menuvh[sfl][number_column_sc]" class="form-control">
+								{% if (sfl['number_column_sc'] is defined and (sfl['number_column_sc'] == 6)) %} 
+									<option value="6" selected="selected">2</option>
+									<option value="4">3</option>
+									<option value="3">4</option>
+									<option value="1-5">5</option>
+								{% elseif (sfl['number_column_sc'] == 4) %} 
+									<option value="6">2</option>
+									<option value="4" selected="selected">3</option>
+									<option value="3">4</option>
+									<option value="1-5">5</option>
+								{% elseif (sfl['number_column_sc'] == 3) %} 
+									<option value="6">2</option>
+									<option value="4">3</option>
+									<option value="3" selected="selected">4</option>
+									<option value="1-5">5</option>
+								{% else %} 
+									<option value="6">2</option>
+									<option value="4">3</option>
+									<option value="3">4</option>
+									<option value="1-5" selected="selected">5</option>
+								{% endif %} 
+							</select>										
+						</div>
+					</div>
+				<div class="form-group type_full_show_img">
+					<label class="col-sm-3 control-label">{{ ns_text_product_width }}</label>
+					<div class="col-sm-3">
+						<input type="text" name="menuvh[sfl][freelink_img_width]" value="{{ sfl['freelink_img_width'] is defined?sfl['freelink_img_width']:50}}" placeholder="{{ ns_text_product_width }}" class="form-control" />									 
+					</div>
+					<label class="col-sm-3 control-label">{{ ns_text_product_height }}</label>
+					<div class="col-sm-3">
+						<input type="text" name="menuvh[sfl][freelink_img_height]" value="{{ sfl['freelink_img_height'] is defined?sfl['freelink_img_height']:50}}" placeholder="{{ ns_text_product_height }}" class="form-control" />									 
+					</div>
+				</div>		
+				
+				<ul class="nav nav-tabs" id="language-freelink-menu">
+					{% for language in languages %} 
+					<li><a href="#language-freelink-{{ language['language_id'] }}" data-toggle="tab">
+					<img src="language/{{ language['code'] }}/{{ language['code'] }}.png" title="{{ language['name'] }}" /> {{ language['name'] }}</a></li>
+					{% endfor %} 
+				</ul>
+				<div class="tab-content">
+				{% for language in languages %} 
+					<div class="tab-pane" id="language-freelink-{{ language['language_id'] }}">	
+						<table id="freelinkitems" class="table table-bordered table-hover">
+							<thead>
+								<tr>
+									<td>{{ ns_text_thumb }}</td>
+									<td>{{ ns_text_menu_name }}</td>
+									<td>{{ ns_text_type_link }}</td>
+									<td>{{ column_3level }}</td>
+									<td>{{ ns_text_sort_menu }}</td>
+									<td></td>
+								</tr>
+							</thead>
+							<tbody>
+							{% set freelinkitem_row = 0 %} 
+							{% if (freelink_items[language['language_id']] is defined) %}
+							{% for freelink_item in freelink_items[language['language_id']] %} 
+								<tr id="freelinkitem-row{{ freelinkitem_row }}">
+									<td class="text-center">
+										<a href="" id="thumb-image-freelink-{{ freelinkitem_row }}" data-toggle="image" class="img-thumbnail"><img src="{{ freelink_item['thumb'] }}" alt="" title="" data-placeholder="{{ placeholder }}"  /></a>
+										<input type="hidden" name="menuvh[sfl][freelink_item][{{ language['language_id'] }}][{{ freelinkitem_row }}][image]" value="{{ freelink_item['image'] }}" id="input-image-freelink-{{ freelinkitem_row }}" />
+									</td>
+									<td class="text-left">
+										<input class="form-control" type="text" name="menuvh[sfl][freelink_item][{{ language['language_id'] }}][{{ freelinkitem_row }}][title]" value="{{ freelink_item['title'] }}" />
+									</td>
+									<td class="text-left">
+										<input class="form-control" type="text" name="menuvh[sfl][freelink_item][{{ language['language_id'] }}][{{ freelinkitem_row }}][link]" value="{{ freelink_item['link'] }}" />
+									</td>
+									<td class="text-left ns-input-group" style="min-width:250px;">
+										{% set freelinkitem_row3level = 0 %} 
+										<div id="subcatfreelink{{ freelinkitem_row }}">
+											{% if (freelink_item['subcat'] is defined) %} 
+											{% for subcat3level in freelink_item['subcat'] %}
+												<div id="subcatfreelink-row-{{ freelinkitem_row }}{{ freelinkitem_row3level }}">
+													<div class="input-group">
+														<input class="form-control" type="text" name="menuvh[sfl][freelink_item][{{ language['language_id'] }}][{{ freelinkitem_row }}][subcat][{{ freelinkitem_row3level }}][title]" value="{{ subcat3level['title'] is defined ? subcat3level['title'] : '' }}" />			
+														<input class="form-control" type="text" name="menuvh[sfl][freelink_item][{{ language['language_id'] }}][{{ freelinkitem_row }}][subcat][{{ freelinkitem_row3level }}][link]" value="{{ subcat3level['link'] is defined ? subcat3level['link'] : '' }}" />
+														<span class="input-group-addon"><a class="text-danger" onclick="$('#language-freelink-{{ language['language_id'] }} #subcatfreelink-row-{{ freelinkitem_row }}{{ freelinkitem_row3level }}').remove();" data-toggle="tooltip" title="{{ text_delete }}"><i class="fa fa-trash-o"></i></a></span>
+													</div>
+												<hr>
+												{% set freelinkitem_row3level = freelinkitem_row3level + 1 %} 
+												</div>	
+											{% endfor %} 
+											{% endif %} 
+										<input type="hidden" id="subcatfreelink-row-number-{{ freelinkitem_row }}" value="{{ freelinkitem_row3level }}">	
+										</div>
+										<a class="btn btn-success" onclick="addFreelinkItem3level('{{ freelinkitem_row }}','{{ language['language_id'] }}');">{{ text_add }}</a>
+									</td>
+									<td class="text-left">
+										<input  class="form-control" type="text" name="menuvh[sfl][freelink_item][{{ language['language_id'] }}][{{ freelinkitem_row }}][sort]" value="{{ freelink_item['sort'] }}" />
+									</td>
+									<td class="text-right">
+										<a class="btn btn-danger" onclick="$('#freelinkitem-row{{ freelinkitem_row }}').remove();" data-toggle="tooltip" title="{{ text_delete }}"><i class="fa fa-trash-o"></i></a>
+									</td>
+								</tr>
+							{% set freelinkitem_row = freelinkitem_row + 1 %} 
+							{% endfor %} 
+							{% endif %} 
+							<input type="hidden" id="freelink-row-number" value="{{ freelinkitem_row }}">	
+							</tbody>
+							<tfoot>
+								<tr>
+									<td colspan="4"></td>
+									<td class="text-right"><a class="btn btn-primary" onclick="addFreelinkItem('{{ language['language_id'] }}');" data-toggle="tooltip" title="{{ text_add }}"><i class="fa fa-plus-circle"></i></a></td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+				{% endfor %} 
+				</div>
+			</div>
+			
+			<div class="show_elements_add_html">
+			<div class="form-group">
+				<label class="col-sm-3 control-label" for="input_use_html_category">{{ ns_text_add_html }}</label>
+				<div class="col-sm-9">
+					<div class="form-group">
+						<div class="col-sm-12">
+							<select id="input_use_html_category" name="menuvh[use_add_html]" class="form-control">
+								{% if (use_add_html) %} 
+								<option value="1" selected="selected">{{ text_enabled }}</option>
+								<option value="0">{{ text_disabled }}</option>
+								{% else %} 
+								<option value="1">{{ text_enabled }}</option>
+								<option value="0" selected="selected">{{ text_disabled }}</option>
+								{% endif %} 
+							</select>								
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-12">
+					<ul class="nav nav-tabs" id="language_add_html">
+						{% for language in languages %} 
+							<li><a href="#language_add_html_{{ language['language_id'] }}" data-toggle="tab"><img src="language/{{ language['code'] }}/{{ language['code'] }}.png" title="{{ language['name'] }}" /> {{ language['name'] }}</a></li>
+						{% endfor %} 
+					</ul>
+					<div class="tab-content">
+						{% for language in languages %} 
+							<div class="tab-pane" id="language_add_html_{{ language['language_id'] }}">
+								<div class="form-group required">
+									<div class="col-sm-12">
+										<textarea data-toggle="summernote" data-lang="{{ summernote }}" class="form-control" name="menuvh[add_html][{{ language['language_id'] }}]" id="input_add_html_description_{{ language['language_id'] }}">{{ add_html[language['language_id']] is defined ? add_html[language['language_id']] : '' }}</textarea>
+									</div>
+								</div>
+							</div>
+						{% endfor %} 
+					</div>
+				</div>
+			</div>
+			</div>
+		
+	  </form>
+	</div>
+	<div class="clearfix"></div>
+	<div class="modal-footer">
+	  <div class="text-center"><a onclick="saveEditor();" class="button-save btn btn-info btn-lg" data-form="form-edit-menu-type"><i class="fa fa-save fa-fw"></i>{{ button_save }}</a></div>
+	</div>
+  </div>
+ <script type="text/javascript" src="view/javascript/summernote/summernote.js"></script>
+  <link href="view/javascript/summernote/summernote.css" rel="stylesheet" />
+  <script type="text/javascript" src="view/javascript/summernote/summernote-image-attributes.js"></script> 
+  <script type="text/javascript" src="view/javascript/summernote/opencart.js"></script>  
+<script>
+$(document).ready(function() {	
+	sel_type_category();
+	$('#language_add_html a:first').tab('show');
+	$('#language_html a:first').tab('show');
+	$('#language-freelink-menu a:first').tab('show');
+});
+function sel_type_category(){
+	$('.show_elements').hide();	
+	sel_menu_type = $("#input-menu-type :selected").val();		
+	sel_category_type = $("#input_variant_category :selected").val();
+	sel_freelink_type = $("#input_variant_freelink :selected").val();
+	$(".show_elements_"+sel_menu_type).show();
+	
+		if((sel_menu_type=="category" && (sel_category_type=="simple" || sel_category_type=="0")) || sel_menu_type=="0" || sel_menu_type=="freelink" || sel_menu_type=="information"   || sel_menu_type=="link" || sel_menu_type=="html"){
+			$('.show_elements_add_html').hide();
+		} else {
+			$('.show_elements_add_html').show();
+		}
+		if((sel_menu_type=="category" && (sel_category_type=="simple"))){
+			$('.show_elements_category .type_full_show').hide();
+			$('.show_elements_category .type_full_show_img').hide();
+			$('.show_elements_category .number_column_sc').hide();
+		} else {
+			$('.show_elements_category .number_column_sc').show();
+			$('.show_elements_category .type_full_show').show();
+			$('.show_elements_category .type_full_show_img').show();
+		}
+		if((sel_menu_type=="category" && (sel_category_type=="full" || sel_category_type=="full_masonry"))){
+			$('.show_elements_category .type_full_show_img').hide();
+		}
+		
+		if((sel_menu_type=="category" && (sel_category_type=="full_3_level" || sel_category_type=="full_3_level_image"))){
+			$('.show_elements_category .type_full_show_img').hide();
+			$('.show_elements_category .number_column_sc').hide();
+			if(sel_category_type=="full_3_level_image"){
+				$('.show_elements_category .type_full_show_img').show();
+			}
+		}
+		
+		if(sel_menu_type=="freelink" && (sel_freelink_type=="simple")){
+			$('.show_elements_freelink .freelink_number_column_sc').hide();
+			$('.show_elements_freelink .type_full_show_img').hide();
+		} else {
+			$('.show_elements_freelink .freelink_number_column_sc').show();
+			$('.show_elements_freelink .type_full_show_img').show();
+		}
+		if(sel_menu_type=="freelink" && (sel_freelink_type=="full" || sel_freelink_type=="full_masonry")){
+			$('.show_elements_freelink .type_full_show_img').hide();
+		}
+		if(sel_menu_type=="freelink" && (sel_freelink_type=="full_3_level")){
+			$('.show_elements_freelink .type_full_show_img').hide();
+			$('.show_elements_freelink .freelink_number_column_sc').hide();
+		}		
+}
+
+
+
+$('#input-category').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=catalog/category/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {				
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['category_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('#input-category').val('');		
+		$('#category-item-' + item['value']).remove();	
+		cathtml1  = '<div class="row-category-menu" id="category-item-' + item['value'] + '">';
+		cathtml1 += '<i class="del-cat fa fa-minus-circle"></i>';
+		cathtml1 += '<span>'+item['label']+'</span>';		
+		cathtml1 += '<input type="hidden" name="menuvh[category_setting][category_list][]" value="' + item['value'] + '" /></div>';
+		
+		$('#category-category').append(cathtml1);	
+	}
+});
+$('#category-category').delegate('.del-cat', 'click', function() {
+	$(this).parent().remove();
+});
+
+$('#input-product').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['product_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('#input-product').val('');		
+		$('#product-item' + item['value']).remove();		
+		$('#product-product').append('<div id="product-item' + item['value'] + '"><i class="fa fa-minus-circle"></i> ' + item['label'] + '<input type="hidden" name="menuvh[product][products_list][]" value="' + item['value'] + '" /></div>');	
+	}
+});
+$('#product-product').delegate('.fa-minus-circle', 'click', function() {
+	$(this).parent().remove();
+});
+
+
+function addFreelinkItem(language_id) {
+	var freelinkitem_row = $('#freelink-row-number').val();
+	$('#freelink-row-number').val(parseInt(freelinkitem_row) + 1);
+	html  = '<tr id="freelinkitem-row'+ freelinkitem_row +'">';
+	html += '<td class="text-center"><a href="" id="thumb-image-freelink-'+ freelinkitem_row +'" data-toggle="image" class="img-thumbnail"><img src="{{ placeholder }}"  /></a><input type="hidden" name="menuvh[sfl][freelink_item]['+ language_id +']['+ freelinkitem_row +'][image]" value="" id="input-image-freelink-'+ freelinkitem_row +'" /></td>';
+	html += '<td class="text-left">';
+	html += '<input class="form-control" type="text" name="menuvh[sfl][freelink_item]['+ language_id +']['+ freelinkitem_row +'][title]" value="" />';
+	html += '</td>';
+	html += '<td class="text-left">';
+	html += '<input class="form-control"  type="text" name="menuvh[sfl][freelink_item]['+ language_id +']['+ freelinkitem_row +'][link]" value="" />';
+	html += '<td class="text-left ns-input-group" style="min-width:250px;">';
+	html += '	<div id="subcatfreelink'+ freelinkitem_row +'">';
+	html += '		<input type="hidden" id="subcatfreelink-row-number-'+ freelinkitem_row +'" value="0">';	
+	html += '	</div>';
+	html += '	<a class="btn btn-success" onclick="addFreelinkItem3level('+ freelinkitem_row +',\''+ language_id +'\');">{{ text_add }}</a>';
+	html += '</td>';
+	html += '</td>';
+	html += '<td class="text-left"><input class="form-control" type="text" name="menuvh[sfl][freelink_item]['+ language_id +']['+ freelinkitem_row +'][sort]" size="1" value="" /></td>';
+	html += '<td class="text-right"><a class="btn btn-danger" onclick="$(\'#freelinkitem-row'+ freelinkitem_row +'\').remove();" data-toggle="tooltip" title="{{ text_delete }}"><i class="fa fa-trash-o"></i></a></td>';
+	html += '</tr>'; 
+	
+	$('#language-freelink-'+ language_id +' #freelinkitems tbody').append(html);
+
+	freelinkitem_row++;
+}
+			
+
+function addFreelinkItem3level(freelinkitem_row,language_id) {
+	var freelinkitem_row3level = $('#subcatfreelink-row-number-'+ freelinkitem_row).val();
+	$('#subcatfreelink-row-number-'+ freelinkitem_row).val(parseInt(freelinkitem_row3level) + 1);
+	html  = '<div id="subcatfreelink-row-'+ freelinkitem_row + freelinkitem_row3level+'">';
+	html += '<div class="input-group">';
+	html += '<input class="form-control" type="text" name="menuvh[sfl][freelink_item]['+ language_id +']['+ freelinkitem_row +'][subcat]['+ freelinkitem_row3level +'][title]" value="" />';				
+	html += '<input class="form-control" type="text" name="menuvh[sfl][freelink_item]['+ language_id +']['+ freelinkitem_row +'][subcat]['+ freelinkitem_row3level +'][link]" value="" />';
+	html += '<span class="input-group-addon"><a class="text-danger" onclick="$(\'#language-freelink-'+ language_id +' #subcatfreelink-row-'+ freelinkitem_row + freelinkitem_row3level+'\').remove();" data-toggle="tooltip" title="{{ text_delete }}"><i class="fa fa-trash-o"></i></a></span>';
+	html += '</div><hr>';
+	html += '</div>';
+	$('#language-freelink-'+ language_id +' #subcatfreelink'+freelinkitem_row).append(html);
+
+	freelinkitem_row3level++;
+}
+</script>
+<script type="text/javascript">
+function saveEditor() {	
+	$.ajax({
+		url: 'index.php?route=extension/module/megamenuvh{{ sheme is defined?sheme:''}}/saveTypeMenu&user_token={{ user_token }}&megamenu_id={{ megamenu_id }}',
+		type: 'post',
+		dataType: 'json',
+		data: $('#form-edit-menu-type').serialize(),
+		success: function(json) {
+		$('.alert.alert-danger').remove()
+			if (json['warning']) {
+				$('#form-edit-menu-type').before('<div class="alert alert-danger"><i class="fa fa-check-circle"></i> ' + json['warning'] + '</div>');	
+			}
+			if (json['success']) {
+				$('#form-edit-menu-type').before('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');			
+				
+				setTimeout(function(){
+					$('body').removeClass('mopen-menu');
+					$('#typemenu-modal-{{ megamenu_id }}').modal('hide');
+					$('#typemenu-content-{{ megamenu_id }}').empty();		
+				}, 1000)
+				setTimeout(function(){
+					location.reload();	
+				}, 1500)
+			}
+		}
+	});
+}
+  
+$('#button-close').on('click', function() {
+	$('body').removeClass('mopen-menu');
+	$('#typemenu-modal-{{ megamenu_id }}').modal('hide');
+	$('#typemenu-content-{{ megamenu_id }}').empty();			
+});
+</script>
+</div>

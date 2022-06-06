@@ -1,0 +1,11 @@
+<div class="panel panel-default">
+  <div class="panel-heading">{{ heading_title }}</div>
+  <div class="panel-body">
+  {% for news in all_news %}
+	<div style="margin-bottom:10px; padding-bottom: 5px; border-bottom:1px solid #eee;">
+	  <a href="{{ news.view }}">{{ news.title }}</a><span style="float:right;">{{ news.date_added }}</span><br />
+	  {{ news.description }}
+	</div>
+  {% endfor %}
+  </div>
+</div>

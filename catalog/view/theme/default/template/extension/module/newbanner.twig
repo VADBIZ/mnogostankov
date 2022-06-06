@@ -1,0 +1,12 @@
+<div class="new_baner">
+    {% for banner in banners %}
+        <div class="item">
+            {% if banner.link %}<a href="{{ banner.link }}"><img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" /></a>{% else %}<img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" />{% endif %}
+        </div>
+    {% endfor %}
+    <div class="boks">
+        <p><i class="fa fa-instagram"></i></p>
+        <h3>Мы в instagram</h3>
+        <p>@mnogo_stankov</p>
+    </div>
+</div>

@@ -1,0 +1,62 @@
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+	<div class="modal-header">
+		<button id="button-close" class="pull-right btn btn-danger btn-sm" type="button">x</button>
+		<h4 class="modal-title">{{ ns_text_menu_name }}</h4>
+	</div>
+	<div id="body-edit-product-name" class="modal-body">
+		<form class="form-horizontal" id="form-nameitem-menu" enctype="multipart/form-data" method="post">
+			<div class="form-group required">
+				<div class="col-sm-12">
+					{% for language in languages %} 
+						<div class="input-group pull-left">
+							<span class="input-group-addon"><img src="language/{{ language['code'] }}/{{ language['code'] }}.png" title="{{ language['name'] }}" /></span>
+							<input id="namemenu_{{ language['language_id'] }}" class="form-control" type="text" name="menuvh[namemenu][{{ language['language_id'] }}]" value="{{ menuvh['namemenu'][language['language_id']] is defined ? menuvh['namemenu'][language['language_id']] : '' }}" />
+						</div>
+						{% if (error_namemenu[language['language_id']] is defined) %} 
+							<div class="text-danger">{{ error_namemenu[language['language_id']] }}</div>
+						{% endif %} 
+					{% endfor %} 
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+	  <div class="text-center"><a onclick="saveEditor();" class="button-save btn btn-info btn-lg" data-form="form-nameitem-menu"><i class="fa fa-save fa-fw"></i>{{ button_save }}</a></div>
+	</div>
+  </div>
+<script type="text/javascript">
+
+
+function saveEditor() {	
+	$.ajax({
+		url: 'index.php?route=extension/module/megamenuvh{{ sheme is defined?sheme:''}}/saveNameItem&user_token={{ user_token }}&megamenu_id={{ megamenu_id }}',
+		type: 'post',
+		dataType: 'json',
+		data: $('#form-nameitem-menu').serialize(),
+		success: function(json) {
+		$('.alert.alert-danger').remove()
+			if (json['warning']) {
+				$('#form-nameitem-menu').before('<div class="alert alert-danger"><i class="fa fa-check-circle"></i> ' + json['warning'] + '</div>');	
+			}
+			if (json['success']) {
+				$('#form-nameitem-menu').before('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');			
+				
+				setTimeout(function(){
+					$('#nameitem-modal-{{ megamenu_id }}').modal('hide');
+					$('#nameitem-content-{{ megamenu_id }}').empty();		
+				}, 1000)
+				setTimeout(function(){
+					location.reload();	
+				}, 1500)
+			}
+		}
+	});
+}
+  
+$('#button-close').on('click', function() {
+	$('#nameitem-modal-{{ megamenu_id }}').modal('hide');
+	$('#nameitem-content-{{ megamenu_id }}').empty();			
+});
+</script>
+</div>

@@ -1,0 +1,45 @@
+{{ header }}
+<div class="photo-gallery-wrapper">
+<div id="information-information" class="container">
+  
+  <div class="row">{{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}">{{ content_top }}
+	  <ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+    {% endfor %}
+  </ul>
+      <h1 class="verx">{{ heading_title }}</h1>
+	  
+      {% if paragraphs %}
+            <div class="grid">
+                {% for paragraph in paragraphs %}
+                    <div class="grid-item">
+	                    <img src="{{ paragraph.image }}" alt="" class="img-responsive" />
+                    </div>
+                {% endfor %}
+            </div>
+      {% endif %}
+      {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+</div>
+<style>
+.grid-item { width: 200px; padding: 5px;}
+.grid-item--width2 { width: 400px; padding: 5px;}
+</style>
+<script>
+$('.grid').masonry({
+  // options
+  itemSelector: '.grid-item',
+  columnWidth: 200
+});
+</script>
+{{ footer }}

@@ -1,0 +1,117 @@
+{{ header }}
+<div id="information-contact" class="container">
+	<div class="row">
+		{{ column_left }}
+
+		{% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}">{{ content_top }}
+	  <ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+    {% endfor %}
+  </ul>
+      <h1 class="verx">{{ heading_title }}</h1>
+
+      <div class="col-sm-8">
+      <form action="{{ action }}" method="post" enctype="multipart/form-data" class="form-horizontal">
+        <fieldset>
+          <div class="form-group required {% if error_name %}has-error{% endif %}">
+            <label class="control-label imi" for="input-name">{{ entry_name }}</label>
+            <input type="text" name="name" value="{{ name }}" id="input-name" class="form-control" />
+            {% if error_name %}
+              <div class="text-danger">{{ error_name }}</div>
+            {% endif %}
+          </div>
+          <div class="form-group required {% if error_email %}has-error{% endif %}">
+            <label class="control-label imi" for="input-email">{{ entry_email }}</label>
+            <input type="text" name="email" value="{{ email }}" id="input-email" class="form-control" />
+            {% if error_email %}
+              <div class="text-danger">{{ error_email }}</div>
+            {% endif %}
+          </div>
+          <div class="form-group">
+            <label class="control-label imi" for="input-text1">{{ entry_text1 }}</label>
+            <input type="text" name="company" value="{{ company }}" id="input-text1" class="form-control" />
+          </div>
+          <div class="form-group required {% if error_telephone %}has-error{% endif %}">
+            <label class="control-label imi" for="input-text2">{{ entry_text2 }}</label>
+            <input type="text" name="telephone" value="{{ telephone }}" id="input-text2" class="form-control" />
+			{% if error_telephone %}
+              <div class="text-danger">{{ error_telephone }}</div>
+            {% endif %}
+          </div>
+          <div class="form-group required {% if error_enquiry %}has-error{% endif %}">
+            <label class="control-label imi" for="input-enquiry">{{ entry_enquiry }}</label>
+            <textarea name="enquiry" rows="10" id="input-enquiry" class="form-control">{{ enquiry }}</textarea>
+            {% if error_enquiry %}
+              <div class="text-danger">{{ error_enquiry }}</div>
+            {% endif %}
+          </div>
+		  <div class="form-group required"><input type="checkbox" name="whatsapp" value="1" checked> Хочу получать ответ в WhatsApp</div>
+		  <div class="form-group required"><input type="checkbox" name="mailing" value="1" checked> Хочу получать рассылку на Email</div>
+		  <div class="form-group {% if error_agree %}has-error{% endif %}"><input type="checkbox" name="agree" value="1"> Я согласен на обработку персональных данных в соответствии с <a href="{{ ur }}">политикой конфиденциальности</a></div>
+		  {% if error_agree %}
+              <div class="text-danger">{{ error_agree }}</div>
+          {% endif %}
+          {{ captcha }}
+        </fieldset>
+        <div class="buttons">
+          <div class="pull-center eby">
+            <input class="btn btn-p" type="submit" value="Оставить заявку" />
+			<input type="hidden" name="dowload" value=" " />
+			<input type="hidden" name="vid" value="3" />
+          </div>
+        </div>
+      </form>
+
+      </div>
+        <div style="margin-top:20px">
+          {% if imagez %}
+            <img src="/image/{{ imagez }}" class="img-responsive" />
+          {% endif %}
+        </div>
+        <style>
+            #show-company-contact {
+                font-size: 16px;
+                color:#000000;
+            }
+
+            @media (max-width: 767px) {
+                #show-company-contact {
+                    font-size: 14px;
+                    color:#000000;
+                }
+            }
+        </style>
+        <div class="col-sm-8" style="margin-top:20px">
+            <div class="buttons">
+                <button id="button-company-contact" style="background: #5071D0;color: white" class="btn btn-p">Показать контакты</button>
+                <div style="" id="show-company-contact"></div>
+            </div>
+        </div>
+
+      <script>
+        $('#button-company-contact').click(function(){
+            $.get($('base').attr('href') + 'index.php?route=information/contact/contacts', function(data, status){
+                html = '';
+                $.each(data, function (index, element) {
+                    html += '<b>' + element.name + '</b>';
+                    html += element.value;
+                    html += '</br>'
+                });
+                html += '';
+                $('#show-company-contact').html(html);
+                $('#button-company-contact').remove()
+            });
+        });
+      </script>
+      {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+{{ footer }}

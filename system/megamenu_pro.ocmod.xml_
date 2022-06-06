@@ -1,0 +1,95 @@
+<modification>
+	<code>MEGAMENU PRO</code>
+    <name>MEGAMENU PRO</name>
+	<version>1.0</version>
+	<author>Konushin.Alex(29aleksey)</author>
+	<file path="catalog/view/theme/*/template/common/header.twig">
+		<operation>
+			<search><![CDATA[
+			{{ menu }}
+			]]></search>
+			<add position="replace"><![CDATA[
+			{% if megamenu_status %}
+				{{ menuvh }}
+			{% else %}
+				{{ menu }}
+			{% endif %}
+			]]></add>
+		</operation>	
+	</file>
+	<file path="catalog/view/theme/*/template/common/home.twig">
+		<operation>
+			<search><![CDATA[<div id="content" class="{{ class }}">{{ content_top }}{{ content_bottom }}</div>]]></search>
+			<add position="before"><![CDATA[{% if content_bottom %}]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[<div id="content" class="{{ class }}">{{ content_top }}{{ content_bottom }}</div>]]></search>
+			<add position="after"><![CDATA[ {% endif %}]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[{{ content_top }}]]></search>
+			<add position="replace"><![CDATA[]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[{{ column_left }}]]></search>
+			<add position="replace"><![CDATA[
+			{% if megamenu_setting.menu_open_hpage is defined and megamenu_setting.menu_open_hpage == '1' and megamenu_setting.main_menu_selection == '1' %} 
+				<div class="col-md-3"><div id="menu-header-open"></div></div>
+				<script>
+				if(window.matchMedia("(min-width: 992px)").matches){
+					$('#menu-vertical-list').addClass("nsmenu-block");
+					$('#menu-vertical').addClass("openm");
+				}
+				$(window).resize(function() {
+					if ($(window).width() > 992) {
+						$('#menu-vertical-list').addClass("nsmenu-block");
+						$('#menu-vertical').addClass("openm");
+					} else {
+						$('#menu-vertical').removeClass("openm");
+						$('#menu-vertical-list').removeClass("nsmenu-block");
+					}
+				});
+				$(function(){$('#menu-header-open').css({'min-height': $('#menu-vertical-list').outerHeight() - 20});});</script>
+				<div class="col-md-9">{{ content_top }}</div>
+			{% else %} 
+				<div class="col-md-12">{{ content_top }}</div>
+			{% endif %}
+			</div>
+			<div class="row">
+			{{ column_left }}
+			]]></add>
+		</operation>	
+	</file>
+	<file path="catalog/controller/common/home.php">
+		<operation>
+			<search><![CDATA[$data['column_left'] = $this->load->controller('common/column_left');]]></search>
+			<add position="before"><![CDATA[
+			$data['megamenu_setting'] = $this->config->get('megamenu_setting');
+			
+			]]></add>
+		</operation>	
+	</file>
+	<file path="catalog/controller/common/header.php">
+		<operation>
+			<search><![CDATA[public function index() {]]></search>
+			<add position="after"><![CDATA[
+			$megamenu_setting = $this->config->get('megamenu_setting');
+			if($megamenu_setting['status']=='1'){
+				$main_menu_selection = $megamenu_setting['main_menu_selection'];
+				$data['megamenu_status']=true;
+				$this->document->addScript('catalog/view/javascript/megamenu/megamenu.js');
+				$this->document->addScript('catalog/view/javascript/megamenu/jquery.menu-aim.js?v3');
+				if ($main_menu_selection == '1') {
+				$this->document->addStyle('catalog/view/theme/default/stylesheet/megamenu.css');
+				}
+				if ($main_menu_selection == '0') {
+				$this->document->addStyle('catalog/view/theme/default/stylesheet/megamenu_h.css');
+				}
+				$data['menuvh'] = $this->load->controller('common/menuvh');
+			} else { 
+				$data['megamenu_status']=false;
+			}
+			]]></add>
+		</operation>
+	</file>
+</modification>
