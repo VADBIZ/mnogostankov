@@ -31,10 +31,11 @@
 {% endif %}
 <meta property="og:site_name" content="{{ name }}" />
 <script src="catalog/view/javascript/jquery/jquery-2.1.1.min.js" type="text/javascript"></script>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link href="catalog/view/javascript/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
 <script src="catalog/view/javascript/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
 <script src="catalog/view/javascript/hc-offcanvas-nav.js" type="text/javascript"></script>
-<link href="catalog/view/javascript/hc-offcanvas-nav.css" rel="stylesheet">	
+<link href="catalog/view/javascript/hc-offcanvas-nav.css" rel="stylesheet">
 <link href="catalog/view/javascript/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
 <link href="//fonts.googleapis.com/css?family=Open+Sans:400,400i,300,700" rel="stylesheet" type="text/css" />
 <link href="catalog/view/theme/default/stylesheet/stylesheet.css" rel="stylesheet">
@@ -96,7 +97,7 @@
 
 .mobile_menu_content a {
     font-size: 16px;
-   
+
     padding: 10px 0px;
     color:#111;
     display: block;
@@ -134,7 +135,7 @@ $(function() {
 
 <header>
   <div class="container">
-    
+
     <div class="mobile_menu_container">
         <div class="mobile_menu_content">
             <ul>
@@ -150,12 +151,12 @@ $(function() {
                         </li>
                     {% else %}
                         <li><a href="{{ category.href }}">{{ category.name }}</a></li>
-                    {% endif %}    
+                    {% endif %}
                 {% endfor %}
             </ul>
         </div>
     </div>
-    <div class="mobile_menu_overlay"></div> 
+    <div class="mobile_menu_overlay"></div>
     <div class="row">
 	  <div class="col-sm-4  col-xs-3 visible-xs"></div>
       <div class="col-sm-3  col-xs-5">
@@ -181,14 +182,14 @@ $(function() {
 	      {{ search }}
 		  <div class="today__currency">{{ today_currency }}</div>
 	  </div>
-      
+
     <div class="col-sm-3 hidden-xs hidden-sm"></div>
 	<div class="col-sm-3 hidden-xs hidden-sm">
 	<!--<a class="btn btn-primary btn-block" href="{{ login }}">Вход | Регистрация</a>-->
     <a class="agree btn btn-primary btn-block" href="index.php?route=common/popups">Заказать звонок</a>
 	</div>
-	  
-      
+
+
     </div>
   </div>
 
