@@ -3,6 +3,56 @@ use Dompdf\Dompdf;
 class ControllerSaleContract extends Controller {
 	private $error = array();
 
+	public function mb_ucfirst($text) {
+		return mb_strtoupper(mb_substr($text, 0, 1)) . mb_substr($text, 1);
+	}
+
+	public function get_currency($currency_code, $format) {
+		$date = date('d/m/Y'); // Текущая дата
+		$cache_time_out = '3600'; // Время жизни кэша в секундах
+
+		$file_currency_cache = $_SERVER['DOCUMENT_ROOT'].'/currency.xml'; // Файл кэша
+
+		if(strlen(file_get_contents($file_currency_cache)) == 0 || !is_file($file_currency_cache) || filemtime($file_currency_cache) < (time() - $cache_time_out)) {
+
+			$ch = curl_init();
+
+			curl_setopt($ch, CURLOPT_URL, 'https://www.cbr.ru/scripts/XML_daily.asp?date_req='.$date);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+
+			$out = curl_exec($ch);
+
+			curl_close($ch);
+
+			file_put_contents($file_currency_cache, $out);
+
+		}
+
+		$content_currency = simplexml_load_file($file_currency_cache);
+
+		return number_format(str_replace(',', '.', $content_currency->xpath('Valute[CharCode="'.$currency_code.'"]')[0]->Value), $format);
+
+	}
+
+	public function str_price($value) {
+		$value = explode('.', number_format($value, 2, '.', ''));
+
+		$f = new NumberFormatter('ru', NumberFormatter::SPELLOUT);
+		$str = $f->format($value[0]);
+
+		// Первую букву в верхний регистр.
+		$str = mb_substr($str, 0, 1) . mb_substr($str, 1, mb_strlen($str));
+
+		return $str . ' ';
+	}
+
+//	echo str_price(0);      // Ноль рублей 00 копеек.
+//	echo str_price(150.50); // Сто пятьдесят рублей 50 копеек.
+//	echo str_price(1203);   // Одна тысяча двести три рубля 00 копеек.
+//	echo str_price(2541);   // Две тысячи пятьсот сорок один рубль 00 копеек.
+//	echo str_price(100000); // Сто тысяч рублей 00 копеек.
+
 	public function index() {
 
         require_once(DIR_SYSTEM . 'library/dompdf/autoload.inc.php');
@@ -173,7 +223,7 @@ class ControllerSaleContract extends Controller {
 
 								$html .= '<tr>';
 									$html .= '<td>'.$i.'</td>';
-									$html .= '<td>'.$product['product_info']['name'].'<br><strong>'.$brand['name'].'</strong>';
+									$html .= '<td>'.$product['product_info']['name'].'<br><strong>'. (isset($brand['name']) ? $brand['name'] : '') .'</strong>';
 
 										if (count($product['option']) > 0) {
 											$html .= "<br><br><strong>".$this->language->get('entry_option')."</strong>";
@@ -214,7 +264,7 @@ class ControllerSaleContract extends Controller {
 
 									$totalPriceProductValue = $priceTotal * $product['quantity'];
 									$totalPriceProduct = number_format($totalPriceProductValue, 0, ',', ' ');
-									$totalPriceProductValueNDS = $priceTotal * $product['quantity'] * 0.2;
+									$totalPriceProductValueNDS = ($priceTotal * $product['quantity'] * 0.2) / 1.2;
 									$totalPriceProductNDS = number_format($totalPriceProductValueNDS, 0, ',', ' ');
 									$price_one = number_format($price, 0, ',', ' ');
 
@@ -357,55 +407,5 @@ class ControllerSaleContract extends Controller {
 		} else {
 			$order_info = array();
 		}
-	}
-
-	public function mb_ucfirst($text) {
-		return mb_strtoupper(mb_substr($text, 0, 1)) . mb_substr($text, 1);
-	}
-
-	public function get_currency($currency_code, $format) {
-		$date = date('d/m/Y'); // Текущая дата
-		$cache_time_out = '3600'; // Время жизни кэша в секундах
-
-		$file_currency_cache = $_SERVER['DOCUMENT_ROOT'].'/currency.xml'; // Файл кэша
-
-		if(strlen(file_get_contents($file_currency_cache)) == 0 || !is_file($file_currency_cache) || filemtime($file_currency_cache) < (time() - $cache_time_out)) {
-
-			$ch = curl_init();
-
-			curl_setopt($ch, CURLOPT_URL, 'https://www.cbr.ru/scripts/XML_daily.asp?date_req='.$date);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_HEADER, 0);
-
-			$out = curl_exec($ch);
-
-			curl_close($ch);
-
-			file_put_contents($file_currency_cache, $out);
-
-		}
-
-		$content_currency = simplexml_load_file($file_currency_cache);
-
-		return number_format(str_replace(',', '.', $content_currency->xpath('Valute[CharCode="'.$currency_code.'"]')[0]->Value), $format);
-
-	}
-
-//	echo str_price(0);      // Ноль рублей 00 копеек.
-//	echo str_price(150.50); // Сто пятьдесят рублей 50 копеек.
-//	echo str_price(1203);   // Одна тысяча двести три рубля 00 копеек.
-//	echo str_price(2541);   // Две тысячи пятьсот сорок один рубль 00 копеек.
-//	echo str_price(100000); // Сто тысяч рублей 00 копеек.
-
-	public function str_price($value) {
-		$value = explode('.', number_format($value, 2, '.', ''));
-
-		$f = new NumberFormatter('ru', NumberFormatter::SPELLOUT);
-		$str = $f->format($value[0]);
-
-		// Первую букву в верхний регистр.
-		$str = mb_substr($str, 0, 1) . mb_substr($str, 1, mb_strlen($str));
-
-		return $str . ' ';
 	}
 }
