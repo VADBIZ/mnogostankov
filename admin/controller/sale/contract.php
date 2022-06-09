@@ -205,6 +205,8 @@ class ControllerSaleContract extends Controller {
 						$html .= '</thead>';
 						$html .= '<tbody>';
 							$i=1;
+                            $sumTotal = 0;
+                            $sumNDS = 0;
 							foreach($order_products as $product){
 
 								$brand = $this->model_catalog_manufacturer->getManufacturer($product['product_info']['manufacturer_id']);
@@ -268,6 +270,9 @@ class ControllerSaleContract extends Controller {
 									$totalPriceProductNDS = number_format($totalPriceProductValueNDS, 0, ',', ' ');
 									$price_one = number_format($price, 0, ',', ' ');
 
+									$sumTotal += $totalPriceProductValue;
+                                    $sumNDS += $totalPriceProductValueNDS;
+
 									$html .= '</td>';
 									$html .= '<td>'.$product['quantity'].'</td>';
 									$html .= '<td>'.$price_one.'</td>';
@@ -286,9 +291,9 @@ class ControllerSaleContract extends Controller {
 						$html .= '</tbody>';
 					$html .= '</table>';
 					if ($currency == "USD") {
-						$html .= '<p>Итого: '.$this->str_price($totalPriceProductValue).' '.$currency_usd_text2.'., в т.ч. НДС (20%) '.$this->str_price($totalPriceProductValueNDS).$currency_usd_text2.'.</p>';
+						$html .= '<p>Итого: '.$this->str_price($sumTotal).' '.$currency_usd_text2.'., в т.ч. НДС (20%) '.$this->str_price($sumNDS).$currency_usd_text2.'.</p>';
 					} else {
-						$html .= '<p>Итого: '.$this->str_price($totalPriceProductValue).' '.mb_strtolower($currency).'., в т.ч. НДС (20%) '.$this->str_price($totalPriceProductValueNDS).mb_strtolower($currency).'.</p>';
+						$html .= '<p>Итого: '.$this->str_price($sumTotal).' '.mb_strtolower($currency).'., в т.ч. НДС (20%) '.$this->str_price($sumNDS).mb_strtolower($currency).'.</p>';
 					}
 					$attribute_groups = $this->model_catalog_product->getProductAttributes($product['product_id']);
 					if (count($attribute_groups) > 0) {
