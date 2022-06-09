@@ -1,6 +1,6 @@
 {{ header }}
 <div id="product-product" class="container">
-  
+
   <div class="row">{{ column_left }}
     {% if column_left and column_right %}
     {% set class = 'col-sm-6' %}
@@ -15,7 +15,7 @@
     <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
     {% endfor %}
   </ul>
-    
+
       <div class="row">
         {% if column_left or column_right %}
         {% set class = 'col-sm-8' %}
@@ -34,10 +34,10 @@
                         <li class="image-additional"><img src="{{ image.additional }}" title="{{ heading_title }}" alt="{{ heading_title }}" /></li>
                     {% endfor %}
                 {% endif %}
-            </ul>		  
+            </ul>
 		  </div>
-		  
-		  <div class="col-md-10">	  
+
+		  <div class="col-md-10">
             <ul class="thumbnails slider-for">
                 {% if thumb %}
                     <li><a class="thumbnail" href="{{ popup }}" title="{{ heading_title }}"><img src="{{ thumb }}" title="{{ heading_title }}" alt="{{ heading_title }}" /></a></li>
@@ -49,10 +49,10 @@
                 {% endif %}
             </ul>
 		  </div>
-		  
+
 		 </div>
-		  
-		  <script>	  
+
+		  <script>
 	$('.slider-for').slick({
 		slidesToShow: 1,
 		slidesToScroll: 1,
@@ -74,7 +74,7 @@
 		touchThreshold: 4
 	});
 </script>
-		  
+
           {% endif %}
           </div>
         {% if column_left or column_right %}
@@ -83,13 +83,13 @@
         {% set class = 'col-sm-4' %}
         {% endif %}
         <div class="{{ class }}">
-          
+
           <h3 class="h3_prod">{{ heading_title }}</h3>
           <ul class="list-unstyled">
             {% if manufacturer %}
             <li>{{ text_manufacturer }} <a href="{{ manufacturers }}">{{ manufacturer }}</a></li>
             {% endif %}
-            
+
             {% if reward %}
             <li><b class="naimen">{{ text_reward }}</b> {{ reward }}</li>
             {% endif %}
@@ -115,8 +115,8 @@
 					<h2 class="product__price pr2">{{ price_zero }}</h2>
 				{% endif %}
 <!--              <h2 class="pr2">{% if not special %}{{ price }}{% else %}<span style="text-decoration: line-through;">{{ price }}</span> {{ special }}{% endif %}</h2>-->
-            
-            
+
+
           </ul>
           <!--<div class="input-group number-spinner">
 			      <span class="input-group-btn">
@@ -126,13 +126,13 @@
 				  <span class="input-group-btn">
 					<button class="btn btn-default" data-dir="up"><i class="fa fa-plus"></i></button>
 				  </span>
-                
+
            </div>-->
           {% endif %}
 		  <div class="for_1 col-sm-12" style="display:none">
 		    <div class="clear"></div>
 		    <form action="{{ action }}" method="post" id="form-rev" enctype="multipart/form-data" class="form-horizontal col-sm-12">
-                
+
                 <div class="form-group required obj_name">
                     <label class="control-label" for="input-name">{{ entry_name }}</label>
                     <input type="text" name="name" value="{{ name }}" id="input-name" class="form-control" />
@@ -149,14 +149,15 @@
                     <label class="control-label" for="input-enquiry">{{ entry_enquiry }}</label>
                     <textarea name="enquiry" rows="10" id="input-enquiry" class="form-control">{{ enquiry }}</textarea>
                 </div>
+
+                {{ captcha_quick_form }}
+
 		        <div class="form-group"><input type="checkbox" name="whatsapp" value="1" checked> Хочу получать ответ в WhatsApp</div>
 		        <div class="form-group"><input type="checkbox" name="mailing" value="1" checked> Хочу получать рассылку на Email</div>
 		        <div class="form-group obj_agree">
 				    <input type="checkbox" name="agree" value="1"> Я согласен на обработку персональных данных в соответствии с <a href="{{ ur }}">политикой конфиденциальности</a>
 		            <div class="ag"></div>
 		        </div>
-                {{ captcha }}
-                
 		        <div id="r"></div>
                 <div class="buttons">
                     <div class="">
@@ -172,7 +173,7 @@
 		  </div>
           <div class="clear"></div>
           <div id="product">
-          
+
           <!-- Опции начало -->
           {% if options %}
             <hr>
@@ -199,7 +200,7 @@
                 <div class="radio">
                   <label>
                     <input type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" />
-                    {% if option_value.image %} <img src="{{ option_value.image }}" alt="{{ option_value.name }} {% if option_value.price %} {{ option_value.price_prefix }} {{ option_value.price }} {% endif %}" class="img-thumbnail" /> {% endif %}                  
+                    {% if option_value.image %} <img src="{{ option_value.image }}" alt="{{ option_value.name }} {% if option_value.price %} {{ option_value.price_prefix }} {{ option_value.price }} {% endif %}" class="img-thumbnail" /> {% endif %}
                     {{ option_value.name }}
                     {% if option_value.price %}
                     ({{ option_value.price_prefix }}{{ option_value.price }})
@@ -276,7 +277,7 @@
             {% endfor %}
             {% endif %}
             <!-- Опции конец -->
-            
+
             {% if recurrings %}
             <hr>
             <h3>{{ text_payment_recurring }}</h3>
@@ -290,9 +291,9 @@
               <div class="help-block" id="recurring-description"></div>
             </div>
             {% endif %}
-            
-            
-            
+
+
+
             <!--<div class="form-group">
               <div class="float8 col-pad-0">
                   <button type="button" id="button-cart" data-loading-text="{{ text_loading }}" class="btn btn-primary btn-lg w240">{{ button_cart }}</button>
@@ -303,7 +304,7 @@
                   <button type="button" data-toggle="tooltip" class="btn btn-default" title="{{ button_compare }}" onclick="compare.add('{{ product_id }}');"><i class="fa fa-external-link"></i></button>
               </div>
             </div>
-            
+
             {% if minimum > 1 %}
             <div class="alert alert-info"><i class="fa fa-info-circle"></i> {{ text_minimum }}</div>
             {% endif %}</div>
@@ -316,15 +317,15 @@
                 <!-- uSocial -->
                 <script async src="https://usocial.pro/usocial/usocial.js?uid=b6480c52daf64356&v=6.1.5" data-script="usocial" charset="utf-8"></script>
                 <div class="uSocial-Share"
-                data-pid="a459353bdfec7281a3a19a8a55a8dff1" 
-                data-type="share" 
-                data-options="round-rect,style4,default,absolute,horizontal,size24,eachCounter0,counter0,mobile_position_right" 
+                data-pid="a459353bdfec7281a3a19a8a55a8dff1"
+                data-type="share"
+                data-options="round-rect,style4,default,absolute,horizontal,size24,eachCounter0,counter0,mobile_position_right"
                 data-social="vk,telegram,email"></div>
                <!-- /uSocial -->
             </div>
             <div class="col-sm-4"><button class="btn toCopy" data-clipboard-text="{{ hrr }}">Скопировать ссылку</button></div>
            </div>
-           
+
       </div>
       <div class="clear"></div>
       <p><hr></p>
@@ -348,7 +349,7 @@
             <div class="tab-pane active" id="tab-specification">
               <table class="table table-bordered">
                 {% for attribute_group in attribute_groups %}
-                
+
                 <tbody>
                 {% for attribute in attribute_group.attribute %}
                 <tr>
@@ -413,12 +414,12 @@
 			</div>
 			{% endif %}
 			</div>
-         </div>   
-         
+         </div>
+
       </div>
-      
-      
-      
+
+
+
       {% if products %}
       <h3>{{ text_related }}</h3>
       <div class="row"> {% set i = 0 %}
@@ -452,7 +453,7 @@
               <button type="button" data-toggle="tooltip" title="{{ button_wishlist }}" onclick="wishlist.add('{{ product.product_id }}');"><i class="fa fa-heart"></i></button>
               <button type="button" data-toggle="tooltip" title="{{ button_compare }}" onclick="compare.add('{{ product.product_id }}');"><i class="fa fa-exchange"></i></button>
             </div>
-            
+
           </div>
         </div>
         {% if column_left and column_right and (i + 1) % 2 == 0 %}
@@ -502,23 +503,28 @@ $('#button-form1').on('click', function() {
 				    $('.for_1 .obj_name').addClass('has-error');
 					$('.for_1 input[name=\'name\']').after('<div class="text-danger">' + json['error']['name'] + '</div>');
 				}
-				
+
 				if(json['error']['telephone']) {
 				    $('.for_1 .obj_telephone').addClass('has-error');
 					$('.for_1 input[name=\'telephone\']').after('<div class="text-danger">' + json['error']['telephone'] + '</div>');
 				}
-				
+
 				if(json['error']['email']) {
 				    $('.for_1 .obj_email').addClass('has-error');
 					$('.for_1 input[name=\'email\']').after('<div class="text-danger">' + json['error']['email'] + '</div>');
 				}
-				
+
 				if(json['error']['agree']) {
 				    $('.for_1 .obj_agree').addClass('has-error');
-					
+
 					$('.for_1 .ag').after('<div class="text-danger">' + json['error']['agree'] + '</div>');
 				}
-				
+
+                if(json['error']['captcha']) {
+                    $('.for_1 .obj_captcha').addClass('has-error');
+                    $('.for_1 input[name=\'captcha\']').after('<div class="text-danger">' + json['error']['captcha'] + '</div>');
+                }
+
 			}
 
 			if (json['success']) {
@@ -550,7 +556,7 @@ $('select[name=\'recurring_id\'], input[name="quantity"]').change(function(){
 		}
 	});
 });
-//--></script> 
+//--></script>
 <script type="text/javascript"><!--
 $('#button-cart').on('click', function() {
 	$.ajax({
@@ -590,7 +596,7 @@ $('#button-cart').on('click', function() {
 			}
 
 			if (json['success']) {
-				
+
 
 				$('#cart > button').html('<i class="fa fa-shopping-cart"></i><sup id="cart-total">' + json['total'] + '</sup> Корзина');
 
@@ -605,7 +611,7 @@ $('#button-cart').on('click', function() {
         }
 	});
 });
-//--></script> 
+//--></script>
 <script type="text/javascript"><!--
 $('.date').datetimepicker({
 	language: '{{ datepicker }}',
@@ -674,7 +680,7 @@ $('button[id^=\'button-upload\']').on('click', function() {
 		}
 	}, 500);
 });
-//--></script> 
+//--></script>
 <script type="text/javascript"><!--
 $('#review').delegate('.pagination a', 'click', function(e) {
     e.preventDefault();
@@ -719,15 +725,15 @@ $('#button-review').on('click', function() {
 });
 
 
-//--></script> 
+//--></script>
 <script type="text/javascript"><!--
 var counter = {{ minimum }};
 var min = {{ minimum }};
-$(document).on('click', '.number-spinner button', function () {    
+$(document).on('click', '.number-spinner button', function () {
 	var btn = $(this),
 		oldValue = btn.closest('.number-spinner').find('input').val().trim(),
 		newVal = min;
-			
+
 	if (btn.attr('data-dir') == 'up') {
 		newVal = parseInt(oldValue) + counter;
 	} else {
@@ -754,7 +760,7 @@ function updateprice(q){
             } else {
                 $('.pr2').html('<span style="text-decoration: line-through;">' + json['price'] + '</span> ' + json['special']);
             }
-            
+
             $('.pr3').html(json['tax']);
 		}
 	});
@@ -780,4 +786,4 @@ $(document).ready(function() {
 	});
 });
 </script>
-{{ footer }} 
+{{ footer }}
