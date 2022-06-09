@@ -4,7 +4,7 @@
 
 class ControllerProductProduct extends Controller {
 	private $error = array();
-	
+
 	public function index() {
 		$this->load->language('product/product');
         $data['ur'] = $this->config->get('config_ur');
@@ -158,13 +158,13 @@ class ControllerProductProduct extends Controller {
 		}
 
 		$this->load->model('catalog/product');
-		
+
 		$this->load->model('catalog/category');
 
             $pull_category = $this->model_catalog_product->getCategories($this->request->get['product_id']);
 
-		
-		
+
+
             $cat_ids = '';
 						if(!empty($pull_category)){
 							foreach ($pull_category as $catid) {
@@ -184,7 +184,7 @@ class ControllerProductProduct extends Controller {
         			//skip 0, which would be the root category
               if(isset($category_id[1])){
         				$par_category = $this->model_catalog_category->getParent($category_id[1]);
-				  
+
 //        	      if(!isset($this->request->get['path'])){
         					if (isset($par_category)) {
         						$url = '';
@@ -270,26 +270,26 @@ class ControllerProductProduct extends Controller {
 			} else {
 				$this->document->setTitle($product_info['name']);
 			}
-			
+
 			if ($product_info['noindex'] <= 0 && $this->config->get('config_noindex_status')) {
 				$this->document->setRobots('noindex,follow');
 			}
-			
+
 			if ($product_info['meta_h1']) {
 				$data['heading_title'] = $product_info['meta_h1'];
 			} else {
 				$data['heading_title'] = $product_info['name'];
 			}
-          
+
             $data['hrr'] = $this->url->link('product/product', $url . '&product_id=' . $this->request->get['product_id']);
             $data['pdf'] = $this->url->link('extension/module/print_version_product', 'print_id=' . $this->request->get['product_id']);
-			
+
 			$this->document->setDescription($product_info['meta_description']);
 			$this->document->setKeywords($product_info['meta_keyword']);
 			$this->document->addLink($this->url->link('product/product', 'product_id=' . $this->request->get['product_id']), 'canonical');
-			
-			
-			
+
+
+
             $this->document->addScript('catalog/view/javascript/clipboard.min.js');
 			$this->document->addScript('catalog/view/javascript/jquery/magnific/jquery.magnific-popup.min.js');
 			$this->document->addStyle('catalog/view/javascript/jquery/magnific/magnific-popup.css');
@@ -297,7 +297,7 @@ class ControllerProductProduct extends Controller {
 			$this->document->addScript('catalog/view/javascript/jquery/datetimepicker/moment/moment-with-locales.min.js');
 			$this->document->addScript('catalog/view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.js');
 			$this->document->addStyle('catalog/view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.css');
-          
+
             $this->document->addScript('catalog/view/javascript/slick/slick.js');
             $this->document->addStyle('catalog/view/javascript/slick/slick.css');
             $this->document->addStyle('catalog/view/javascript/slick/slick-theme.css');
@@ -317,23 +317,25 @@ class ControllerProductProduct extends Controller {
             $data['mpn'] = $product_info['mpn'];
 			$data['reward'] = $product_info['reward'];
 			$data['points'] = $product_info['points'];
-          
+
             if ($product_info['length'] > 0) {
 				$data['length'] = $this->length->format($product_info['length'], $product_info['length_class_id']);
 			} else {
 				$data['length'] = false;
 			}
-			
+
             $data['width'] = $this->length->format($product_info['width'], $product_info['length_class_id']);
-			
+
             $data['height'] = $this->length->format($product_info['height'], $product_info['length_class_id']);
-			
+
             if ($product_info['length'] > 0) {
 				$data['weight'] = $this->weight->format($product_info['weight'], $product_info['weight_class_id']);
 			} else {
 				$data['weight'] = false;
 			}
-          
+
+            $data['captcha_quick_form'] = $this->load->controller('extension/captcha/' . $this->config->get('config_captcha'));
+
 			$data['description'] = html_entity_decode($product_info['description'], ENT_QUOTES, 'UTF-8');
 
 			if ($product_info['quantity'] <= 0) {
@@ -343,7 +345,7 @@ class ControllerProductProduct extends Controller {
 			} else {
 				$data['stock'] = $this->language->get('text_instock');
 			}
-          
+
             if ($product_info['image']) {
                 $data['video'] = str_replace('watch?v=', 'embed/', $product_info['video']);
             } else {
@@ -369,7 +371,7 @@ class ControllerProductProduct extends Controller {
 			} else {
 				$data['thumb'] = '';
 			}
-          
+
             if ($product_info['image']) {
 				$data['additional'] = $this->model_tool_image->resize($product_info['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_additional_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_additional_height'));
 			} else {
@@ -399,7 +401,7 @@ class ControllerProductProduct extends Controller {
 				} else {
 					$data['price_zero'] = $this->language->get('text_price_zero');
 				}
-				
+
 				$data['price'] = $this->currency->format($this->tax->calculate($product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
 			} else {
 				$data['price'] = false;
@@ -422,7 +424,7 @@ class ControllerProductProduct extends Controller {
 			} else {
 				$data['tax'] = false;
 			}
-			
+
 			$data['taxx'] = $this->currency->format($tax_price, $this->session->data['currency']);
 
 			$discounts = $this->model_catalog_product->getProductDiscounts($this->request->get['product_id']);
@@ -529,7 +531,7 @@ class ControllerProductProduct extends Controller {
 					$special = false;
 					$tax_price = (float)$result['price'];
 				}
-	
+
 				if ($this->config->get('config_tax')) {
 					$tax = $this->currency->format($tax_price, $this->session->data['currency']);
 				} else {
@@ -541,13 +543,13 @@ class ControllerProductProduct extends Controller {
 				} else {
 					$rating = false;
 				}
-              
+
                 if ($result['quantity'] <= 0) {
 				    $stockk = $result['stock_status'];
 			    } else {
 				    $stockk = $this->language->get('text_instock');
 			    }
-				
+
 				$data['products'][] = array(
 					'product_id'  => $result['product_id'],
 					'thumb'       => $image,
@@ -580,7 +582,7 @@ class ControllerProductProduct extends Controller {
 			$data['recurrings'] = $this->model_catalog_product->getProfiles($this->request->get['product_id']);
 
 			$this->model_catalog_product->updateViewed($this->request->get['product_id']);
-			
+
 			$data['column_left'] = $this->load->controller('common/column_left');
 			$data['column_right'] = $this->load->controller('common/column_right');
 			$data['content_top'] = $this->load->controller('common/content_top');
@@ -740,7 +742,7 @@ class ControllerProductProduct extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
-  
+
     public function price() {
         $this->load->language('product/product');
 
@@ -748,13 +750,13 @@ class ControllerProductProduct extends Controller {
 
 		if ($this->request->server['REQUEST_METHOD'] == 'POST') {
             $this->load->model('catalog/product');
-          
+
             $product_id = (int)$this->request->post['product_id'];
             $product_info = $this->model_catalog_product->getProduct($product_id);
             if ($product_info) {
 			    $quantity = (int)$this->request->post['quantity'];
                 $options_price = 0;
-              
+
                 // base price
 			    $product_discount_query = $this->db->query("SELECT price FROM " . DB_PREFIX . "product_discount WHERE product_id = '" . (int)$product_id . "' AND customer_group_id = '" . (int)$this->config->get('config_customer_group_id') . "' AND quantity <= '" . (int)$quantity . "' AND ((date_start = '0000-00-00' OR date_start < NOW()) AND (date_end = '0000-00-00' OR date_end > NOW())) ORDER BY quantity DESC, priority ASC, price ASC LIMIT 1");
 
@@ -763,7 +765,7 @@ class ControllerProductProduct extends Controller {
 			    } else {
 				    $base_price = $product_info['price'];
 			    }
-              
+
                 // price
 			    if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
 				    $json['price'] = $this->currency->format($this->tax->calculate($base_price + $options_price, $product_info['tax_class_id'], $this->config->get('config_tax')) * $quantity, $this->session->data['currency']);
@@ -796,7 +798,7 @@ class ControllerProductProduct extends Controller {
 			    }
             }
         }
-      
+
         $this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
     }
@@ -824,7 +826,7 @@ class ControllerProductProduct extends Controller {
 		}
 
 		$product_info = $this->model_catalog_product->getProduct($product_id);
-		
+
 		$recurring_info = $this->model_catalog_product->getProfile($product_id, $recurring_id);
 
 		$json = array();
