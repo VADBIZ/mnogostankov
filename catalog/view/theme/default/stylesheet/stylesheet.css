@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 /* Обычный */
 @font-face {
-	font-family: 'Inter'; 
-	src: url('/image/fonts/Inter-Light.otf'); 
+	font-family: 'Inter';
+	src: url('/image/fonts/Inter-Light.otf');
 }
- 
+
 /* Жирный */
 @font-face {
-	font-family: 'Inter-Bold'; 
-	src: url('/image/fonts/Inter-Bold.otf'); 
+	font-family: 'Inter-Bold';
+	src: url('/image/fonts/Inter-Bold.otf');
 }
 body {
 	font-family: Roboto;
@@ -140,7 +140,7 @@ div.required .control-label:before {
 	margin: 0 0 20px 0;
 	min-height: 40px;
     color: #fff;
-  
+
 }
 #top .container {
 	padding: 0 20px;
@@ -159,7 +159,7 @@ div.required .control-label:before {
 }
 #top .btn-link, #top-links li, #top-links a {
 	color: #111;
-	
+
 	text-decoration: none;
 }
 #top #top-links a {color: #fff;}
@@ -180,7 +180,7 @@ div.required .control-label:before {
 header {
   padding-top: 16px;
   /*background: #fff;*/
-  
+
 }
 #top-links {
 	padding-top: 6px;
@@ -218,7 +218,7 @@ border-radius: 2px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
   border-radius: 2px;
   color: #fff;
-  border: 1px solid #5071D0; 
+  border: 1px solid #5071D0;
 }
 /* cart */
 #cart {
@@ -432,14 +432,14 @@ border: 0px solid #888;
 border-radius: 5px;
 }
 #column-left .list-group span {
-  
+
   line-height: 20px;
   display: inline-block;
   border: 0;
   width: 32px;
   height: 32px;
 }
-#column-left .list-group a:hover > span.texts { 
+#column-left .list-group a:hover > span.texts {
 background: #fff;
 }
 #column-left .list-group span.texts {
@@ -503,7 +503,7 @@ header span.compare {
 	background-image: url("/image/home.png") !important;
 	background-repeat: no-repeat;
     background-position: center;
-	
+
 }
 #column-left .list-group span.cart {
     background-image: url("/image/Union.png");
@@ -525,7 +525,7 @@ header span.compare {
 	background-image: url("/image/Vector.svg") !important;
 	background-repeat: no-repeat;
     background-position: center;
-	
+
 }
 #column-left .list-group span.compare {
     background-image: url("/image/Union2.png");
@@ -539,7 +539,7 @@ header span.compare {
 	background-image: url("/image/Union2.svg") !important;
 	background-repeat: no-repeat;
     background-position: center;
-	
+
 }
 /* content */
 #content {
@@ -601,7 +601,7 @@ header span.compare {
 @media (max-width: 1155px) {
   .new_baner {
         justify-content: space-around;
-    }  
+    }
   .new_baner .item {
         flex: 0 1 calc(100% / 4 - 0px);
     }
@@ -616,7 +616,7 @@ header span.compare {
     .new_baner .item {
         flex: 0 1 100%;
     }
-	
+
 	.list-inline > li {display: block;padding: 5px 0px !important;}
 }
 .zag {
@@ -632,7 +632,7 @@ footer {
 	margin-top: 30px;
 	padding-top: 40px;
 	background: #080D1C;
-	
+
 	color: #ffffff;
     padding-bottom: 49px;
 }
@@ -726,7 +726,7 @@ color: #111111;
 
 .breadcrumbs li:last-child a:after {
   content: none;
-}   
+}
 .pagination {
 	margin: 0;
 }
@@ -767,7 +767,7 @@ color: #111111;
 #input-quantity {
     border: 0;
     box-shadow: inset 0 0px 0px rgba(0,0,0,.075);
-    
+
 }
 .btn {
 	padding: 7.5px 12px;
@@ -808,7 +808,7 @@ color: #111111;
 }
 .btn-primary {
 	color: #ffffff;
-	
+
 	background: #5071D0;
 box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
 border-radius: 5px;
@@ -905,7 +905,7 @@ border-radius: 5px;
 	border: 0px solid #DDDDDD;
 	text-shadow: 0 0px 0 #FFF;
     background-color: #ffffff;
-  
+
 }
 .eby .btn-p {
 	font-family: 'Inter';
@@ -952,7 +952,7 @@ border-radius: 5px;
 .kn1 button i {font-size: 24px;}
 /* product list */
 .product-thumb {
-	
+
 	margin-bottom: 20px;
 	overflow: auto;
     background: #fff;
@@ -1054,7 +1054,7 @@ font-size: 15px;
 line-height: 140%;
 text-align: center;
 color: #111111;
-  
+
 }
 .slick-wrapper .product-thumb h4 a {font-size: 12px;}
 .product-thumb p {
@@ -1077,9 +1077,9 @@ color: #111111;
 }
 .product-thumb .compare  span {
 	display: inline-block;
-	position: relative; 
-	padding: 0 0 0 35px; 
-	line-height: 14px;    
+	position: relative;
+	padding: 0 0 0 35px;
+	line-height: 14px;
 }
 .product-thumb .compare  span:before {
 	content: "✓";
@@ -1094,25 +1094,25 @@ color: #111111;
     border: 1px solid #ddd;
     text-align: center;
     font-size: 14px;
-    
+
 }
- 
+
 /* Checked */
 .product-thumb .compare input[type=checkbox]:checked + span:before {
 	background: #FFC837;
     color: #fff;
 }
- 
+
 /* Focus */
 .product-thumb .compare .focused span:before {
 	box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
 }
- 
+
 /* Hover */
 .product-thumb .compare  span:hover:before {
 	filter: brightness(110%);
 }
- 
+
 /* Active */
 .product-thumb .compare  span:active:before {
 	filter: brightness(80%);
@@ -1567,10 +1567,10 @@ background: none;
   grid-column-gap: 30px;
   grid-row-gap: 30px;
   padding: 0 0px 115px 0px;
-  
+
 }
 .serq_4 .its {
- 
+
 }
 .bl_1 {
 width: 50%;
@@ -1763,7 +1763,7 @@ ul#basics {
   width: 90%;
   top: 0;
   right: 0;
-  
+
   padding: 0 5% 1em;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
@@ -1801,7 +1801,7 @@ ul#basics {
     position: static;
     height: 100%;
   width: 90%;
-  
+
     overflow: visible;
     -webkit-transform: translateZ(0) translateX(0);
     -moz-transform: translateZ(0) translateX(0);
@@ -1910,10 +1910,10 @@ ul#basics {
     display: block;
   }
   .cd-faq-group > li {
-    
+
     margin-bottom: 6px;
-    
-    
+
+
     margin-bottom: 6px;
     border-top: 1px solid #111;
   }
@@ -2071,9 +2071,9 @@ background: none;
     right: 0;
     top: 0px;
     padding: 10px;
-    color: #868686; 
+    color: #868686;
 }
-#menuVertical ul li ul{
+#menuVertical > ul > li > ul{
     position: absolute;
     top: 0px;
     left: 90%;
@@ -2087,9 +2087,25 @@ background: none;
     min-height: 400px;
 }
 /*******показываем выпадашку при наведении ********/
-#menuVertical ul li:hover ul{display:block;}
+#menuVertical ul > li:hover > ul{display:block;}
+#menuVertical > ul > li > ul > li {
+	min-width: 280px;
+	max-width:280px;
+	float:left;
+}
+#menuVertical > ul > li > ul > li:hover ul {
+	display: block;
+}
+#menuVertical ul > li > ul li > ul{
+	position: relative;
+	padding-left: 0px;
+	margin-left: 0;
+	display: none;
+}
+#menuVertical ul > li > ul li > ul li{
+	padding-left: 20px;
+}
 #menuVertical ul li ul li a{
-    white-space:nowrap;
     text-transform:none;
     padding:10px 20px;
     color: #000;
@@ -2160,7 +2176,7 @@ padding-right: 0px;
     font-size: 30px;
     line-height: 140%;
     text-align: center;
-    color: #111111; 
+    color: #111111;
 }
 .telocat .prev, .telocat .next {
     position: absolute;
@@ -2173,7 +2189,7 @@ text-align: center;
 cursor: pointer;
 }
 .telocat .next {
-    right: 20px; 
+    right: 20px;
 }
 .telocat .prev {
      right: 60px;
@@ -2182,7 +2198,7 @@ cursor: pointer;
     background: #FFFFFF;
 box-shadow: 2px 1px 4px rgba(0, 0, 0, 0.1);
 border-radius: 10px;
-  
+
 }
 
 /* Новый банер */
@@ -2206,7 +2222,7 @@ margin-bottom: 97px;
 .ban_news .images {
 position: absolute;
 top: 0px;
-margin-top: -55px; 
+margin-top: -55px;
 right: -70px;
 }
 .ban_news .fon2 {
@@ -2294,7 +2310,7 @@ flex-wrap: wrap;
 .bl-1 .l-1 {
 	position: absolute;
 	top:40px;
-	font-family: 'Montserrat'; 
+	font-family: 'Montserrat';
     font-style: normal;
     font-weight: 700;
     font-size: 20px;
@@ -2337,7 +2353,7 @@ flex-wrap: wrap;
 	colsm-50:nth-child(2) {margin-top: 15px;}
 }
 @media (max-width: 991px) {
-	.colsm-50:nth-child(2) {margin-top: 9px;} 
+	.colsm-50:nth-child(2) {margin-top: 9px;}
 }
 
 @media (max-width: 767px) {
@@ -2489,7 +2505,7 @@ flex-wrap: wrap;
 		margin-bottom: 20px;
 	}
 	.today__currency span {
-		display: inline;	
+		display: inline;
 	}
 }
 
