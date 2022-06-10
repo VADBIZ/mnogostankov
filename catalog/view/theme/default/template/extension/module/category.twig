@@ -2,15 +2,23 @@
 <nav id="menuVertical">
     <ul>
         {% for category in categories %}
-        <li><a href="{{ category.href }}" class="list-group-item">{{ category.name }}</a> 
+        <li><a href="{{ category.href }}" class="list-group-item">{{ category.name }}</a>
             {% if category.children %}
                 <ul>
                     {% for child in category.children %}
-                        <li><a href="{{ child.href }}" class="list-group-item">{{ child.name }}</a></li>
+                        <li><a href="{{ child.href }}" class="list-group-item">{{ child.name }}</a>
+                            {% if child.children2 %}
+                                <ul>
+                                    {% for child2 in child.children2 %}
+                                        <li><a href="{{ child2.href }}">{{ child2.name }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </li>
                     {% endfor %}
-                </ul>    
+                </ul>
             {% endif %}
         </li>
         {% endfor %}
-    </ul>    
+    </ul>
 </nav>
