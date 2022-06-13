@@ -2,6 +2,7 @@
 <div class="row" id="polpol">
     <div class="col-sm-12 v_t">{{ text_01 }}</div>
     <div class="col-sm-12">
+        <div id="r"></div>
         <form action="{{ action }}" method="post" id="form-rev" enctype="multipart/form-data" class="form-horizontal col-sm-12">
         <fieldset>
           <div class="form-group required obj_name">
@@ -27,7 +28,6 @@
 		  <div class="ag"></div>
 		  </div>
         </fieldset>
-		<div id="r"></div>
         <div class="buttons">
           <div class="">
             <input class="btn btn-primary btn-block btn-lg" data-loading-text="{{ text_loading }}" id="button-form1" type="button" value="{{ button_submit }}" />
@@ -91,13 +91,7 @@ $('#button-form1').on('click', function() {
 			}
 
 			if (json['success']) {
-				$('#r').after('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
-
-				$('#polpol input[name=\'name\']').val('');
-				$('#polpol input[name=\'telephone\']').val('');
-				$('#polpol input[name=\'email\']').val('');
-				$('#polpol textarea[name=\'enquiry\']').val('');
-                $('#polpol textarea[name=\'captcha\']').val('');
+				$('#polpol').html('<div class="col-sm-12"><div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div></div>');
 			}
 		}
 	});
