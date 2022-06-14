@@ -129,7 +129,7 @@ $_['entry_total']                = 'Всего';
 $_['entry_date_added']           = 'Дата добавления';
 $_['entry_date_modified']        = 'Дата обновления';
 
-$_['entry_foundoc']			 	 = 'Учредительный документ';
+$_['entry_foundoc']			 	 = 'На основании';
 $_['entry_garantime']			 = 'Гарантийный срок';
 $_['entry_comwork']			 	 = 'Пусконаладочные работы';
 $_['entry_delivery']			 = 'Адрес поставки';

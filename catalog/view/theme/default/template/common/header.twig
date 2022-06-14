@@ -6,192 +6,199 @@
 <html dir="{{ direction }}" lang="{{ lang }}">
 <!--<![endif]-->
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="robots" content="noindex, nofollow"/>
-<title>{{ title }}</title>
-{% if robots %}
-<meta name="robots" content="{{ robots }}" />
-{% endif %}
-<base href="{{ base }}" />
-{% if description %}
-<meta name="description" content="{{ description }}" />
-{% endif %}
-{% if keywords %}
-<meta name="keywords" content="{{ keywords }}" />
-{% endif %}
-<meta property="og:title" content="{{ title }}" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="{{ og_url }}" />
-{% if og_image %}
-<meta property="og:image" content="{{ og_image }}" />
-{% else %}
-<meta property="og:image" content="{{ logo }}" />
-{% endif %}
-<meta property="og:site_name" content="{{ name }}" />
-<script src="catalog/view/javascript/jquery/jquery-2.1.1.min.js" type="text/javascript"></script>
-<link href="catalog/view/javascript/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
-<script src="catalog/view/javascript/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
-<script src="catalog/view/javascript/hc-offcanvas-nav.js" type="text/javascript"></script>
-<link href="catalog/view/javascript/hc-offcanvas-nav.css" rel="stylesheet">	
-<link href="catalog/view/javascript/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
-<link href="//fonts.googleapis.com/css?family=Open+Sans:400,400i,300,700" rel="stylesheet" type="text/css" />
-<link href="catalog/view/theme/default/stylesheet/stylesheet.css" rel="stylesheet">
-{% for style in styles %}
-<link href="{{ style.href }}" type="text/css" rel="{{ style.rel }}" media="{{ style.media }}" />
-{% endfor %}
-{% for script in scripts %}
-<script src="{{ script }}" type="text/javascript"></script>
-{% endfor %}
-<script src="catalog/view/javascript/common.js" type="text/javascript"></script>
-{% for link in links %}
-<link href="{{ link.href }}" rel="{{ link.rel }}" />
-{% endfor %}
-{% for analytic in analytics %}
-{{ analytic }}
-{% endfor %}
-<style>
-    .menu_container{text-align: center;}
-	.mobile_menu{
-		font-size: 20px;
-        display: inline-block;
-        vertical-align: top;
-        line-height: 26px;
-        color: #111;
-        border-radius: 0px;
-        border: none;
-        width: 40px;
-        margin: 0;
-        text-decoration: none;
-        -webkit-transition: all 400ms;
-        -moz-transition: all 400ms;
-        transition: all 400ms;
-        text-align: center;
-		float: left;
-	}
-	.mobile_menu:hover{
-		background: #ffffff;
-    	cursor: pointer;
-	}
-    .mobile_menu > span {margin-top: 5px;}
-	.mobile_menu_overlay,.mobile_menu_container{position:fixed;top:0;left:0;width:100%;height:100%}
-	.mobile_menu_container,.mobile_menu_container ul li ul{-webkit-transition:all 200ms;-moz-transition:all 200ms;transition:all 200ms}
-	.mobile_menu_overlay{display:none;cursor:pointer;z-index:10200;background:rgba(0,0,0,0.5)}
-	.mobile_menu_container{-webkit-transform:translateX(-300px);transform:translateX(-300px);width:300px;overflow:hidden;z-index:10201;background:#ffffff}
-	.mobile_menu_container.loaded{-webkit-transform:translateX(0px);transform:translateX(0px)}
-	.mobile_menu_container .mobile_menu_content{overflow:auto;max-height:100%;padding-bottom:30px}
-	.mobile_menu_container ul{margin:0;padding:0}
-	.mobile_menu_container ul li{list-style:none}
-	.mobile_menu_container ul li a{display:block;padding:15px 20px;line-height:20px;font-size:16px;background:#ffffff;color:#111;text-decoration:none;font-weight:bold}
-	.mobile_menu_container ul li a.parent{padding-right:50px;background:#ffffff url("/image/arrow_right.svg") right 20px center no-repeat;background-size:20px}
-	.mobile_menu_container ul li a.parent:hover{background:#ffffff url("/image/arrow_right.svg") right 20px center no-repeat;background-size:20px}
-	.mobile_menu_container ul li a.back{padding-left:50px;background:#ffffff url("/image/arrow_left.svg") left 20px center no-repeat;background-size:20px;box-sizing:border-box;min-height:50px}
-	.mobile_menu_container ul li a.back:hover{background:#ffffff url("/image/arrow_left.svg") left 20px center no-repeat;background-size:20px}
-	.mobile_menu_container ul li a:hover{background:#ffffff}
-	.mobile_menu_container ul li ul{-webkit-transform:translateX(300px);transform:translateX(300px);position:absolute;top:0;left:0;width:100%;height:100%;background:#ffffff;z-index:2}
-	.mobile_menu_container ul li ul.loaded{-webkit-transform:translateX(0px);transform:translateX(0px)}
-	.mobile_menu_container ul li ul.activity{overflow-y:auto;overflow-x:hidden}
-	@media (max-width: 320px){.mobile_menu_container{width:240px}}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="robots" content="noindex, nofollow"/>
+    <title>{{ title }}</title>
+    {% if robots %}
+        <meta name="robots" content="{{ robots }}" />
+    {% endif %}
+    <base href="{{ base }}" />
+    {% if description %}
+        <meta name="description" content="{{ description }}" />
+    {% endif %}
+    {% if keywords %}
+        <meta name="keywords" content="{{ keywords }}" />
+    {% endif %}
+    <meta property="og:title" content="{{ title }}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{ og_url }}" />
+    {% if og_image %}
+        <meta property="og:image" content="{{ og_image }}" />
+    {% else %}
+        <meta property="og:image" content="{{ logo }}" />
+    {% endif %}
+    <meta property="og:site_name" content="{{ name }}" />
+    <script src="catalog/view/javascript/jquery/jquery-2.1.1.min.js" type="text/javascript"></script>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link href="catalog/view/javascript/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+    <script src="catalog/view/javascript/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="catalog/view/javascript/hc-offcanvas-nav.js" type="text/javascript"></script>
+    <link href="catalog/view/javascript/hc-offcanvas-nav.css" rel="stylesheet">
+    <link href="catalog/view/javascript/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400,400i,300,700" rel="stylesheet" type="text/css" />
+    <link href="catalog/view/theme/default/stylesheet/stylesheet.css" rel="stylesheet">
+    {% for style in styles %}
+        <link href="{{ style.href }}" type="text/css" rel="{{ style.rel }}" media="{{ style.media }}" />
+    {% endfor %}
+    {% for script in scripts %}
+        <script src="{{ script }}" type="text/javascript"></script>
+    {% endfor %}
+    <script src="catalog/view/javascript/common.js" type="text/javascript"></script>
+    {% for link in links %}
+        <link href="{{ link.href }}" rel="{{ link.rel }}" />
+    {% endfor %}
+    {% for analytic in analytics %}
+        {{ analytic }}
+    {% endfor %}
+    <style>
+        .menu_container{text-align: center;}
+        .mobile_menu{
+            font-size: 20px;
+            display: inline-block;
+            vertical-align: top;
+            line-height: 26px;
+            color: #111;
+            border-radius: 0px;
+            border: none;
+            width: 40px;
+            margin: 0;
+            text-decoration: none;
+            -webkit-transition: all 400ms;
+            -moz-transition: all 400ms;
+            transition: all 400ms;
+            text-align: center;
+            float: left;
+        }
+        .mobile_menu:hover{
+            background: #ffffff;
+            cursor: pointer;
+        }
+        .mobile_menu > span {margin-top: 5px;}
+        .mobile_menu_overlay,.mobile_menu_container{position:fixed;top:0;left:0;width:100%;height:100%}
+        .mobile_menu_container,.mobile_menu_container ul li ul{-webkit-transition:all 200ms;-moz-transition:all 200ms;transition:all 200ms}
+        .mobile_menu_overlay{display:none;cursor:pointer;z-index:10200;background:rgba(0,0,0,0.5)}
+        .mobile_menu_container{-webkit-transform:translateX(-300px);transform:translateX(-300px);width:300px;overflow:hidden;z-index:10201;background:#ffffff}
+        .mobile_menu_container.loaded{-webkit-transform:translateX(0px);transform:translateX(0px)}
+        .mobile_menu_container .mobile_menu_content{overflow:auto;max-height:100%;padding-bottom:30px}
+        .mobile_menu_container ul{margin:0;padding:0}
+        .mobile_menu_container ul li{list-style:none}
+        .mobile_menu_container ul li a{display:block;padding:15px 20px;line-height:20px;font-size:16px;background:#ffffff;color:#111;text-decoration:none;font-weight:bold}
+        .mobile_menu_container ul li a.parent{padding-right:50px;background:#ffffff url("/image/arrow_right.svg") right 20px center no-repeat;background-size:20px}
+        .mobile_menu_container ul li a.parent:hover{background:#ffffff url("/image/arrow_right.svg") right 20px center no-repeat;background-size:20px}
+        .mobile_menu_container ul li a.back{padding-left:50px;background:#ffffff url("/image/arrow_left.svg") left 20px center no-repeat;background-size:20px;box-sizing:border-box;min-height:50px}
+        .mobile_menu_container ul li a.back:hover{background:#ffffff url("/image/arrow_left.svg") left 20px center no-repeat;background-size:20px}
+        .mobile_menu_container ul li a:hover{background:#ffffff}
+        .mobile_menu_container ul li ul{-webkit-transform:translateX(300px);transform:translateX(300px);position:absolute;top:0;left:0;width:100%;height:100%;background:#ffffff;z-index:2}
+        .mobile_menu_container ul li ul.loaded{-webkit-transform:translateX(0px);transform:translateX(0px)}
+        .mobile_menu_container ul li ul.activity{overflow-y:auto;overflow-x:hidden}
+        @media (max-width: 320px){.mobile_menu_container{width:240px}}
 
-.mobile_menu_content a {
-    font-size: 16px;
-   
-    padding: 10px 0px;
-    color:#111;
-    display: block;
-}
-</style>
-<script>
-$(function() {
-    $(document).on("click", ".mobile_menu_container .parent", function(e) {
-        e.preventDefault();
-        $(".mobile_menu_container .activity").removeClass("activity");
-        $(this).siblings("ul").addClass("loaded").addClass("activity");
-    });
-    $(document).on("click", ".mobile_menu_container .back", function(e) {
-        e.preventDefault();
-        $(".mobile_menu_container .activity").removeClass("activity");
-        $(this).parent().parent().removeClass("loaded");
-        $(this).parent().parent().parent().parent().addClass("activity");
-    });
-    $(document).on("click", ".mobile_menu", function(e) {
-        e.preventDefault();
-        $(".mobile_menu_container").addClass("loaded");
-        $(".mobile_menu_overlay").fadeIn();
-    });
-    $(document).on("click", ".mobile_menu_overlay", function(e) {
-        $(".mobile_menu_container").removeClass("loaded");
-        $(this).fadeOut(function() {
-            $(".mobile_menu_container .loaded").removeClass("loaded");
-            $(".mobile_menu_container .activity").removeClass("activity");
-        });
-    });
-})
-</script>
+        .mobile_menu_content a {
+            font-size: 16px;
+
+            padding: 10px 0px;
+            color:#111;
+            display: block;
+        }
+    </style>
+    <script>
+        $(function() {
+            $(document).on("click", ".mobile_menu_container .parent", function(e) {
+                e.preventDefault();
+                $(".mobile_menu_container .activity").removeClass("activity");
+                $(this).siblings("ul").addClass("loaded").addClass("activity");
+            });
+            $(document).on("click", ".mobile_menu_container .back", function(e) {
+                e.preventDefault();
+                $(".mobile_menu_container .activity").removeClass("activity");
+                $(this).parent().parent().removeClass("loaded");
+                $(this).parent().parent().parent().parent().addClass("activity");
+            });
+            $(document).on("click", ".mobile_menu", function(e) {
+                e.preventDefault();
+                $(".mobile_menu_container").addClass("loaded");
+                $(".mobile_menu_overlay").fadeIn();
+            });
+            $(document).on("click", ".mobile_menu_overlay", function(e) {
+                $(".mobile_menu_container").removeClass("loaded");
+                $(this).hide()
+                $(this).fadeOut();
+            });
+
+            $(document).on("click", ".parent-close", function(e) {
+                $('.mobile_menu_overlay').trigger('click');
+            });
+        })
+    </script>
 </head>
 <body>
 
 <header>
-  <div class="container">
-    
-    <div class="mobile_menu_container">
-        <div class="mobile_menu_content">
-            <ul>
-                {% for category in categories %}
-                    {% if category.children %}
-                        <li><a href="#" class="parent">{{ category.name }}</a>
-                            <ul>
-                                <li><a href="#" class="back"></a></li>
-                                {% for child in category.children %}
-                                    <li><a href="{{ child.href }}">{{ child.name }}</a></li>
-                                {% endfor %}
-                            </ul>
-                        </li>
+    <div class="container">
+
+        <div class="mobile_menu_container">
+            <div class="mobile_menu_content">
+                <ul>
+                    <li style="padding: 15px 20px"><span style="opacity:0;">Выйти</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" class="parent-close" style="float: right;height: 45px;width: auto;margin: -5px -12px;">
+                            <circle cx="10" cy="10" r="9.5" stroke="#E0E0E0"></circle>
+                            <path d="M7.17188 7.17188L12.8287 12.8287" stroke="#000000"></path>
+                            <path d="M12.8281 7.17188L7.17127 12.8287" stroke="#000000"></path>
+                        </svg>
+                    </li>
+                    {% for category in categories %}
+                        {% if category.children %}
+                            <li><a href="#" class="parent">{{ category.name }}</a>
+                                <ul>
+                                    <li><a href="#" class="back"></a></li>
+                                    {% for child in category.children %}
+                                        <li><a href="{{ child.href }}">{{ child.name }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li><a href="{{ category.href }}">{{ category.name }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="mobile_menu_overlay"></div>
+        <div class="row">
+            <div class="col-sm-4  col-xs-3 visible-xs"></div>
+            <div class="col-sm-3  col-xs-5">
+                <div id="logo">
+                    {% if logo %}
+                        {% if home == og_url %}
+                            <a href="{{ home }}"><img src="/image/icons/logo.svg" title="{{ name }}" alt="{{ name }}" class="img-responsive" /></a>
+                        {% else %}
+                            <a href="{{ home }}"><img src="/image/icons/logo.svg" title="{{ name }}" alt="{{ name }}" class="img-responsive" /></a>
+                        {% endif %}
                     {% else %}
-                        <li><a href="{{ category.href }}">{{ category.name }}</a></li>
-                    {% endif %}    
-                {% endfor %}
-            </ul>
+                        <h1><a href="{{ home }}">{{ name }}</a></h1>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="icx col-sm-4 col-xs-4 visible-xs">
+                <a href="/"><span class="home"></span></a>
+                <a href="/wishlist"><span class="wishlist"></span></a>
+                <a href="/compare"><span class="compare"></span></a>
+            </div>
+            <div class="col-sm-3 col-xs-12">
+                <a href="#" class="mobile_menu visible-xs"><span class="visible-xs"><img src="/image/mob_menu.svg" /></span></a>
+                {{ search }}
+            </div>
+
+            <div class="col-sm-3 col-xs-12 text-right orderCurrency">
+                <div class="today__currency">{{ today_currency }}</div>
+            </div>
+            <div class="col-sm-3 hidden-xs hidden-sm">
+                <!--<a class="btn btn-primary btn-block" href="{{ login }}">Вход | Регистрация</a>-->
+                <a class="agree btn btn-primary btn-block" href="index.php?route=common/popups">Заказать звонок</a>
+            </div>
         </div>
     </div>
-    <div class="mobile_menu_overlay"></div> 
-    <div class="row">
-	  <div class="col-sm-4  col-xs-3 visible-xs"></div>
-      <div class="col-sm-3  col-xs-5">
-		<div id="logo">
-          {% if logo %}
-            {% if home == og_url %}
-              <img src="/image/icons/logo.svg" title="{{ name }}" alt="{{ name }}" class="img-responsive" />
-            {% else %}
-              <a href="{{ home }}"><img src="/image/icons/logo.svg" title="{{ name }}" alt="{{ name }}" class="img-responsive" /></a>
-            {% endif %}
-          {% else %}
-            <h1><a href="{{ home }}">{{ name }}</a></h1>
-          {% endif %}
-		</div>
-      </div>
-	  <div class="icx col-sm-4 col-xs-4 visible-xs">
-	   <a href="/"><span class="home"></span></a>
-	   <a href="/wishlist"><span class="wishlist"></span></a>
-	   <a href="/compare"><span class="compare"></span></a>
-	  </div>
-      <div class="col-sm-3  col-xs-12">
-	      <a href="#" class="mobile_menu visible-xs"><span class="visible-xs"><img src="/image/mob_menu.svg" /></span></a>
-	      {{ search }}
-		  <div class="today__currency">{{ today_currency }}</div>
-	  </div>
-      
-    <div class="col-sm-3 hidden-xs hidden-sm"></div>
-	<div class="col-sm-3 hidden-xs hidden-sm">
-	<!--<a class="btn btn-primary btn-block" href="{{ login }}">Вход | Регистрация</a>-->
-    <a class="agree btn btn-primary btn-block" href="index.php?route=common/popups">Заказать звонок</a>
-	</div>
-	  
-      
-    </div>
-  </div>
-
-
-			{{ menu }}
-			</header>
+    {{ menu }}
+</header>
