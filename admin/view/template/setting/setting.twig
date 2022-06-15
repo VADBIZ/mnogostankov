@@ -328,7 +328,7 @@
                       {% for config_requisite in config_requisites %}
                         <tr id="requisite-row{{ requisite_row }}">
                           <td class="text-right">
-                            <select name="config_requisite[{{ special_row }}][code]" class="form-control">
+                            <select name="config_requisite[{{ requisite_row }}][code]" class="form-control">
                               {% for key, requisite in requisites %}
                                 {% if key == config_requisite.code %}
                                   <option value="{{ key }}" selected="selected">{{ requisite }}</option>
