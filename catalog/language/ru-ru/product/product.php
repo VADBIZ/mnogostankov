@@ -60,6 +60,6 @@ $_['error_rating']             = 'Пожалуйста, выберите оце�
 
 
 //валюта в карточке товара
-$_['text_price_usd']			= '<strong>Цена $:</strong> от %s';
-$_['text_price_rub']			= '<strong>Цена ₽:</strong> от %s';
+$_['text_price_usd']			= '<strong>Цена $:</strong> %s';
+$_['text_price_rub']			= '<strong>Цена ₽:</strong> %s';
 $_['text_price_zero']			= 'Цена по запросу';

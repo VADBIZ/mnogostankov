@@ -1792,6 +1792,12 @@ class ControllerCatalogProduct extends Controller {
 				$filter_model = '';
 			}
 
+			if (isset($this->request->get['filter_manufacturer_id'])) {
+				$filter_manufacturer_id = (int)$this->request->get['filter_manufacturer_id'];
+			} else {
+				$filter_manufacturer_id = 0;
+			}
+
 			if (isset($this->request->get['limit'])) {
 				$limit = (int)$this->request->get['limit'];
 			} else {
@@ -1801,6 +1807,7 @@ class ControllerCatalogProduct extends Controller {
 			$filter_data = array(
 				'filter_name'  => $filter_name,
 				'filter_model' => $filter_model,
+				'filter_manufacturer_id' => $filter_manufacturer_id,
 				'start'        => 0,
 				'limit'        => $limit
 			);
