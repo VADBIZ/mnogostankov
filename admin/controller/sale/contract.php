@@ -349,6 +349,7 @@ class ControllerSaleContract extends Controller {
 							$html .= '</thead>';
 							$html .= '<tbody>';
                             foreach ($this->config->get('config_requisite') as $requisite) {
+                                if (isset($requisite['code']) && isset($requisite['value'])) {
                                 if ($requisite['code'] == 'name') {
                                     $name = 'Название';
                                     $value = $company_name;
@@ -362,7 +363,7 @@ class ControllerSaleContract extends Controller {
                                     $name = 'ОГРН';
                                     $value = $ogrn;
                                 } elseif ($requisite['code'] == 'urad') {
-                                    $name = 'Юридический адрес';
+                                    $name = 'Юридический и фактический адрес';
                                     $value = $urad;
                                 } elseif ($requisite['code'] == 'bank') {
                                     $name = 'Банк';
@@ -389,6 +390,7 @@ class ControllerSaleContract extends Controller {
                                 $html .= '<td>' . $requisite['value'] . '</td>';
                                 $html .= '<td>' . $value . '</td>';
                                 $html .= '</tr>';
+                            }
                             }
 								$html .= '<tr>';
 									$html .= '<td style="padding-top:30px">Подпись<br>МП</td>';

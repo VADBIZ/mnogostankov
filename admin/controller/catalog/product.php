@@ -1795,7 +1795,7 @@ class ControllerCatalogProduct extends Controller {
 			if (isset($this->request->get['filter_manufacturer_id'])) {
 				$filter_manufacturer_id = (int)$this->request->get['filter_manufacturer_id'];
 			} else {
-				$filter_manufacturer_id = 0;
+				$filter_manufacturer_id = null;
 			}
 
 			if (isset($this->request->get['limit'])) {
