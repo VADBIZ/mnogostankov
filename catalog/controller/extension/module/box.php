@@ -34,6 +34,8 @@ class ControllerExtensionModuleBox extends Controller {
             foreach ($setting['product_list'] as $product_id) {
                 $result = $this->model_catalog_product->getProduct($product_id);
 
+                if (!$result) continue;
+              
                 if ($result['image']) {
                     $image = $this->model_tool_image->resize($result['image'], 190, 130);
                 } else {
