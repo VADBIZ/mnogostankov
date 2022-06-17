@@ -110,7 +110,7 @@ class ControllerSaleContract extends Controller {
 			$customer_info = $this->model_customer_customer->getCustomer($order_info['customer_id']);
 			$inn = $custom_field_info["2"];
 			$kpp = $custom_field_info["3"];
-			$ogrn = $custom_field_info["4"];
+			$ogrn = ($custom_field_info[9] ?? $custom_field_info["4"]);
 			$urad = $custom_field_info["5"];
 			$emaildir = $custom_field_info["8"];
 			$phonedir = $customer_info["telephone"];
