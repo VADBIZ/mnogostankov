@@ -30,37 +30,39 @@ class ControllerApiCart extends Controller {
 
 				$product_info = $this->model_catalog_product->getProduct($this->request->post['product_id']);
 
-                if ($product_info['price'] == 0) {
-                    $json['error']['store'] = "В товаре не указана цена. Попросите администратора сайта поставить цену.";
-                } elseif ($product_info) {
-					if (isset($this->request->post['quantity'])) {
-						$quantity = $this->request->post['quantity'];
-					} else {
-						$quantity = 1;
-					}
+				if ($product_info) {
+                    if ($product_info['price'] == 0) {
+                        $json['error']['store'] = "В товаре не указана цена. Попросите администратора сайта поставить цену.";
+                    } else {
+                        if (isset($this->request->post['quantity'])) {
+                            $quantity = $this->request->post['quantity'];
+                        } else {
+                            $quantity = 1;
+                        }
 
-					if (isset($this->request->post['option'])) {
-						$option = array_filter($this->request->post['option']);
-					} else {
-						$option = array();
-					}
+                        if (isset($this->request->post['option'])) {
+                            $option = array_filter($this->request->post['option']);
+                        } else {
+                            $option = array();
+                        }
 
-					$product_options = $this->model_catalog_product->getProductOptions($this->request->post['product_id']);
+                        $product_options = $this->model_catalog_product->getProductOptions($this->request->post['product_id']);
 
-					foreach ($product_options as $product_option) {
-						if ($product_option['required'] && empty($option[$product_option['product_option_id']])) {
-							$json['error']['option'][$product_option['product_option_id']] = sprintf($this->language->get('error_required'), $product_option['name']);
-						}
-					}
+                        foreach ($product_options as $product_option) {
+                            if ($product_option['required'] && empty($option[$product_option['product_option_id']])) {
+                                $json['error']['option'][$product_option['product_option_id']] = sprintf($this->language->get('error_required'), $product_option['name']);
+                            }
+                        }
 
-					if (!isset($json['error']['option'])) {
-						$this->cart->add($this->request->post['product_id'], $quantity, $option);
+                        if (!isset($json['error']['option'])) {
+                            $this->cart->add($this->request->post['product_id'], $quantity, $option);
 
-						$json['success'] = $this->language->get('text_success');
+                            $json['success'] = $this->language->get('text_success');
 
-						unset($this->session->data['shipping_method']);
-						unset($this->session->data['payment_method']);
-					}
+                            unset($this->session->data['shipping_method']);
+                            unset($this->session->data['payment_method']);
+                        }
+                    }
 				} else {
 					$json['error']['store'] = $this->language->get('error_store');
 				}

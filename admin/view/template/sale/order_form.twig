@@ -245,7 +245,7 @@
                 <button type="button" id="button-customer" data-loading-text="{{ text_loading }}" class="btn btn-primary"><i class="fa fa-arrow-right"></i> {{ button_continue }}</button>
               </div>
             </div>
-
+			  
             <div class="tab-pane" id="tab-cart">
               <div class="table-responsive">
                 <table class="table table-bordered">
@@ -329,7 +329,7 @@
                 </div>
               </div>
             </div>
-
+			 
             <div class="tab-pane" id="tab-spec">
               <fieldset>
                 <div class="form-group required">
@@ -380,7 +380,7 @@
                   <textarea name="time_delivery" rows="5" id="input-time-delivery" class="form-control">{{ time_delivery }}</textarea>
                 </div>
               </div>
-
+				  
 				  <div class="form-group required">
                 <label class="col-sm-2 control-label" for="input-foundoc">{{ entry_foundoc }}</label>
                 <div class="col-sm-10">
@@ -419,8 +419,8 @@
 					<button id="button-sublist" class="btn btn-primary">{{ entry_sublist_add }}</button>
                 </div>
               </div>
-
-
+				  
+				  
               </fieldset>
               <div class="row">
                 <div class="col-sm-6 text-left">
@@ -431,7 +431,7 @@
                 </div>
               </div>
             </div>
-
+			  
             <div class="tab-pane" id="tab-total">
               <div class="table-responsive">
                 <table class="table table-bordered">
@@ -536,12 +536,12 @@
       </div>
     </div>
   </div>
-
+	
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
+	
   <script type="text/javascript"><!--
-
+	  
 $(document).ready(function() {
     $('.select2Init').select2({
 		placeholder: 'Выберите компанию клиента из списка'
@@ -585,19 +585,19 @@ $(document).ready(function() {
 		});
 	});
 });
-
+	  
 // Disable the tabs
 $('#order a[data-toggle=\'tab\']').on('click', function(e) {
 	return false;
 });
-
+	 
 //pact link
 var getSelectedPactLink = $("#input-pact-type").find("option:selected").attr("data-link");
 $(".pact_type_link").attr("href",getSelectedPactLink);
 $("#input-pact-type").change(function(){
 	$(".pact_type_link").attr("href", $(this).find("option:selected").attr("data-link"));
 });
-
+	  
 //pact sign
 $('#button-pact-sign').on('click', function() {
 	$('#form-upload-pact-sign').remove();
@@ -644,7 +644,7 @@ $('#button-pact-sign').on('click', function() {
 		}
 	}, 500);
 });
-
+	  
 //shipping method
 var getSelectedShipping = $("select[name=\'shipping_code\']").find("option:selected").text();
 $('input[name="shipping_method"]').attr("value",getSelectedShipping);
@@ -652,7 +652,7 @@ $('select[name=\'shipping_code\']').on('change', function() {
 	var shipping_method = $(this).find("option:selected").text();
 	$('input[name="shipping_method"]').attr("value",shipping_method);
 });
-
+	  
 //payment method
 var getSelectedPayment = $("select[name=\'payment_code\']").find("option:selected").text();
 $('input[name="payment_method"]').attr("value",getSelectedPayment);
@@ -660,7 +660,7 @@ $('select[name=\'payment_code\']').on('change', function() {
 	var payment_method = $(this).find("option:selected").text();
 	$('input[name="payment_method"]').attr("value",payment_method);
 });
-
+	  
 // Currency
 $('select[name=\'currency\']').on('change', function() {
 	$.ajax({
@@ -693,7 +693,7 @@ $('select[name=\'currency\']').on('change', function() {
 });
 
 $('select[name=\'currency\']').trigger('change');
-
+	  
 // Customer
 //$('#tab-customer input[name="company"]').autocomplete({
 //	'source': function(request, response) {
@@ -862,7 +862,7 @@ $('#button-customer').on('click', function() {
 $('#tab-product input[name=\'product\']').autocomplete({
 	'source': function(request, response) {
 		$.ajax({
-			url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_status=1&filter_name=' +  encodeURIComponent(request),
+			url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
 			dataType: 'json',
 			success: function(json) {
 				response($.map(json, function(item) {
@@ -1183,7 +1183,7 @@ $('#button-cart').on('click', function() {
 		$('a[href=\'#tab-spec\']').tab('show');
 	}
 });
-
+	  
 $('#button-spec').on('click', function() {
 	$('a[href=\'#tab-total\']').tab('show');
 });
@@ -1209,11 +1209,11 @@ $('#button-save').on('click', function() {
 			$('#button-save').button('reset');
 		},
 		success: function(json) {
-
+			
 //			console.log(json);
-
+			
 			$('.alert-dismissible, .text-danger').remove();
-
+			
 			if (json['error']) {
 				$('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
 			}
@@ -1236,11 +1236,11 @@ $('#button-save').on('click', function() {
 		}
 	});
 });
-
+	  
 //создаем спецификацию
 $('#button-create-spec').on('click', function(e) {
 	e.preventDefault();
-
+	
 	var url = '{{ catalog }}index.php?route=api/order/createSpec&api_token={{ api_token }}&store_id=' + $('select[name=\'store_id\'] option:selected').val();
 
 	var dataSpec = {
@@ -1253,7 +1253,7 @@ $('#button-create-spec').on('click', function(e) {
 		company_address: $("#input-custom-field6").val(),
 		company_name: $("#input-company").val()
 	};
-
+	
 	$.ajax({
 		url: url,
 		type: 'post',
@@ -1276,13 +1276,13 @@ $('#button-create-spec').on('click', function(e) {
 			if (json['success']) {
 				$('#content > .container-fluid').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + '  <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
             }
-
+			
 			if (json['link']) {
 				$(".spec_link").removeClass("hidden").attr("href",json['link']);
 //				$('#button-create-spec').addClass("hidden");
 				$('input[name="spec"]').attr("value",json['link']);
 			}
-
+			
 		},
 		error: function(xhr, ajaxOptions, thrownError) {
 			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
@@ -1418,7 +1418,7 @@ $('#button-refresh').on('click', function() {
 		},
 		complete: function() {
 			$('#button-refresh').button('reset');
-		},
+		},		
 		success: function(json) {
 			$('.alert-dismissible').remove();
 
@@ -1544,7 +1544,7 @@ $('#button-refresh').on('click', function() {
 		}
 	});
 });
-
+	  
 //дополнительные поля для списка в договоре
 $("#button-sublist").click(function(e){
 	e.preventDefault();
@@ -1557,6 +1557,6 @@ $(".order__sublist").on("click",".order__sublist-remove",function(e){
 	var parentSublistGroup = $(this).closest(".input-group");
 	parentSublistGroup.remove();
 });
-
+	  
 //--></script></div>
 {{ footer }}
