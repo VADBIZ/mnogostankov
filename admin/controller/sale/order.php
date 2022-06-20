@@ -445,7 +445,6 @@ class ControllerSaleOrder extends Controller {
 			$data['customer_id'] = $order_info['customer_id'];
 			$data['customer_group_id'] = $order_info['customer_group_id'];
 			$data['firstname'] = $order_info['firstname'];
-			$data['whosign'] = $order_info['whosign'];
 			$data['lastname'] = $order_info['lastname'];
 			$data['email'] = $order_info['email'];
 			$data['telephone'] = $order_info['telephone'];
@@ -517,7 +516,6 @@ class ControllerSaleOrder extends Controller {
 			$data['customer_id'] = 0;
 			$data['customer_group_id'] = $this->config->get('config_customer_group_id');
 			$data['firstname'] = '';
-			$data['whosign'] = '';
 			$data['lastname'] = '';
 			$data['email'] = '';
 			$data['telephone'] = '';
@@ -907,7 +905,6 @@ class ControllerSaleOrder extends Controller {
 			$data['date_added'] = date($this->language->get('date_format_short'), strtotime($order_info['date_added']));
 
 			$data['firstname'] = $order_info['firstname'];
-			$data['whosign'] = $order_info['whosign'];
 			$data['lastname'] = $order_info['lastname'];
 
 			if ($order_info['customer_id']) {
@@ -942,7 +939,6 @@ class ControllerSaleOrder extends Controller {
 			$find = array(
 				'{firstname}',
 				'{lastname}',
-				'{whosign}',
 				'{company}',
 				'{address_1}',
 				'{address_2}',

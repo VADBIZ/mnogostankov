@@ -98,7 +98,6 @@ class ControllerSaleContract extends Controller {
 
 			$custom_field_info = json_decode($order_info['custom_field'], true);
 			$company_name = $order_info['company'];
-			$who_sign = $order_info['whosign'];
 			$foundoc = $order_info['foundoc'];
 			$termpay = $order_info['term_pay'];
 			$timedelivery = $order_info['time_delivery'];
@@ -113,6 +112,7 @@ class ControllerSaleContract extends Controller {
 			$ogrn = ($custom_field_info[9] ?? $custom_field_info["4"]);
 			$urad = $custom_field_info["5"];
 			$emaildir = $custom_field_info["8"];
+            $who_sign = ($custom_field_info[10] ?? '');
 			$phonedir = $customer_info["telephone"];
 
 			$currency = $this->language->get('currency_rub_symbol');
@@ -188,7 +188,7 @@ class ControllerSaleContract extends Controller {
 				$html .= '<footer><p class="page">Страница <span></span> из 2</p></footer>';
 				$html .= '<h1 class="contract__title">ДОГОВОР №'.$order_number.'<br>присоединения к '.$pact_title_datv.'</h1>';
 				$html .= '<table style="width:100%;margin-bottom:10px"><tr><td style="text-align:left;padding-left:30px">г. Омск</td><td style="text-align:right">'.$order_date.'</td></tr></table>';
-				$html .= '<p class="ti">Поставщик: ООО ГК «СТРУЧАЕВ», в лице Генерального директора Стручаева Виктора Васильевича, действующего на основании Устава и</p>';
+				$html .= '<p class="ti">Поставщик: ООО "СТРУЧАЕВ ГРУПП", в лице Генерального директора Стручаева Виктора Васильевича, действующего на основании Устава и</p>';
 				$html .= '<p class="ti">Покупатель: '.$company_name.' в лице '.$who_sign.' действующего на основании '.$foundoc.',</p>';
 				$html .= '<p class="ti">настоящим Договором присоединяется к '.$pact_title_datv.', известных Покупателю и имеющих обязательную для Покупателя силу. Настоящим Покупатель подтверждает готовность оплатить и принять следующее Оборудование:</p>';
 				if (count($order_products) > 0) {

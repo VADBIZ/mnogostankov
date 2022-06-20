@@ -401,10 +401,6 @@ class ControllerCustomerCustomer extends Controller {
 			$this->error['firstname'] = $this->language->get('error_firstname');
 		}
 
-		if ((utf8_strlen($this->request->post['whosign']) < 1) || (utf8_strlen(trim($this->request->post['whosign'])) > 255)) {
-			$this->error['whosign'] = $this->language->get('error_whosign');
-		}
-
 		if ((utf8_strlen($this->request->post['lastname']) < 1) || (utf8_strlen(trim($this->request->post['lastname'])) > 32)) {
 			$this->error['lastname'] = $this->language->get('error_lastname');
 		}
