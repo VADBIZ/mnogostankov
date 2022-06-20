@@ -13,7 +13,7 @@ class ControllerApiOrder extends Controller {
 			if (!isset($this->session->data['customer'])) {
 				$json['error'] = $this->language->get('error_customer');
 			}
-			
+
 					//проверка способов оплаты
 					if (empty($this->request->post['payment_method']) || empty($this->request->post['payment_code'])) {
 						$json['error'] = $this->language->get('error_payment_method');
@@ -69,13 +69,6 @@ class ControllerApiOrder extends Controller {
 						$json['error'] = $this->language->get('error_time_delivery');
 					}
 
-					//проверяем наличие ФИО руководителя с правом подписи
-						if (isset($this->request->post['whosign']) && !empty($this->request->post['whosign'])) {
-							$this->session->data['whosign'] = $this->request->post['whosign'];
-						} else {
-							$json['error'] = $this->language->get('error_whosign');
-						}
-
 					//проверяем наличие учредительного документа
 						if (isset($this->request->post['foundoc']) && !empty($this->request->post['foundoc'])) {
 							$this->session->data['foundoc'] = $this->request->post['foundoc'];
@@ -116,13 +109,13 @@ class ControllerApiOrder extends Controller {
 					} else {
 						$this->session->data['currency'] = "RUB";
 					}
-					
+
 					if (isset($this->request->post['account_custom_field']) && !empty($this->request->post['account_custom_field'])) {
 						$this->session->data['custom_field'] = $this->request->post['account_custom_field'];
 					} else {
 						$this->session->data['custom_field'] = "";
 					}
-			
+
 			// Cart
 			if ((!$this->cart->hasProducts()) || (!$this->cart->hasStock() && !$this->config->get('config_stock_checkout'))) {
 				$json['error'] = $this->language->get('error_stock');
@@ -146,10 +139,10 @@ class ControllerApiOrder extends Controller {
 					break;
 				}
 			}
-			
+
 			if (!$json) {
 				$json['success'] = $this->language->get('text_create');
-				
+
 				$order_data = array();
 
 				// Store Details
@@ -157,7 +150,7 @@ class ControllerApiOrder extends Controller {
 				$order_data['store_id'] = $this->config->get('config_store_id');
 				$order_data['store_name'] = $this->config->get('config_name');
 				$order_data['store_url'] = $this->config->get('config_url');
-				
+
 				// Customer Details
 				$order_data['customer_id'] = $this->session->data['customer']['customer_id'];
 				$order_data['customer_group_id'] = $this->session->data['customer']['customer_group_id'];
@@ -166,8 +159,7 @@ class ControllerApiOrder extends Controller {
 				$order_data['email'] = $this->session->data['customer']['email'];
 				$order_data['telephone'] = $this->session->data['customer']['telephone'];
 				$order_data['custom_field'] = $this->session->data['customer']['custom_field'];
-				
-					$order_data['whosign'] = $this->session->data['whosign'];
+
 					$order_data['currency'] = $this->session->data['currency'];
 					$order_data['custom_field'] = $this->session->data['custom_field'];
 					$order_data['payment_method'] = $this->session->data['payment_method'];
@@ -231,7 +223,7 @@ class ControllerApiOrder extends Controller {
 					'taxes'  => &$taxes,
 					'total'  => &$total
 				);
-			
+
 				$sort_order = array();
 
 				$results = $this->model_setting_extension->getExtensions('total');
@@ -245,7 +237,7 @@ class ControllerApiOrder extends Controller {
 				foreach ($results as $result) {
 					if ($this->config->get('total_' . $result['code'] . '_status')) {
 						$this->load->model('extension/total/' . $result['code']);
-						
+
 						// We have to put the totals in an array so that they pass by reference.
 						$this->{'model_extension_total_' . $result['code']}->getTotal($total_data);
 					}
@@ -307,7 +299,7 @@ class ControllerApiOrder extends Controller {
 				}
 
 				$this->load->model('checkout/order');
-				
+
 				$json['order_id'] = $this->model_checkout_order->addOrder($order_data);
 
 				// Set the order history
@@ -318,7 +310,7 @@ class ControllerApiOrder extends Controller {
 				}
 
 				$this->model_checkout_order->addOrderHistory($json['order_id'], $order_status_id);
-				
+
 				// clear cart since the order has already been successfully stored.
 //				$this->cart->clear();
 			}
@@ -343,16 +335,16 @@ class ControllerApiOrder extends Controller {
 			} else {
 				$order_id = 0;
 			}
-			
+
 			$order_info = $this->model_checkout_order->getOrder($order_id);
 
 			if ($order_info) {
-				
+
 				// Customer
 				if (!isset($this->session->data['customer'])) {
 					$json['error'] = $this->language->get('error_customer');
 				}
-				
+
 					//проверка способов оплаты
 					if (empty($this->request->post['payment_method']) || empty($this->request->post['payment_code'])) {
 						$json['error'] = $this->language->get('error_payment_method');
@@ -408,13 +400,6 @@ class ControllerApiOrder extends Controller {
 						$json['error'] = $this->language->get('error_time_delivery');
 					}
 
-					//проверяем наличие ФИО руководителя с правом подписи
-						if (isset($this->request->post['whosign']) && !empty($this->request->post['whosign'])) {
-							$this->session->data['whosign'] = $this->request->post['whosign'];
-						} else {
-							$json['error'] = $this->language->get('error_whosign');
-						}
-
 					//проверяем наличие учредительного документа
 						if (isset($this->request->post['foundoc']) && !empty($this->request->post['foundoc'])) {
 							$this->session->data['foundoc'] = $this->request->post['foundoc'];
@@ -455,15 +440,15 @@ class ControllerApiOrder extends Controller {
 					} else {
 						$this->session->data['currency'] = "RUB";
 					}
-					
+
 					if (isset($this->request->post['account_custom_field']) && !empty($this->request->post['account_custom_field'])) {
 						$this->session->data['custom_field'] = $this->request->post['account_custom_field'];
 					} else {
 						$this->session->data['custom_field'] = "";
 					}
-				
+
 //				var_dump($this->session->data);
-				
+
 //				var_dump($this->request->post);
 //				var_dump($order_data);
 
@@ -493,7 +478,7 @@ class ControllerApiOrder extends Controller {
 
 				if (!$json) {
 					$json['success'] = $this->language->get('text_success');
-					
+
 					$order_data = array();
 
 					// Store Details
@@ -509,7 +494,6 @@ class ControllerApiOrder extends Controller {
 					$order_data['lastname'] = $this->session->data['customer']['lastname'];
 					$order_data['email'] = $this->session->data['customer']['email'];
 					$order_data['telephone'] = $this->session->data['customer']['telephone'];
-					$order_data['whosign'] = $this->session->data['whosign'];
 					$order_data['currency'] = $this->session->data['currency'];
 					$order_data['custom_field'] = $this->session->data['custom_field'];
 					$order_data['payment_method'] = $this->session->data['payment_method'];
@@ -566,14 +550,14 @@ class ControllerApiOrder extends Controller {
 					$totals = array();
 					$taxes = $this->cart->getTaxes();
 					$total = 0;
-					
-					// Because __call can not keep var references so we put them into an array. 
+
+					// Because __call can not keep var references so we put them into an array.
 					$total_data = array(
 						'totals' => &$totals,
 						'taxes'  => &$taxes,
 						'total'  => &$total
 					);
-			
+
 					$sort_order = array();
 
 					$results = $this->model_setting_extension->getExtensions('total');
@@ -587,7 +571,7 @@ class ControllerApiOrder extends Controller {
 					foreach ($results as $result) {
 						if ($this->config->get('total_' . $result['code'] . '_status')) {
 							$this->load->model('extension/total/' . $result['code']);
-							
+
 							// We have to put the totals in an array so that they pass by reference.
 							$this->{'model_extension_total_' . $result['code']}->getTotal($total_data);
 						}
@@ -617,7 +601,7 @@ class ControllerApiOrder extends Controller {
 					} else {
 						$order_status_id = $this->config->get('config_order_status_id');
 					}
-					
+
 					$this->model_checkout_order->addOrderHistory($order_id, $order_status_id);
 
 					// When order editing is completed, delete added order status for Void the order first.
@@ -633,7 +617,7 @@ class ControllerApiOrder extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
-	
+
 	//проверка номера договора на уникальность
 	public function checkUniquePact($pact_number){
 		$this->load->model('sale/order');
@@ -666,7 +650,7 @@ class ControllerApiOrder extends Controller {
 				$json['error'] = $this->language->get('error_not_found');
 			}
 		}
-		
+
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}

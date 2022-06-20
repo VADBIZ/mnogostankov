@@ -119,7 +119,7 @@ class ControllerSaleContract extends Controller {
 			$html .= '</tr></table>';
 			$html .= '<h1 class="contract__title">ДОГОВОР №'.$order_number.'<br>присоединения к '.$pact_title_datv.'</h1>';
 			$html .= '<table style="width:100%;margin-bottom:10px"><tr><td style="text-align:left">г. Омск</td><td style="text-align:right">№'.$order_info["order_number"].'</td></tr></table>';
-			$html .= '<p>Поставщик: ООО ГК «СТРУЧАЕВ», в лице Генерального директора Стручаева Виктора Васильевича, действующего на основании Устава и<br>';
+			$html .= '<p>Поставщик: ООО "СТРУЧАЕВ ГРУПП", в лице Генерального директора Стручаева Виктора Васильевича, действующего на основании Устава и<br>';
 			$html .= 'Покупатель: '.$company_name.' в лице '.$who_sign.' действующего на основании '.$foundoc.',<br>';
 			$html .= 'настоящим Договором присоединяется к '.$pact_title_datv.', известных Покупателю и имеющих обязательную для Покупателя силу. Настоящим Покупатель подтверждает готовность оплатить и принять следующее Оборудование:</p>';
 			if (count($order_products) > 0) {
@@ -226,7 +226,7 @@ class ControllerSaleContract extends Controller {
 						$html .= '<tbody>';
 							$html .= '<tr>';
 								$html .= '<td>Название</td>';
-								$html .= '<td>ООО ГК «СТРУЧАЕВ»</td>';
+								$html .= '<td>ООО "СТРУЧАЕВ ГРУПП"</td>';
 								$html .= '<td>'.$company_name.'</td>';
 							$html .= '</tr>';
 							$html .= '<tr>';
