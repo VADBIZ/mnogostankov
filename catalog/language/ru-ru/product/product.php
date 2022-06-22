@@ -4,12 +4,12 @@
 
 // Text
 $_['text_search']              = 'Поиск';
-$_['text_brand']               = 'Бренд';
-$_['text_manufacturer']        = 'Бренд:';
+$_['text_brand']               = 'Производитель';
+$_['text_manufacturer']        = 'Производитель:';
 $_['text_model']               = 'Модель:';
 $_['text_reward']              = 'Бонусные баллы:';
 $_['text_points']              = 'Цена в бонусных баллах:';
-$_['text_stock']               = 'Наличие:';
+$_['text_stock']               = 'Статус товара:';
 $_['text_instock']             = 'В наличии';
 $_['text_tax']                 = 'Без налога:';
 $_['text_discount']            = ' или больше ';
