@@ -1,12 +1,11 @@
 <aside id="column-left" class="col-sm-3 hidden-xs">
-<hr style="margin-top: 0;">
-  <div class="list-group">
-      
+  <div class="list-group" style="background: white; padding-top: 10px">
+
           <div><a href="{{ home }}"><span class="home"></span> <span class="texts">Главная</span></a></div>
           <!--<div><a href="index.php?route=checkout/cart"><span class="cart"></span> <span class="texts">Корзина</span></a></div>-->
           <div><a href="{{ wishlist }}" id="wishlist-total" title="{{ text_wishlist }}"><span class="wishlist"></span> <span class="texts">Избранное</span></a></div>
           <div><a href="index.php?route=product/compare"><span class="compare"></span> <span class="texts">Сравнить</span></a></div>
-      
+
   </div>
   {% if modules %}
       {% for module in modules %}

@@ -1,10 +1,10 @@
-<div class="cat_verh">Каталог</div>
 <nav id="menuVertical">
+    <div class="cat_verh" style="padding: 10px 15px">Каталог</div>
     <ul>
         {% for category in categories %}
         <li><a href="{{ category.href }}" class="list-group-item">{{ category.name }}</a>
             {% if category.children %}
-                <ul>
+                <ul class="menu-children">
                     {% for child in category.children %}
                         <li><a href="{{ child.href }}" class="list-group-item">{{ child.name }}</a>
                             {% if child.children2 %}
