@@ -50,6 +50,26 @@
             </ul>
 		  </div>
 
+              <div class="col-sm-12">
+                  {% if attribute_groups %}
+                      <div class="tab-pane" id="tab-specification">
+                          <table class="table table-bordered">
+                              {% for attribute_group in attribute_groups %}
+                                  <tbody>
+                                  {% for attribute in attribute_group.attribute %}
+                                      <tr>
+                                          <td>{{ attribute.name }}</td>
+                                          <td>{{ attribute.text }}</td>
+                                      </tr>
+                                  {% endfor %}
+                                  </tbody>
+                              {% endfor %}
+                          </table>
+                      </div>
+                  {% endif %}
+                  <div class="tab-pane" id="tab-description">{{ description }}</div>
+              </div>
+
 		 </div>
 
 		  <script>
@@ -324,97 +344,70 @@
                <!-- /uSocial -->
             </div>
             <div class="col-sm-4"><button class="btn toCopy" data-clipboard-text="{{ hrr }}">Скопировать ссылку</button></div>
-           </div>
+
+            <div class="col-sm-12">
+                {% if video %}
+                    <div class="tab-pane" id="tab-video">
+                        <iframe width="100%" style="height: auto" src="{{ video }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                {% endif %}
+
+                {% if review_status %}
+                    <div class="tab-pane" id="tab-review">
+                        <form class="form-horizontal" id="form-review">
+                            <div id="review"></div>
+                            <h2>{{ text_write }}</h2>
+                            {% if review_guest %}
+                                <div class="form-group required">
+                                    <div class="col-sm-12">
+                                        <label class="control-label" for="input-name">{{ entry_name }}</label>
+                                        <input type="text" name="name" value="{{ customer_name }}" id="input-name" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="form-group required">
+                                    <div class="col-sm-12">
+                                        <label class="control-label" for="input-review">{{ entry_review }}</label>
+                                        <textarea name="text" rows="5" id="input-review" class="form-control"></textarea>
+                                        <div class="help-block">{{ text_note }}</div>
+                                    </div>
+                                </div>
+                                <div class="form-group required">
+                                    <div class="col-sm-12">
+                                        <label class="control-label">{{ entry_rating }}</label>
+                                        &nbsp;&nbsp;&nbsp; {{ entry_bad }}&nbsp;
+                                        <input type="radio" name="rating" value="1" />
+                                        &nbsp;
+                                        <input type="radio" name="rating" value="2" />
+                                        &nbsp;
+                                        <input type="radio" name="rating" value="3" />
+                                        &nbsp;
+                                        <input type="radio" name="rating" value="4" />
+                                        &nbsp;
+                                        <input type="radio" name="rating" value="5" />
+                                        &nbsp;{{ entry_good }}</div>
+                                </div>
+                                {{ captcha }}
+                                <div class="buttons clearfix">
+                                    <div class="pull-right">
+                                        <button type="button" id="button-review" data-loading-text="{{ text_loading }}" class="btn btn-primary">{{ button_continue }}</button>
+                                    </div>
+                                </div>
+                            {% else %}
+                                {{ text_login }}
+                            {% endif %}
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
 
       </div>
       <div class="clear"></div>
       <p><hr></p>
       <div class="row">
-        <div class="col-sm-12">
-           <ul class="nav nav-tabs">
-            <li><a href="#tab-description" data-toggle="tab">{{ tab_description }}</a></li>
-            {% if attribute_groups %}
-            <li class="active"><a href="#tab-specification" data-toggle="tab">{{ tab_attribute }}</a></li>
-            {% endif %}
-            {% if review_status %}
-            <li><a href="#tab-review" data-toggle="tab">{{ tab_review }}</a></li>
-            {% endif %}
-			{% if video %}
-            <li><a href="#tab-video" data-toggle="tab">Видео</a></li>
-            {% endif %}
-          </ul>
-          <div class="tab-content">
-            <div class="tab-pane" id="tab-description">{{ description }}</div>
-            {% if attribute_groups %}
-            <div class="tab-pane active" id="tab-specification">
-              <table class="table table-bordered">
-                {% for attribute_group in attribute_groups %}
 
-                <tbody>
-                {% for attribute in attribute_group.attribute %}
-                <tr>
-                  <td>{{ attribute.name }}</td>
-                  <td>{{ attribute.text }}</td>
-                </tr>
-                {% endfor %}
-                  </tbody>
-                {% endfor %}
-              </table>
-            </div>
-            {% endif %}
-            {% if review_status %}
-            <div class="tab-pane" id="tab-review">
-              <form class="form-horizontal" id="form-review">
-                <div id="review"></div>
-                <h2>{{ text_write }}</h2>
-                {% if review_guest %}
-                <div class="form-group required">
-                  <div class="col-sm-12">
-                    <label class="control-label" for="input-name">{{ entry_name }}</label>
-                    <input type="text" name="name" value="{{ customer_name }}" id="input-name" class="form-control" />
-                  </div>
-                </div>
-                <div class="form-group required">
-                  <div class="col-sm-12">
-                    <label class="control-label" for="input-review">{{ entry_review }}</label>
-                    <textarea name="text" rows="5" id="input-review" class="form-control"></textarea>
-                    <div class="help-block">{{ text_note }}</div>
-                  </div>
-                </div>
-                <div class="form-group required">
-                  <div class="col-sm-12">
-                    <label class="control-label">{{ entry_rating }}</label>
-                    &nbsp;&nbsp;&nbsp; {{ entry_bad }}&nbsp;
-                    <input type="radio" name="rating" value="1" />
-                    &nbsp;
-                    <input type="radio" name="rating" value="2" />
-                    &nbsp;
-                    <input type="radio" name="rating" value="3" />
-                    &nbsp;
-                    <input type="radio" name="rating" value="4" />
-                    &nbsp;
-                    <input type="radio" name="rating" value="5" />
-                    &nbsp;{{ entry_good }}</div>
-                </div>
-                {{ captcha }}
-                <div class="buttons clearfix">
-                  <div class="pull-right">
-                    <button type="button" id="button-review" data-loading-text="{{ text_loading }}" class="btn btn-primary">{{ button_continue }}</button>
-                  </div>
-                </div>
-                {% else %}
-                {{ text_login }}
-                {% endif %}
-              </form>
-            </div>
-            {% endif %}
-			{% if video %}
-			<div class="tab-pane" id="tab-video">
-			<iframe width="100%" height="400" src="{{ video }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-			</div>
-			{% endif %}
-			</div>
-         </div>
+
+
 
       </div>
 
