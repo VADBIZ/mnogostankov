@@ -2087,7 +2087,7 @@ background: none;
     width: auto;
     background: #F6F8FF;
     z-index: 99999;
-    width: 300%;
+    width: 310%;
     margin: 0;
     padding: 0;
     min-height: 400px;
@@ -2095,9 +2095,9 @@ background: none;
 /*******показываем выпадашку при наведении ********/
 #menuVertical ul > li:hover > .menu-children {
 	padding: 15px 0;
-	margin-left: 30px;
 	display:block;
 	box-shadow: 1px 1px 10px;
+	background: white;
 }
 #menuVertical > ul > li > ul > li {
 	min-width: 280px;
