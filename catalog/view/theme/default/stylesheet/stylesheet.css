@@ -2033,7 +2033,13 @@ background: none;
 }
 
 /* Меню вертикаль */
-#menuVertical{width:100%;height:auto;}
+#menuVertical {
+	width: 100%;
+	height: auto;
+	background: white;
+	margin-top: -20px;
+	padding-top: 20px;
+}
 #menuVertical .list-group-item {border-radius:0;}
 #menuVertical ul{
     display:block;
@@ -2051,7 +2057,7 @@ background: none;
     width:100%;
     height:auto;
     box-sizing:border-box;
-    padding: 10px 15px 10px 2px;
+    padding: 10px 15px 10px 15px;
     background: none;
     text-decoration:none;
     z-index: 999999;
@@ -2081,17 +2087,25 @@ background: none;
     width: auto;
     background: #F6F8FF;
     z-index: 99999;
-    width: 310%;
+    width: 300%;
     margin: 0;
     padding: 0;
     min-height: 400px;
 }
 /*******показываем выпадашку при наведении ********/
-#menuVertical ul > li:hover > ul{display:block;}
+#menuVertical ul > li:hover > .menu-children {
+	padding: 15px 0;
+	margin-left: 30px;
+	display:block;
+	box-shadow: 1px 1px 10px;
+}
 #menuVertical > ul > li > ul > li {
 	min-width: 280px;
 	max-width:280px;
 	float:left;
+}
+#menuVertical > ul > li > ul > li > a {
+	font-weight: 700;
 }
 #menuVertical > ul > li > ul > li:hover ul {
 	display: block;
@@ -2100,10 +2114,7 @@ background: none;
 	position: relative;
 	padding-left: 0px;
 	margin-left: 0;
-	display: none;
-}
-#menuVertical ul > li > ul li > ul li{
-	padding-left: 20px;
+	display: block;
 }
 #menuVertical ul li ul li a{
     text-transform:none;
