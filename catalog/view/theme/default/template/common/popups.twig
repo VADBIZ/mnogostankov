@@ -32,6 +32,9 @@
           <div class="">
             <input class="btn btn-primary btn-block btn-lg" data-loading-text="{{ text_loading }}" id="button-form1" type="button" value="{{ button_submit }}" />
 			<input type="hidden" name="vid" value="1" />
+              {% if product_id is not null %}
+              <input type="hidden" name="product_id" value="{{ product_id }}" />
+              {% endif %}
           </div>
         </div>
       </form>

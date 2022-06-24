@@ -149,47 +149,8 @@
 
            </div>-->
           {% endif %}
-		  <div class="for_1 col-sm-12" style="display:none">
-		    <div class="clear"></div>
-		    <form action="{{ action }}" method="post" id="form-rev" enctype="multipart/form-data" class="form-horizontal col-sm-12">
-
-                <div class="form-group required obj_name">
-                    <label class="control-label" for="input-name">{{ entry_name }}</label>
-                    <input type="text" name="name" value="{{ name }}" id="input-name" class="form-control" />
-                </div>
-		        <div class="form-group required obj_telephone">
-                    <label class="control-label" for="input-telephone">{{ entry_telephone }}</label>
-                    <input type="text" name="telephone" id="phone" value="{{ telephone }}" id="input-telephone" class="form-control" />
-                </div>
-                <div class="form-group required obj_email">
-                    <label class="control-label" for="input-email">{{ entry_email }}</label>
-                    <input type="text" name="email" value="{{ email }}" id="input-email" class="form-control" />
-                </div>
-                <div class="form-group">
-                    <label class="control-label" for="input-enquiry">{{ entry_enquiry }}</label>
-                    <textarea name="enquiry" rows="10" id="input-enquiry" class="form-control">{{ enquiry }}</textarea>
-                </div>
-
-                {{ captcha_quick_form }}
-
-		        <div class="form-group"><input type="checkbox" name="whatsapp" value="1" checked> Хочу получать ответ в WhatsApp</div>
-		        <div class="form-group"><input type="checkbox" name="mailing" value="1" checked> Хочу получать рассылку на Email</div>
-		        <div class="form-group obj_agree">
-				    <input type="checkbox" name="agree" value="1"> Я согласен на обработку персональных данных в соответствии с <a href="{{ ur }}">политикой конфиденциальности</a>
-		            <div class="ag"></div>
-		        </div>
-		        <div id="r"></div>
-                <div class="buttons">
-                    <div class="">
-                        <input class="btn btn-primary btn-block btn-lg" data-loading-text="{{ text_loading }}" id="button-form1" type="button" value="Получить консультацию" />
-						<input type="hidden" name="vid" value="2" />
-						<input type="hidden" name="product_id" value="{{ product_id }}" />
-                    </div>
-                </div>
-            </form>
-		  </div>
 		  <div class="form-group">
-		    <button type="button" id="button-forms" class="btn btn-primary btn-lg btn-block">Получить консультацию</button>
+		    <button type="button" href="index.php?route=common/popups&popup_product_id={{ product_id }}" class="agree btn btn-primary btn-lg btn-block">Получить консультацию</button>
 		  </div>
           <div class="clear"></div>
           <div id="product">
@@ -469,67 +430,6 @@
       {{ content_bottom }}</div>
     {{ column_right }}</div>
 </div>
-<script>
-$('#button-forms').click(function() {
-	$('.for_1').show('slow');
-    $('#button-forms').remove();
-});
-
-
-$('#button-form1').on('click', function() {
-    $.ajax({
-		url: 'index.php?route=common/popups/add',
-		type: 'post',
-		dataType: 'json',
-		data: $("#form-rev").serialize(),
-		beforeSend: function() {
-			$('#button-form1').button('loading');
-		},
-		complete: function() {
-			$('#button-form1').button('reset');
-		},
-		success: function(json) {
-			$('.text-danger').remove();
-
-			if (json['error']) {
-			    if(json['error']['name']) {
-				    $('.for_1 .obj_name').addClass('has-error');
-					$('.for_1 input[name=\'name\']').after('<div class="text-danger">' + json['error']['name'] + '</div>');
-				}
-
-				if(json['error']['telephone']) {
-				    $('.for_1 .obj_telephone').addClass('has-error');
-					$('.for_1 input[name=\'telephone\']').after('<div class="text-danger">' + json['error']['telephone'] + '</div>');
-				}
-
-				if(json['error']['email']) {
-				    $('.for_1 .obj_email').addClass('has-error');
-					$('.for_1 input[name=\'email\']').after('<div class="text-danger">' + json['error']['email'] + '</div>');
-				}
-
-				if(json['error']['agree']) {
-				    $('.for_1 .obj_agree').addClass('has-error');
-
-					$('.for_1 .ag').after('<div class="text-danger">' + json['error']['agree'] + '</div>');
-				}
-
-                if(json['error']['captcha']) {
-                    $('.for_1 .obj_captcha').addClass('has-error');
-                    $('.for_1 input[name=\'captcha\']').after('<div class="text-danger">' + json['error']['captcha'] + '</div>');
-                }
-
-			}
-
-			if (json['success']) {
-				$('.for_1').html('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
-			}
-		}
-	});
-});
-
-
-
-</script>
 <script type="text/javascript"><!--
 $('select[name=\'recurring_id\'], input[name="quantity"]').change(function(){
 	$.ajax({
