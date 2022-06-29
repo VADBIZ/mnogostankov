@@ -11,10 +11,14 @@
 !/image/cache/index.html
 
 # System Cache Files
+/storage-mnogo/cache/*
+!/storage-mnogo/cache/index.html
 /system/storage/cache/*
 !/system/storage/cache/index.html
 
 # Modification Files
+/storage-mnogo/modification/*
+!/storage-mnogo/modification/index.html
 /system/storage/modification/*
 !/system/storage/modification/index.html
 
@@ -23,14 +27,20 @@
 /image/templates/default.jpg
 
 # Download Files
+/storage-mnogo/download/*
+!/storage-mnogo/download/index.html
 /system/storage/download/*
 !/system/storage/download/index.html
 
 # Session Files
+/storage-mnogo/session/*
+!/storage-mnogo/session/index.html
 /system/storage/session/*
 !/system/storage/session/index.html
 
 # Upload Files
+/storage-mnogo/upload/*
+!/storage-mnogo/upload/index.html
 /system/storage/upload/*
 !/system/storage/upload/index.html
 
@@ -39,6 +49,8 @@
 # /upload/flags/*
 
 # Log Files
+/storage-mnogo/logs/*
+!/storage-mnogo/logs/index.html
 /system/storage/logs/*
 !/system/storage/logs/index.html
 
@@ -49,6 +61,8 @@
 # Ignore all vendor files included by composer and the lock file
 /tests/phpunit/vendor/*
 /tests/phpunit/composer.lock
+
+catalog/view/theme/default/stylesheet/ocfilter/ocf.cache*
 
 # Test Config File
 /tests/phpunit/bootstrap.php
