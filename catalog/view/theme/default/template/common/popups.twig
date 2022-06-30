@@ -81,7 +81,7 @@ $('#button-form1').on('click', function() {
 
                 if(json['error']['captcha']) {
                     $('#polpol .obj_captcha').addClass('has-error');
-                    $('#polpol input[name=\'captcha\']').after('<div class="text-danger">' + json['error']['captcha'] + '</div>');
+                    $('#polpol .g-recaptcha').after('<div class="text-danger">' + json['error']['captcha'] + '</div>');
                 }
 
 			}
