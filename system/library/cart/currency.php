@@ -2,10 +2,12 @@
 namespace Cart;
 class Currency {
 	private $currencies = array();
+	private $cache;
 
 	public function __construct($registry) {
 		$this->db = $registry->get('db');
 		$this->language = $registry->get('language');
+		$this->cache = $registry->get('cache');
 
 		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "currency");
 
@@ -60,26 +62,29 @@ class Currency {
 		}
 	}
 
-	public function get_currency($currency_code, $format) {
-		$date = date('d/m/Y'); // Текущая дата
-		$cache_time_out = '3600'; // Время жизни кэша в секундах
+    public function get_currency($currency_code, $format) {
+        $date = date('d/m/Y');
 
-		$file_currency_cache = $_SERVER['DOCUMENT_ROOT'].'/currency.xml'; // Файл кэша
+        $file_currency_cache = $this->cache->get('cbr.currency');
 
-		if(!is_file($file_currency_cache) || filectime($file_currency_cache) < (time() - $cache_time_out)) {
-			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, 'https://www.cbr.ru/scripts/XML_daily.asp?date_req='.$date);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_HEADER, 0);
-			$out = curl_exec($ch);
-			curl_close($ch);
-			file_put_contents($file_currency_cache, $out);
-		}
+        if (!$file_currency_cache) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, 'https://www.cbr.ru/scripts/XML_daily.asp?date_req=' . $date);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            $out = curl_exec($ch);
+            curl_close($ch);
 
-		$content_currency = simplexml_load_file($file_currency_cache);
+            $result = json_decode(json_encode((array)simplexml_load_string($out)), true);
+            $this->cache->set('cbr.currency', $result);
+        }
 
-		return number_format(str_replace(',', '.', $content_currency->xpath('Valute[CharCode="'.$currency_code.'"]')[0]->Value), $format);
-	}
+        foreach ($file_currency_cache['Valute'] as $item) {
+            if ($item['CharCode'] == $currency_code) {
+                return number_format(str_replace(',', '.', $item['Value']), $format);
+            }
+        }
+    }
 
 	public function convert($value, $from, $to) {
 		if (isset($this->currencies[$from])) {

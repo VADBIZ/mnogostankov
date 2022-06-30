@@ -1,7 +1,6 @@
 {{ header }}
 <div class="photo-gallery-wrapper">
 <div id="information-information" class="container">
-  
   <div class="row">{{ column_left }}
     {% if column_left and column_right %}
     {% set class = 'col-sm-6' %}
@@ -17,29 +16,18 @@
     {% endfor %}
   </ul>
       <h1 class="verx">{{ heading_title }}</h1>
-	  
+
       {% if paragraphs %}
-            <div class="grid">
-                {% for paragraph in paragraphs %}
-                    <div class="grid-item">
-	                    <img src="{{ paragraph.image }}" alt="" class="img-responsive" />
-                    </div>
-                {% endfor %}
-            </div>
+          <div class="row">
+              {% for paragraph in paragraphs %}
+                  <div class="col-xs-12 col-sm-6 col-md-4" style="margin-bottom: 15px">
+                      <img src="{{ paragraph.image }}" alt="" class="fluid img-thumbnail">
+                  </div>
+              {% endfor %}
+          </div>
       {% endif %}
       {{ content_bottom }}</div>
     {{ column_right }}</div>
 </div>
 </div>
-<style>
-.grid-item { width: 200px; padding: 5px;}
-.grid-item--width2 { width: 400px; padding: 5px;}
-</style>
-<script>
-$('.grid').masonry({
-  // options
-  itemSelector: '.grid-item',
-  columnWidth: 200
-});
-</script>
 {{ footer }}
