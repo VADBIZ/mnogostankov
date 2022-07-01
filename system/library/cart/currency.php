@@ -47,8 +47,6 @@ class Currency {
 			$string .= $symbol_left;
 		}
 
-//		var_dump($amount);
-
 		$string .= number_format($amount, (int)$decimal_place, $this->language->get('decimal_point'), $this->language->get('thousand_point'));
 
 		if ($symbol_right) {
@@ -79,10 +77,14 @@ class Currency {
             $this->cache->set('cbr.currency', $result);
         }
 
-        foreach ($file_currency_cache['Valute'] as $item) {
-            if ($item['CharCode'] == $currency_code) {
-                return number_format(str_replace(',', '.', $item['Value']), $format);
+        if (isset($file_currency_cache['Valute'])) {
+            foreach ($file_currency_cache['Valute'] as $item) {
+                if ($item['CharCode'] == $currency_code) {
+                    return number_format(str_replace(',', '.', $item['Value']), $format);
+                }
             }
+        } else {
+            return 0;
         }
     }
 
