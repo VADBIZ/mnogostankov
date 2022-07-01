@@ -7,15 +7,33 @@
         <fieldset>
           <div class="form-group required obj_name">
             <label class="control-label" for="input-name">{{ entry_name }}</label>
-              <input type="text" name="name" value="{{ name }}" id="input-name" class="form-control" />
+              <input type="text" name="{{ token }}_name" value="{{ name }}" id="popup-input-name" class="form-control" />
+              <input type="hidden" name="name" value="{{ name }}" />
+              <script>
+                  $('#popup-input-name').on('input keyup', function(e) {
+                      $('input[name=name]').val($(this).val())
+                  });
+              </script>
           </div>
 		  <div class="form-group required obj_telephone">
             <label class="control-label" for="input-telephone">{{ entry_telephone }}</label>
-              <input type="text" name="telephone" id="phone" value="{{ telephone }}" id="input-telephone" class="form-control" />
+              <input type="text" name="{{ token }}_telephone" value="{{ telephone }}" id="popup-input-telephone" class="form-control" />
+              <input type="hidden" name="telephone" value="{{ telephone }}" />
+              <script>
+                  $('#popup-input-telephone').on('input keyup', function(e) {
+                      $('input[name=telephone]').val($(this).val())
+                  });
+              </script>
           </div>
           <div class="form-group required obj_email">
             <label class="control-label" for="input-email">{{ entry_email }}</label>
-              <input type="text" name="email" value="{{ email }}" id="input-email" class="form-control" />
+              <input type="text" name="{{ token }}_email" value="{{ email }}" id="popup-input-email" class="form-control" />
+              <input type="hidden" name="email" value="{{ email }}" />
+              <script>
+                  $('#popup-input-email').on('input keyup', function(e) {
+                      $('input[name=email]').val($(this).val())
+                  });
+              </script>
           </div>
           <div class="form-group">
             <label class="control-label" for="input-enquiry">{{ entry_enquiry }}</label>
@@ -85,7 +103,7 @@ $('#button-form1').on('click', function() {
 
                 if(json['error']['captcha']) {
                     $('#polpol .obj_captcha').addClass('has-error');
-                    $('#polpol input[name=\'captcha\']').after('<div class="text-danger">' + json['error']['captcha'] + '</div>');
+                    $('#polpol .g-recaptcha').after('<div class="text-danger">' + json['error']['captcha'] + '</div>');
                 }
 
 			}
@@ -98,6 +116,6 @@ $('#button-form1').on('click', function() {
 });
 
 $(function(){
-    $("#phone").mask("+7 (999)999-99-99");
+    $("#popup-input-telephone").mask("+7 (999)999-99-99");
 });
 //--></script>
