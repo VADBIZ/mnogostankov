@@ -11,6 +11,8 @@ class ControllerCommonPopups extends Controller {
 
         $data['product_id'] = ($this->request->get['popup_product_id'] ?? 0);
 
+        $data['token'] = token(3) . '_' . time();
+
         $data['captcha'] = $this->load->controller('extension/captcha/' . $this->config->get('config_captcha'), $this->error);
 
 		$this->response->setOutput($this->load->view('common/popups', $data));
