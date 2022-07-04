@@ -20,7 +20,7 @@
       {% if paragraphs %}
           <div class="row">
               {% for paragraph in paragraphs %}
-                  <div class="col-xs-12 col-sm-6 col-md-4" style="margin-bottom: 15px">
+                  <div class="col-xs-12 col-md-4 capture">
                       <img src="{{ paragraph.image }}" alt="" class="fluid img-thumbnail">
                   </div>
               {% endfor %}
@@ -30,4 +30,19 @@
     {{ column_right }}</div>
 </div>
 </div>
+<style>
+    .capture {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    .capture .img-thumbnail {
+        max-height: 200px;
+    }
+    @media (max-width: 768px) {
+        .capture .img-thumbnail {
+            min-width:100%;
+            max-height: unset !important;
+        }
+    }
+</style>
 {{ footer }}
