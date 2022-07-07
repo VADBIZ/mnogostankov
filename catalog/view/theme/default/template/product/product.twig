@@ -657,4 +657,30 @@ $(document).ready(function() {
 	});
 });
 </script>
+
+<script type="text/javascript"><!--
+    price_usd = parseFloat({{ price_usd_value }});
+
+    $('input[name*="option"]').on('change', function(){
+        price = price_usd;
+        $('input[name*="option"]').each(function (){
+            if($(this).is(':checked')) {
+                price += parseFloat($(this).attr('data-price'));
+            }
+        });
+
+        $.ajax({
+            url: 'index.php?route=product/product/transformToPrice',
+            type: 'get',
+            dataType: 'json',
+            data: 'price=' + price,
+            success: function(json) {
+                $('.product__price:first-child').html(json.price_usd);
+                $('.product__price:last-child').html(json.price_rub);
+            }
+        });
+
+        console.log(price)
+    });
+    //--></script>
 {{ footer }}
