@@ -419,11 +419,16 @@ top: 0px;
     min-height: 32px;
 }
 #column-left .list-group div a {
-  min-width:205px;
-    display: inline-block;
-    border: 0;
-  padding: 5px 12px 5px 5px;
-  line-height: 80%;
+	min-width: 205px;
+	display: inline-block;
+	border: 0;
+	padding: 5px 12px 5px 5px;
+	line-height: 80%;
+	margin-bottom: 12px;
+}
+#column-left .list-group div a span:first-child {
+	box-shadow: 1px 2px 8px rgba(0, 0, 0, 0.1);
+	border-radius: 2px;
 }
 #column-left .list-group div:first-child a {
 border: 0px solid #888;
@@ -905,7 +910,8 @@ border-radius: 5px;
 	border: 0px solid #DDDDDD;
 	text-shadow: 0 0px 0 #FFF;
     background-color: #ffffff;
-
+	box-shadow: 4px 4px 7px rgb(0 0 0 / 10%);
+	color: #5071D0;
 }
 .eby .btn-p {
 	font-family: 'Inter';
@@ -2036,7 +2042,6 @@ background: none;
 #menuVertical {
 	width: 100%;
 	height: auto;
-	background: white;
 	margin-top: -20px;
 	padding-top: 20px;
 }
@@ -2050,7 +2055,14 @@ background: none;
     list-style:none;
     position: static;
 }
-#menuVertical ul li{display:block; width:100%; height:auto; position: static;}
+
+#menuVertical ul li {
+	display: block;
+	width: 100%;
+	height: auto;
+	position: static;
+	margin-bottom: 10px;
+}
 #menuVertical ul li a{
     position: static;
     display:block;
@@ -2379,7 +2391,8 @@ flex-wrap: wrap;
     font-weight: 600;
     font-size: 15px;
     line-height: 140%;
-    color: #5071D0;
+    color: #111111;
+	padding: 20px 15px;
 }
 .v_t {
 	font-family: 'Inter';
