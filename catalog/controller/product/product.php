@@ -398,6 +398,8 @@ class ControllerProductProduct extends Controller {
 
 					$data['price_usd'] = sprintf($this->language->get('text_price_usd'), number_format($price_usd, 0, ',', ' '));
 					$data['price_rub'] = sprintf($this->language->get('text_price_rub'), $price_rub);
+
+					$data['price_usd_value'] = $price_usd;
 				} else {
 					$data['price_zero'] = $this->language->get('text_price_zero');
 				}
@@ -863,4 +865,17 @@ class ControllerProductProduct extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
+
+	public function transformToPrice() {
+        $price = $this->request->get['price'];
+
+        $price_currency = $this->currency->get_currency('USD', 4);
+        $price_rub = number_format((float)$price * $price_currency, 0, ',', ' ');
+
+        $json['price_usd'] = sprintf('<strong>Цена $:</strong> %s', number_format($price, 0, ',', ' '));
+        $json['price_rub'] = sprintf('<strong>Цена ₽:</strong> %s', $price_rub);
+
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
+    }
 }
