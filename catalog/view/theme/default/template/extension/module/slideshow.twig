@@ -1,6 +1,6 @@
 <style>
   #list-group{{ module }} .list-group-item {
-    padding: 13px 20px;
+    padding: 10px 20px;
     margin-bottom: 1px;
     background: linear-gradient(321.26deg, #4167DA 0%, #7699FF 98.06%);
   }
@@ -13,14 +13,58 @@
   }
   #list-group{{ module }} a:hover {
     font-weight: 700;
-    text-shadow: 0 0 black;
+    text-shadow: none;
   }
   #list-group{{ module }} a img {
     float:right;
-    margin-top:5px
+    margin-top:-13px
   }
   #list-group{{ module }} .list-group-item-heading {
     color: white;
+  }
+  #list-group{{ module }} .list-group-item:first-child {
+    font-weight: 700;
+  }
+
+  #list-group{{ module }} .list-group-item-text {
+    font-size: 13px;
+    opacity: 0.8;
+  }
+  @media (min-width: 992px) and (max-width: 1200px) {
+    #list-group{{ module }} .list-group-item-heading {
+      color: white;
+      font-size: 12px;
+    }
+    #list-group{{ module }} a {
+      color: white;
+      font-family: 'Inter';
+      font-style: normal;
+      line-height: 100%;
+    }
+    #list-group{{ module }} .list-group-item-text {
+      font-size: 10px;
+      opacity: 0.8;
+    }
+  }
+  @media (min-width: 768px) and (max-width: 992px) {
+    #list-group{{ module }} .list-group-item {
+      padding: 10px 20px;
+    }
+    #list-group{{ module }} .list-group-item-heading {
+      color: white;
+      font-size: 8px;
+    }
+    #list-group{{ module }} a {
+      color: white;
+      font-size: 6px;
+      font-family: 'Inter';
+      font-style: normal;
+      line-height: 100%;
+    }
+    #list-group{{ module }} .list-group-item-text {
+      font-size: 6px;
+      opacity: 0.8;
+    }
   }
 </style>
 <div class="row hidden-xs">
@@ -36,9 +80,13 @@
 </div>
 
   <div id="list-group{{ module }}" class="list-group col-sm-3">
+    <a href="#" class="list-group-item">
+      <span class="list-group-item-heading">Акции</span>
+    </a>
     {% for menu in blue_menu %}
       <a href="{{ menu.href }}" class="list-group-item">
         <span class="list-group-item-heading">{{ menu.name }}</span>
+        <p class="list-group-item-text">Посмотреть</p>
         <img src="/image/arrow.svg">
       </a>
     {% endfor %}
@@ -54,5 +102,10 @@ $('#slideshow{{ module }}').swiper({
     autoplayDisableOnInteraction: true,
 	loop: true
 });
+
+  difference = $('#slideshow{{ module }}').height() - $('#list-group{{ module }}').height();
+  if (difference > 0) {
+    $('#list-group{{ module }} a:last-child').css('height', $('#list-group{{ module }} .list-group-item:last-child').outerHeight() + difference);
+  }
 //--></script>
 </div>
