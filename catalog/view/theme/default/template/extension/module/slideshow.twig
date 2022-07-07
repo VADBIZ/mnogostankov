@@ -1,26 +1,58 @@
-<div class="slideshow swiper-viewport">
+<style>
+  #list-group{{ module }} .list-group-item {
+    padding: 13px 20px;
+    margin-bottom: 1px;
+    background: linear-gradient(321.26deg, #4167DA 0%, #7699FF 98.06%);
+  }
+  #list-group{{ module }} a {
+    color: white;
+    font-size: 14px;
+    font-family: 'Inter';
+    font-style: normal;
+    line-height: 140%;
+  }
+  #list-group{{ module }} a:hover {
+    font-weight: 700;
+    text-shadow: 0 0 black;
+  }
+  #list-group{{ module }} a img {
+    float:right;
+    margin-top:5px
+  }
+  #list-group{{ module }} .list-group-item-heading {
+    color: white;
+  }
+</style>
+<div class="row hidden-xs">
+<div class="col-sm-9">
+<div class="slideshow swiper-viewport" style="margin-bottom: 0; box-shadow: none">
   <div id="slideshow{{ module }}" class="swiper-container">
     <div class="swiper-wrapper"> {% for banner in banners %}
-      <div class="swiper-slide text-center">{% if banner.link %}<a href="{{ banner.link }}"><img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" /></a>{% else %}<img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" />{% endif %}</div>
+      <div class="swiper-slide text-center" style="padding: unset; border: none">{% if banner.link %}<a href="{{ banner.link }}"><img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" /></a>{% else %}<img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" />{% endif %}</div>
       {% endfor %} </div>
   </div>
-  <div class="swiper-pagination slideshow{{ module }}"></div>
-  <div class="swiper-pager">
-    <div class="swiper-button-next"></div>
-    <div class="swiper-button-prev"></div>
-  </div>
+  <div class="swiper-pagination slideshow{{ module }}" style="bottom: 10px;"></div>
 </div>
+</div>
+
+  <div id="list-group{{ module }}" class="list-group col-sm-3">
+    {% for menu in blue_menu %}
+      <a href="{{ menu.href }}" class="list-group-item">
+        <span class="list-group-item-heading">{{ menu.name }}</span>
+        <img src="/image/arrow.svg">
+      </a>
+    {% endfor %}
+  </div>
 <script type="text/javascript"><!--
 $('#slideshow{{ module }}').swiper({
 	mode: 'horizontal',
 	slidesPerView: 1,
 	pagination: '.slideshow{{ module }}',
 	paginationClickable: true,
-	nextButton: '.slideshow .swiper-button-next',
-    prevButton: '.slideshow .swiper-button-prev',
     spaceBetween: 30,
 	autoplay: 2500,
     autoplayDisableOnInteraction: true,
 	loop: true
 });
 //--></script>
+</div>

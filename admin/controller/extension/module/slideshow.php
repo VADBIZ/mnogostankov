@@ -117,6 +117,40 @@ class ControllerExtensionModuleSlideshow extends Controller {
 			$data['height'] = '';
 		}
 
+		// Blue Menu
+        if (isset($this->request->post['blue_menu'])) {
+            $data['blue_menu'] = $this->request->post['blue_menu'];
+        } elseif (!empty($module_info['blue_menu'])) {
+            $data['blue_menu'] = $module_info['blue_menu'];
+        } else {
+            $data['blue_menu'] = '';
+        }
+
+		// Mobile
+        if (isset($this->request->post['mobile_banner_id'])) {
+            $data['mobile_banner_id'] = $this->request->post['mobile_banner_id'];
+        } elseif (!empty($module_info)) {
+            $data['mobile_banner_id'] = $module_info['mobile_banner_id'];
+        } else {
+            $data['mobile_banner_id'] = '';
+        }
+
+        if (isset($this->request->post['mobile_width'])) {
+            $data['mobile_width'] = $this->request->post['mobile_width'];
+        } elseif (!empty($module_info)) {
+            $data['mobile_width'] = $module_info['mobile_width'];
+        } else {
+            $data['mobile_width'] = '';
+        }
+
+        if (isset($this->request->post['mobile_height'])) {
+            $data['mobile_height'] = $this->request->post['mobile_height'];
+        } elseif (!empty($module_info)) {
+            $data['mobile_height'] = $module_info['mobile_height'];
+        } else {
+            $data['mobile_height'] = '';
+        }
+
 		if (isset($this->request->post['status'])) {
 			$data['status'] = $this->request->post['status'];
 		} elseif (!empty($module_info)) {
