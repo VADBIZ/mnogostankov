@@ -298,7 +298,7 @@
          </div>
             <div class="col-sm-12 col-pad-0"><hr></div>
             <div class="clear"></div>
-            <div class="col-sm-8 col-pad-0">
+            <div class="col-sm-4 col-pad-0 hidden-xs">
                 <!-- uSocial -->
                 <script async src="https://usocial.pro/usocial/usocial.js?uid=b6480c52daf64356&v=6.1.5" data-script="usocial" charset="utf-8"></script>
                 <div class="uSocial-Share"
@@ -308,7 +308,7 @@
                 data-social="vk,telegram,email"></div>
                <!-- /uSocial -->
             </div>
-            <div class="col-sm-4"><button class="btn toCopy" data-clipboard-text="{{ hrr }}">Скопировать ссылку</button></div>
+            <div class="col-sm-8"><button class="btn toCopy" data-clipboard-text="{{ hrr }}">Скопировать ссылку</button></div>
 
             <div class="col-sm-12" style="margin-top: 20px">
                 {% if video %}
@@ -659,6 +659,7 @@ $(document).ready(function() {
 </script>
 
 <script type="text/javascript"><!--
+    // Option Auto calc
     price_usd = parseFloat({{ price_usd_value }});
 
     $('input[name*="option"]').on('change', function(){
@@ -681,6 +682,20 @@ $(document).ready(function() {
         });
 
         console.log(price)
+    });
+
+    // Размер google captcha
+    $(function() {
+        var captchasAr = document.querySelectorAll(".g-recaptcha");
+        captchasAr.forEach(function (captcha) {
+            var reCaptchaWidth = 304;
+            var containerWidth = captcha.parentNode.offsetWidth;
+            if (reCaptchaWidth > containerWidth) {
+                captcha.parentNode.style.transform = 'scale(' + (containerWidth / reCaptchaWidth) + ')';
+                captcha.parentNode.style.transformOrigin = 'left top';
+                captcha.parentNode.style.width = (reCaptchaWidth / containerWidth) * 100 + '%';
+            }
+        });
     });
     //--></script>
 {{ footer }}
