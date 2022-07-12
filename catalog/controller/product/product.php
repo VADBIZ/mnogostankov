@@ -5,10 +5,10 @@
 class ControllerProductProduct extends Controller {
 	private $error = array();
 
-	public function index() {
-		$this->load->language('product/product');
-        $data['ur'] = $this->config->get('config_ur');
-		$data['breadcrumbs'] = array();
+    public function index() {
+        $this->load->language('product/product');
+
+        $data['breadcrumbs'] = array();
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
@@ -159,55 +159,7 @@ class ControllerProductProduct extends Controller {
 
 		$this->load->model('catalog/product');
 
-		$this->load->model('catalog/category');
-
-            $pull_category = $this->model_catalog_product->getCategories($this->request->get['product_id']);
-
-
-
-            $cat_ids = '';
-						if(!empty($pull_category)){
-							foreach ($pull_category as $catid) {
-								if ($catid =='0') {
-									unset($catid);
-								}
-								if ($catid['category_id'] !=='0'){
-									$cat_ids .= $catid['category_id'].'_';
-								}
-							}
-
-              $path        = '';
-              $parts       = array(explode('_', (string)$cat_ids));
-        			$flip_array  = array_pop($parts);
-        			$category_id = array_reverse($flip_array);
-
-        			//skip 0, which would be the root category
-              if(isset($category_id[1])){
-        				$par_category = $this->model_catalog_category->getParent($category_id[1]);
-
-//        	      if(!isset($this->request->get['path'])){
-        					if (isset($par_category)) {
-        						$url = '';
-        					}
-
-        					if(isset($category_id[1])){
-        						$category_info = $this->model_catalog_category->getCategory($category_id[1]);
-
-        							if(isset($category_info)){
-        								$categoryParent = isset($par_category['category_id']) ? $par_category['category_id'] : '0';
-
-        								$data['breadcrumbs'][] = array(
-        									'text'      => isset($category_info['name']) ? $category_info['name'] : '',
-        									'href'      => $this->url->link('product/category', 'path=' . $category_id[1]),
-        									'separator' => $this->language->get('text_separator')
-        								);
-        							}
-        					}
-              	}
-            	}
-//        		}
-
-		$product_info = $this->model_catalog_product->getProduct($product_id);
+        $product_info = $this->model_catalog_product->getProduct($product_id);
 
 		if ($product_info) {
 			$url = '';
@@ -265,42 +217,22 @@ class ControllerProductProduct extends Controller {
 				'href' => $this->url->link('product/product', $url . '&product_id=' . $this->request->get['product_id'])
 			);
 
-			if ($product_info['meta_title']) {
-				$this->document->setTitle($product_info['meta_title']);
-			} else {
-				$this->document->setTitle($product_info['name']);
-			}
-
-			if ($product_info['noindex'] <= 0 && $this->config->get('config_noindex_status')) {
-				$this->document->setRobots('noindex,follow');
-			}
-
-			if ($product_info['meta_h1']) {
-				$data['heading_title'] = $product_info['meta_h1'];
-			} else {
-				$data['heading_title'] = $product_info['name'];
-			}
-
-            $data['hrr'] = $this->url->link('product/product', $url . '&product_id=' . $this->request->get['product_id']);
-            $data['pdf'] = $this->url->link('extension/module/print_version_product', 'print_id=' . $this->request->get['product_id']);
-
-			$this->document->setDescription($product_info['meta_description']);
-			$this->document->setKeywords($product_info['meta_keyword']);
-			$this->document->addLink($this->url->link('product/product', 'product_id=' . $this->request->get['product_id']), 'canonical');
-
-
-
-            $this->document->addScript('catalog/view/javascript/clipboard.min.js');
-			$this->document->addScript('catalog/view/javascript/jquery/magnific/jquery.magnific-popup.min.js');
-			$this->document->addStyle('catalog/view/javascript/jquery/magnific/magnific-popup.css');
-			$this->document->addScript('catalog/view/javascript/jquery/datetimepicker/moment/moment.min.js');
-			$this->document->addScript('catalog/view/javascript/jquery/datetimepicker/moment/moment-with-locales.min.js');
-			$this->document->addScript('catalog/view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.js');
-			$this->document->addStyle('catalog/view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.css');
+            $this->document->setTitle($product_info['meta_title']);
+            $this->document->setDescription($product_info['meta_description']);
+            $this->document->setKeywords($product_info['meta_keyword']);
+            $this->document->addLink($this->url->link('product/product', 'product_id=' . $this->request->get['product_id']), 'canonical');
+            $this->document->addScript('catalog/view/javascript/jquery/magnific/jquery.magnific-popup.min.js');
+            $this->document->addStyle('catalog/view/javascript/jquery/magnific/magnific-popup.css');
+            $this->document->addScript('catalog/view/javascript/jquery/datetimepicker/moment/moment.min.js');
+            $this->document->addScript('catalog/view/javascript/jquery/datetimepicker/moment/moment-with-locales.min.js');
+            $this->document->addScript('catalog/view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.js');
+            $this->document->addStyle('catalog/view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.css');
 
             $this->document->addScript('catalog/view/javascript/slick/slick.js');
             $this->document->addStyle('catalog/view/javascript/slick/slick.css');
             $this->document->addStyle('catalog/view/javascript/slick/slick-theme.css');
+
+            $data['heading_title'] = $product_info['name'];
 
 			$data['text_minimum'] = sprintf($this->language->get('text_minimum'), $product_info['minimum']);
 			$data['text_login'] = sprintf($this->language->get('text_login'), $this->url->link('account/login', '', true), $this->url->link('account/register', '', true));
@@ -386,7 +318,7 @@ class ControllerProductProduct extends Controller {
 				$data['images'][] = array(
 					'popup' => $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_height')),
 					'thumb' => $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_thumb_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_thumb_height')),
-                  'additional' => $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_additional_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_additional_height'))
+                    'additional' => $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_additional_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_additional_height'))
 				);
 			}
 
@@ -427,9 +359,7 @@ class ControllerProductProduct extends Controller {
 				$data['tax'] = false;
 			}
 
-			$data['taxx'] = $this->currency->format($tax_price, $this->session->data['currency']);
-
-			$discounts = $this->model_catalog_product->getProductDiscounts($this->request->get['product_id']);
+            $discounts = $this->model_catalog_product->getProductDiscounts($this->request->get['product_id']);
 
 			$data['discounts'] = array();
 
@@ -547,9 +477,9 @@ class ControllerProductProduct extends Controller {
 				}
 
                 if ($result['quantity'] <= 0) {
-				    $stockk = $result['stock_status'];
+				    $stock = $result['stock_status'];
 			    } else {
-				    $stockk = $this->language->get('text_instock');
+				    $stock = $this->language->get('text_instock');
 			    }
 
 				$data['products'][] = array(
@@ -563,7 +493,7 @@ class ControllerProductProduct extends Controller {
 					'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
 					'rating'      => $rating,
                     'ean'        => $result['ean'],
-                    'stock'        => $stockk,
+                    'stock'        => $stock,
 					'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'])
 				);
 			}
@@ -740,66 +670,6 @@ class ControllerProductProduct extends Controller {
 				$json['success'] = $this->language->get('text_success');
 			}
 		}
-
-		$this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($json));
-	}
-
-    public function price() {
-        $this->load->language('product/product');
-
-		$json = array();
-
-		if ($this->request->server['REQUEST_METHOD'] == 'POST') {
-            $this->load->model('catalog/product');
-
-            $product_id = (int)$this->request->post['product_id'];
-            $product_info = $this->model_catalog_product->getProduct($product_id);
-            if ($product_info) {
-			    $quantity = (int)$this->request->post['quantity'];
-                $options_price = 0;
-
-                // base price
-			    $product_discount_query = $this->db->query("SELECT price FROM " . DB_PREFIX . "product_discount WHERE product_id = '" . (int)$product_id . "' AND customer_group_id = '" . (int)$this->config->get('config_customer_group_id') . "' AND quantity <= '" . (int)$quantity . "' AND ((date_start = '0000-00-00' OR date_start < NOW()) AND (date_end = '0000-00-00' OR date_end > NOW())) ORDER BY quantity DESC, priority ASC, price ASC LIMIT 1");
-
-			    if ($product_discount_query->num_rows) {
-				    $base_price = $product_discount_query->row['price'];
-			    } else {
-				    $base_price = $product_info['price'];
-			    }
-
-                // price
-			    if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
-				    $json['price'] = $this->currency->format($this->tax->calculate($base_price + $options_price, $product_info['tax_class_id'], $this->config->get('config_tax')) * $quantity, $this->session->data['currency']);
-			    } else {
-				    $json['price'] = false;
-			    }
-
-			    // special
-			    if ((float)$product_info['special']) {
-				    $json['special'] = $this->currency->format($this->tax->calculate($product_info['special'] + $options_price, $product_info['tax_class_id'], $this->config->get('config_tax')) * $quantity, $this->session->data['currency']);
-			    } else {
-				    $json['special'] = false;
-			    }
-
-			    // ex tax
-			    if ($this->config->get('config_tax')) {
-				    $tax = (float)$product_info['special'] ? $product_info['special'] : $base_price;
-				    $tax = ($tax + $options_price) * $quantity;
-				    $json['tax'] = $this->language->get('text_tax') . ' ' . $this->currency->format($tax, $this->session->data['currency']);
-			    } else {
-				    $json['tax'] = false;
-			    }
-
-			    // discounts
-			    $json['discounts'] = array();
-
-			    foreach ($this->model_catalog_product->getProductDiscounts($product_id) as $discount) {
-				    $discount_price = $this->currency->format($this->tax->calculate($discount['price'] + $options_price, $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-				    $json['discounts'][] = $discount['quantity'] . $this->language->get('text_discount') . $discount_price;
-			    }
-            }
-        }
 
         $this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
