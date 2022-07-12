@@ -37,7 +37,7 @@ class ControllerProductCategory extends Controller {
                 $this->document->setRobots('noindex,follow');
             }
 		} else {
-			$sort = 'p.sort_order';
+			$sort = 'p.viewed';
 		}
 
 		if (isset($this->request->get['order'])) {
@@ -46,7 +46,7 @@ class ControllerProductCategory extends Controller {
                 $this->document->setRobots('noindex,follow');
             }
 		} else {
-			$order = 'ASC';
+			$order = 'DESC';
 		}
 
 		if (isset($this->request->get['page'])) {
@@ -114,11 +114,11 @@ class ControllerProductCategory extends Controller {
 		} else {
 			$category_id = 0;
 		}
-        
+
 		$category_info = $this->model_catalog_category->getCategory($category_id);
 
 		if ($category_info) {
-			
+
 			$data['href_categor'] = $this->url->link('product/category', 'path=' . $this->request->get['path']);
 
 			if ($category_info['meta_title']) {
@@ -236,29 +236,29 @@ class ControllerProductCategory extends Controller {
 				} else {
 					$tax = false;
 				}
-				
-				
+
+
 
 				if ($this->config->get('config_review_status')) {
 					$rating = (int)$result['rating'];
 				} else {
 					$rating = false;
 				}
-              
+
                 if ($result['quantity'] <= 0) {
 				    $stock = $result['stock_status'];
 			    } else {
 				    $stock = $this->language->get('text_instock');
 			    }
-				
+
 				$w_list = array_column($this->customer->getWishlist(), 'product_id');
-				
+
                 if (in_array($result['product_id'], $w_list)) {
 	                $w = '1';
                 } else {
 	                $w = false;
                 }
-				
+
 				$data['products'][] = array(
 					'product_id'  => $result['product_id'],
 					'thumb'       => $image,
@@ -277,8 +277,8 @@ class ControllerProductCategory extends Controller {
 					'href'        => $this->url->link('product/product', 'path=' . $this->request->get['path'] . '&product_id=' . $result['product_id'] . $url)
 				);
 			}
-			
-			
+
+
 
 			$url = '';
 
@@ -339,10 +339,10 @@ class ControllerProductCategory extends Controller {
 					'href'  => $this->url->link('product/category', 'path=' . $this->request->get['path'] . '&sort=rating&order=DESC' . $url)
 				);
 			}
-			
-			
 
-			
+
+
+
 
 			$url = '';
 
