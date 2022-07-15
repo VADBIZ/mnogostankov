@@ -156,6 +156,7 @@ class ControllerProductCategory extends Controller {
 
 			$data['description'] = html_entity_decode($category_info['description'], ENT_QUOTES, 'UTF-8');
 			$data['compare'] = $this->url->link('product/compare');
+			$data['category_id'] = $category_info['category_id'];
 
 			$url = '';
 
