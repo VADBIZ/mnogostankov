@@ -817,6 +817,9 @@ class ModelToolExportImport extends Model {
 		if (in_array("mpn",$product_fields)) {
 			$expected_heading[] = "mpn";
 		}
+		if (in_array("video",$product_fields)) {
+			$expected_heading[] = "video";
+		}
 		if ($this->use_table_seo_url) {
 			$expected_heading = array_merge( $expected_heading, array( "location", "quantity", "model", "manufacturer", "image_name", "shipping", "price", "points", "date_added", "date_modified", "date_available", "weight", "weight_unit", "length", "width", "height", "length_unit", "status", "tax_class_id", "description") );
 		} else {
@@ -3294,6 +3297,9 @@ class ModelToolExportImport extends Model {
 			if (in_array('mpn',$product_fields)) {
 				$mpn = $this->getCell($data,$i,$j++,'');
 			}
+			if (in_array('video',$product_fields)) {
+				$video = $this->getCell($data,$i,$j++,'');
+			}
 			$location = $this->getCell($data,$i,$j++,'');
 			$quantity = $this->getCell($data,$i,$j++,'0');
 			$model = $this->getCell($data,$i,$j++,'   ');
@@ -3424,6 +3430,9 @@ class ModelToolExportImport extends Model {
 			}
 			if (in_array('mpn',$product_fields)) {
 				$product['mpn'] = $mpn;
+			}
+			if (in_array('video',$product_fields)) {
+				$product['video'] = $video;
 			}
 			$product['location'] = $location;
 			$store_ids = trim( $this->clean($store_ids, false) );
@@ -3715,6 +3724,9 @@ class ModelToolExportImport extends Model {
 		if (in_array('mpn',$product_fields)) {
 			$mpn = $this->db->escape($product['mpn']);
 		}
+		if (in_array('video',$product_fields)) {
+			$video = $this->db->escape($product['video']);
+		}
 		$location = $this->db->escape($product['location']);
 		$store_ids = $product['store_ids'];
 		$layout = $product['layout'];
@@ -3738,6 +3750,7 @@ class ModelToolExportImport extends Model {
 		$sql .= in_array('jan',$product_fields) ? "`jan`," : "";
 		$sql .= in_array('isbn',$product_fields) ? "`isbn`," : "";
 		$sql .= in_array('mpn',$product_fields) ? "`mpn`," : "";
+		$sql .= in_array('video',$product_fields) ? "`video`," : "";
 		$sql .= "`location`,`stock_status_id`,`model`,`manufacturer_id`,`image`,`shipping`,`price`,`points`,`date_added`,`date_modified`,`date_available`,`weight`,`weight_class_id`,`status`,";
 		$sql .= "`tax_class_id`,`viewed`,`length`,`width`,`height`,`length_class_id`,`sort_order`,`subtract`,`minimum`) VALUES ";
 		$sql .= "($product_id,$quantity,'$sku','$upc',";
@@ -3745,6 +3758,7 @@ class ModelToolExportImport extends Model {
 		$sql .= in_array('jan',$product_fields) ? "'$jan'," : "";
 		$sql .= in_array('isbn',$product_fields) ? "'$isbn'," : "";
 		$sql .= in_array('mpn',$product_fields) ? "'$mpn'," : "";
+		$sql .= in_array('video',$product_fields) ? "'$video'," : "";
 		$sql .= "'$location',$stock_status_id,'$model',$manufacturer_id,'$image',$shipping,$price,$points,";
 		$sql .= ($date_added=='NOW()') ? "$date_added," : "'$date_added',";
 		$sql .= ($date_modified=='NOW()') ? "$date_modified," : "'$date_modified',";
@@ -7209,6 +7223,9 @@ class ModelToolExportImport extends Model {
 		if (in_array('mpn',$product_fields)) {
 			$worksheet->getColumnDimensionByColumn($j++)->setWidth(max(strlen('mpn'),15)+1);
 		}
+		if (in_array('video',$product_fields)) {
+			$worksheet->getColumnDimensionByColumn($j++)->setWidth(max(strlen('video'),15)+1);
+		}
 		$worksheet->getColumnDimensionByColumn($j++)->setWidth(max(strlen('location'),10)+1);
 		$worksheet->getColumnDimensionByColumn($j++)->setWidth(max(strlen('quantity'),4)+1);
 		$worksheet->getColumnDimensionByColumn($j++)->setWidth(max(strlen('model'),8)+1);
@@ -7292,6 +7309,10 @@ class ModelToolExportImport extends Model {
 		if (in_array('mpn',$product_fields)) {
 			$styles[$j] = &$text_format;
 			$data[$j++] = 'mpn';
+		}
+		if (in_array('video',$product_fields)) {
+			$styles[$j] = &$text_format;
+			$data[$j++] = 'video';
 		}
 		$styles[$j] = &$text_format;
 		$data[$j++] = 'location';
@@ -7392,6 +7413,9 @@ class ModelToolExportImport extends Model {
 			}
 			if (in_array('mpn',$product_fields)) {
 				$data[$j++] = $row['mpn'];
+			}
+			if (in_array('video',$product_fields)) {
+				$data[$j++] = $row['video'];
 			}
 			$data[$j++] = $row['location'];
 			$data[$j++] = $row['quantity'];
@@ -7514,6 +7538,9 @@ class ModelToolExportImport extends Model {
 		}
 		if (in_array('mpn',$product_fields)) {
 			$sql .= "  p.mpn,";
+		}
+		if (in_array('video',$product_fields)) {
+			$sql .= "  p.video,";
 		}
 		$sql .= "  p.location,";
 		$sql .= "  p.quantity,";
