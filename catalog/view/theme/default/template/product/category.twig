@@ -1,6 +1,5 @@
 {{ header }}
 <div id="product-category" class="container">
-  
   <div class="row">{{ column_left }}
     {% if column_left and column_right %}
     {% set class = 'col-sm-6' %}
@@ -19,10 +18,12 @@
       {% if description %}
       <div class="row">
         <div class="col-sm-12">{{ description }}</div>
+          {% if category_id == 646 %}
+              <div class="col-sm-12"><a href="index.php?route=common/popups2" class="btn btn-primary btn-bans agree">Разместить БУ станок</a></div>
+          {% endif %}
       </div>
       <hr>
       {% endif %}
-     
       {% if products %}
       <div class="row">
         <div class="ssort col-md-12 col-xs-12 hidden-xs hidden-sm">
@@ -46,7 +47,6 @@
             </select>
           </div>
         </div>
-        
       </div>
       <div class="row spyns"> {% for product in products %}
         <div class="product-layout col-lg-3 col-md-3 col-sm-4 col-xs-6 yiy">
@@ -55,7 +55,6 @@
                 <div class="caption">
                     <h4><a href="{{ product.href }}">{{ product.name }}</a></h4>
                     <p class="brend">{{ product.manufacturer }}</p>
-        
                     {% if product.price %}
                     <p class="price"> {% if not product.special %}
                     {{ product.price }}
@@ -85,4 +84,4 @@
       {{ content_bottom }}</div>
     {{ column_right }}</div>
 </div>
-{{ footer }} 
+{{ footer }}
