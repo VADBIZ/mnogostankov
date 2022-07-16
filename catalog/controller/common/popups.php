@@ -61,4 +61,10 @@ class ControllerCommonPopups extends Controller {
         $this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
     }
+
+    public function contact() {
+        $this->load->language('common/popups');
+        $data['contacts'] = $this->config->get('config_contact');
+        $this->response->setOutput($this->load->view('common/popups_contact', $data));
+    }
 }

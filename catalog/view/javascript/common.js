@@ -29,11 +29,11 @@ $(document).ready(function() {
 		    $(target).parent().addClass('focused');
 	    }
     });
- 
+
     $('.compare input').focusout(function(){
 	    $(this).parent().removeClass('focused');
     });
-  
+
 	// Highlight any found errors
 	$('.text-danger').each(function() {
 		var element = $(this).parent().parent();
@@ -283,7 +283,7 @@ var voucher = {
 
 var wishlist = {
 	'add': function(product_id) {
-		
+
 		$.ajax({
 			url: 'index.php?route=account/wishlist/add',
 			type: 'post',
@@ -297,14 +297,14 @@ var wishlist = {
 				}
 
 				if (json['success']) {
-					
+
 					//$('body').after('<div class="alert alert-success popup__overlay"><div class="popup"><div class="acn-notification"><button type="button" class="close" data-dismiss="alert">&times;</button>' + json['success'] + ' </div></div></div>');
                  // setTimeout(function(){$('.popup__overlay').remove(); }, 3000);
 				}
 
 				//$('#wishlist-total span').html(json['total']);
 				//$('#wishlist-total').attr('title', json['total']);
-                
+
 				//$('html, body').animate({ scrollTop: 0 }, 'slow');
 			},
 			error: function(xhr, ajaxOptions, thrownError) {
@@ -328,7 +328,7 @@ var compare = {
 				$('.alert-dismissible').remove();
 
 				if (json['success']) {
-					
+
 					//$('body').after('<div class="alert alert-success popup__overlay"><div class="popup"><div class="acn-notification"><button type="button" class="close" data-dismiss="alert">&times;</button> ' + json['success'] + ' </div></div></div>');
 
 					//$('#compare-total').html(json['total']);
@@ -360,12 +360,19 @@ $(document).delegate('.agree', 'click', function(e) {
 		type: 'get',
 		dataType: 'html',
 		success: function(data) {
+			title = $(element).text();
+			isIsset = $(element).attr('data-name') ? $(element).attr('data-name').length.length : 0;
+
+			if (isIsset) {
+				title = $(element).attr('data-name');
+			}
+
 			html  = '<div id="modal-agree" class="modal">';
 			html += '  <div class="modal-dialog">';
 			html += '    <div class="modal-content">';
 			html += '      <div class="modal-header">';
-			html += '        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>';
-			html += '        <h4 class="modal-title">' + $(element).text() + '</h4>';
+			html += '        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><img src="/image/shape.svg"/></button>';
+			html += '        <h4 class="modal-title">' + title + '</h4>';
 			html += '      </div>';
 			html += '      <div class="modal-body">' + data + '</div>';
 			html += '    </div>';

@@ -16,7 +16,7 @@
           </div>
 		  <div class="form-group required obj_telephone">
             <label class="control-label" for="popup-input-telephone">{{ entry_telephone }}</label>
-              <input type="text" name="{{ token }}_telephone" value="{{ telephone }}" id="popup-input-telephone" class="form-control" />
+              <input type="text" name="{{ token }}_telephone" value="{{ telephone }}" placeholder="+7 (___)___-__-__" id="popup-input-telephone" class="form-control" />
               <input type="hidden" name="telephone" value="{{ telephone }}" />
               <script>
                   $('#popup-input-telephone').on('input keyup', function(e) {
@@ -60,7 +60,6 @@
       </form>
     </div>
 </div>
-<style>.modal-dialog {max-width:400px}</style>
 <script type="text/javascript"><!--
 $('#button-form1').on('click', function() {
     $.ajax({

@@ -496,6 +496,16 @@ header span.compare {
     width: 20.81px;
     height: 18.61px;
 }
+header span.about {
+	background-image: url("/image/004.svg");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 100%;
+	display: inline-block;
+	border: 0;
+	width: 20.81px;
+	height: 18.61px;
+}
 #column-left .list-group span.home {
     background-color: #fff;
     background-image: url("/image/home2.png");
@@ -544,6 +554,20 @@ header span.compare {
 	background-image: url("/image/Union2.svg") !important;
 	background-repeat: no-repeat;
     background-position: center;
+
+}
+#column-left .list-group span.about {
+	background-image: url("/image/Union3.png");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-color: #fff;
+	border-radius: 2px;
+}
+#column-left .list-group a:hover > span.about {
+	background: #5071D0;
+	background-image: url("/image/Union3.svg") !important;
+	background-repeat: no-repeat;
+	background-position: center;
 
 }
 /* content */
@@ -2402,6 +2426,7 @@ flex-wrap: wrap;
     line-height: 140%;
     color: #111111;
     opacity: 0.5;
+	margin-bottom: 20px;
 }
 .modal-title {
 	font-family: 'Inter';
@@ -2622,4 +2647,50 @@ flex-wrap: wrap;
 	.index__banner-image {
 		top: -10px;
 	}
+}
+
+.modal-header {
+	border-bottom: none;
+}
+.modal-dialog{
+	max-width: 467px;
+}
+.modal-content {
+	padding-left: 50px;
+	padding-right: 50px;
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+
+.modal-header .close {
+	margin-right: -40px;
+	margin-top: -10px;
+}
+.close {
+	opacity: 1;
+}
+
+.modal-body .form-group>label {
+	bottom: -10px;
+	left: 15px;
+	position: relative;
+	background-color: white;
+	padding: 0px 5px 0px 5px;
+	font-size: 1.2em;
+	transition: 0.2s;
+	pointer-events: none;
+}
+.modal-body .form-control:not(textarea.form-control){
+	border-radius: 5px;
+	height: 50px;
+}
+.modal-body .form-control:focus{
+	border-color: #5071D0;
+}
+.modal-body .form-control:focus~label {
+	bottom: 55px;
+}
+
+.modal-body .form-control:valid~label {
+	bottom: 55px;
 }
