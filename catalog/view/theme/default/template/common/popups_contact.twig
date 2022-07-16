@@ -1,0 +1,11 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div style="" id="show-company-contact">
+            {% for contact in contacts %}
+                {% if contact.name|trim in ['Отдел продаж:', 'Электронная почта:'] %}
+                    <b>{{ contact.name }} </b>{{ contact.value }}<br>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
