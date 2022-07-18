@@ -9,7 +9,9 @@ class ControllerCommonPopups extends Controller {
         $data['action'] = $this->url->link('common/popups/add', '', true);
         $data['ur'] = $this->config->get('config_ur');
 
-        $data['product_id'] = ($this->request->get['popup_product_id'] ?? 0);
+        $data['product_id'] = ($this->request->get['popup_product_id'] ?? null);
+
+        $data['category_id'] = ($this->request->get['popup_category_id'] ?? null);
 
         $data['token'] = token(3) . '_' . time();
 
@@ -25,7 +27,7 @@ class ControllerCommonPopups extends Controller {
 
 		if ($this->request->server['REQUEST_METHOD'] == 'POST') {
             if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 25)) {
-				$json['error']['name'] = $this->language->get('error_name');
+//				$json['error']['name'] = $this->language->get('error_name');
 			}
 
 			if ((utf8_strlen($this->request->post['telephone']) < 3) || (utf8_strlen($this->request->post['telephone']) > 32)) {
@@ -33,7 +35,7 @@ class ControllerCommonPopups extends Controller {
 		    }
 
             if (!filter_var($this->request->post['email'], FILTER_VALIDATE_EMAIL)) {
-			    $json['error']['email'] = $this->language->get('error_email');
+//			    $json['error']['email'] = $this->language->get('error_email');
 		    }
 
 			if (!isset($this->request->post['agree'])) {

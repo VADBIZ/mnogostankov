@@ -4,7 +4,7 @@
     <div class="col-sm-12">
         <form action="{{ action }}" method="post" id="form-rev" enctype="multipart/form-data" class="form-horizontal col-sm-12">
         <fieldset>
-          <div class="form-group required obj_name">
+          <div class="form-group obj_name">
             <label class="control-label" for="popup-input-name">{{ entry_name }}</label>
               <input type="text" name="{{ token }}_name" value="{{ name }}" id="popup-input-name" class="form-control" />
               <input type="hidden" name="name" value="{{ name }}" />
@@ -24,7 +24,7 @@
                   });
               </script>
           </div>
-          <div class="form-group required obj_email">
+          <div class="form-group obj_email">
             <label class="control-label" for="popup-input-email">{{ entry_email }}</label>
               <input type="text" name="{{ token }}_email" value="{{ email }}" id="popup-input-email" class="form-control" />
               <input type="hidden" name="email" value="{{ email }}" />
@@ -39,10 +39,10 @@
               <textarea name="enquiry" rows="10" id="input-enquiry" class="form-control">{{ enquiry }}</textarea>
           </div>
             {{ captcha }}
-		  <div class="form-group"><input type="checkbox" name="whatsapp" value="1" checked> Хочу получать ответ в WhatsApp</div>
-		  <div class="form-group"><input type="checkbox" name="mailing" value="1" checked> Хочу получать рассылку на Email</div>
-		  <div class="form-group obj_agree"><input type="checkbox" name="agree" value="1"> Я согласен на обработку персональных данных в соответствии с <a href="{{ ur }}">политикой конфиденциальности</a>
-		  <div class="ag"></div>
+{#		  <div class="form-group"><input type="checkbox" name="whatsapp" value="1" checked> Хочу получать ответ в WhatsApp</div>#}
+{#		  <div class="form-group"><input type="checkbox" name="mailing" value="1" checked> Хочу получать рассылку на Email</div>#}
+		  <div class="form-group obj_agree"><input checked type="checkbox" name="agree" value="1" checked> Я согласен на обработку персональных данных в соответствии с <a href="{{ ur }}">политикой конфиденциальности</a>
+{#		  <div class="ag"></div>#}
 		  </div>
         </fieldset>
 		<div id="r"></div>
@@ -52,6 +52,8 @@
               {% if product_id is not null %}
                   <input type="hidden" name="product_id" value="{{ product_id }}" />
                   <input type="hidden" name="vid" value="2" />
+              {% elseif category_id is not null %}
+                  <input type="hidden" name="vid" value="4" />
               {% else %}
                   <input type="hidden" name="vid" value="1" />
               {% endif %}
