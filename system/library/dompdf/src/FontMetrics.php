@@ -73,67 +73,6 @@ class FontMetrics
     }
 
     /**
-     * Loads the stored font family cache
-     *
-     * @see FontMetrics::saveFontFamilies()
-     */
-    public function loadFontFamilies()
-    {
-        $fontDir = $this->getOptions()->getFontDir();
-        $rootDir = $this->getOptions()->getRootDir();
-
-        // FIXME: tempoarary define constants for cache files <= v0.6.2
-        if (!defined("DOMPDF_DIR")) { define("DOMPDF_DIR", $rootDir); }
-        if (!defined("DOMPDF_FONT_DIR")) { define("DOMPDF_FONT_DIR", $fontDir); }
-
-        $file = $rootDir . "/lib/fonts/dompdf_font_family_cache.dist.php";
-        $distFonts = require $file;
-
-        if (!is_readable($this->getCacheFile())) {
-            $this->fontLookup = $distFonts;
-            return;
-        }
-
-        $cacheData = require $this->getCacheFile();
-
-        $this->fontLookup = array();
-        if (is_array($this->fontLookup)) {
-            foreach ($cacheData as $key => $value) {
-                $this->fontLookup[stripslashes($key)] = $value;
-            }
-        }
-
-        // Merge provided fonts
-        $this->fontLookup += $distFonts;
-    }
-
-    /**
-     * @return Options
-     */
-    public function getOptions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * @param Options $options
-     * @return $this
-     */
-    public function setOptions(Options $options)
-    {
-        $this->options = $options;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCacheFile()
-    {
-        return $this->getOptions()->getFontDir() . DIRECTORY_SEPARATOR . self::CACHE_FILE;
-    }
-
-    /**
      * @deprecated
      */
     public function save_font_families()
@@ -177,6 +116,41 @@ class FontMetrics
     }
 
     /**
+     * Loads the stored font family cache
+     *
+     * @see FontMetrics::saveFontFamilies()
+     */
+    public function loadFontFamilies()
+    {
+        $fontDir = $this->getOptions()->getFontDir();
+        $rootDir = $this->getOptions()->getRootDir();
+
+        // FIXME: temporarily define constants for cache files <= v0.6.2
+        if (!defined("DOMPDF_DIR")) { define("DOMPDF_DIR", $rootDir); }
+        if (!defined("DOMPDF_FONT_DIR")) { define("DOMPDF_FONT_DIR", $fontDir); }
+
+        $file = $rootDir . "/lib/fonts/dompdf_font_family_cache.dist.php";
+        $distFonts = require $file;
+
+        if (!is_readable($this->getCacheFile())) {
+            $this->fontLookup = $distFonts;
+            return;
+        }
+
+        $cacheData = require $this->getCacheFile();
+
+        $this->fontLookup = array();
+        if (is_array($this->fontLookup)) {
+            foreach ($cacheData as $key => $value) {
+                $this->fontLookup[stripslashes($key)] = $value;
+            }
+        }
+
+        // Merge provided fonts
+        $this->fontLookup += $distFonts;
+    }
+
+    /**
      * @param array $style
      * @param string $remote_file
      * @param resource $context
@@ -205,25 +179,36 @@ class FontMetrics
         }
 
         $styleString = $this->getType("{$style['weight']} {$style['style']}");
-        if (isset($entry[$styleString])) {
-            return true;
-        }
 
         $fontDir = $this->getOptions()->getFontDir();
         $remoteHash = md5($remoteFile);
-        $localFile = $fontDir . DIRECTORY_SEPARATOR . $remoteHash;
-        $localTempFile = tempnam($this->options->get("tempDir"), "dompdf-font-");
+
+        $prefix = $fontname . "_" . $styleString;
+        $prefix = preg_replace("/[^\\pL\d]+/u", "-", $prefix);
+        $prefix = trim($prefix, "-");
+        if (function_exists('iconv')) {
+            $prefix = iconv('utf-8', 'us-ascii//TRANSLIT', $prefix);
+        }
+        $prefix = preg_replace("/[^-\w]+/", "", $prefix);
+        
+        $localFile = $fontDir . "/" . $prefix . "_" . $remoteHash;
+
+        if (isset($entry[$styleString]) && $localFile == $entry[$styleString]) {
+            return true;
+        }
 
         $cacheEntry = $localFile;
-        $localFile .= ".".strtolower(pathinfo(parse_url($remoteFile, PHP_URL_PATH),PATHINFO_EXTENSION));
+        $localFile .= ".".strtolower(pathinfo(parse_url($remoteFile, PHP_URL_PATH), PATHINFO_EXTENSION));
 
         $entry[$styleString] = $cacheEntry;
 
         // Download the remote file
         list($remoteFileContent, $http_response_header) = @Helpers::getFileContent($remoteFile, $context);
-        if (false === $remoteFileContent) {
+        if (empty($remoteFileContent)) {
             return false;
         }
+
+        $localTempFile = @tempnam($this->options->get("tempDir"), "dompdf-font-");
         file_put_contents($localTempFile, $remoteFileContent);
 
         $font = Font::load($localTempFile);
@@ -255,46 +240,6 @@ class FontMetrics
         $this->saveFontFamilies();
 
         return true;
-    }
-
-    /**
-     * Returns the current font lookup table
-     *
-     * @return array
-     */
-    public function getFontFamilies()
-    {
-        return $this->fontLookup;
-    }
-
-    /**
-     * @param string $type
-     * @return string
-     */
-    public function getType($type)
-    {
-        if (preg_match("/bold/i", $type)) {
-            if (preg_match("/italic|oblique/i", $type)) {
-                $type = "bold_italic";
-            } else {
-                $type = "bold";
-            }
-        } elseif (preg_match("/italic|oblique/i", $type)) {
-            $type = "italic";
-        } else {
-            $type = "normal";
-        }
-
-        return $type;
-    }
-
-    /**
-     * @param string $fontname
-     * @param mixed $entry
-     */
-    public function setFontFamily($fontname, $entry)
-    {
-        $this->fontLookup[mb_strtolower($fontname)] = $entry;
     }
 
     /**
@@ -349,26 +294,6 @@ class FontMetrics
         }
 
         return $width;
-    }
-
-    /**
-     * @return Canvas
-     */
-    public function getCanvas()
-    {
-        return $this->canvas;
-    }
-
-    /**
-     * @param Canvas $canvas
-     * @return $this
-     */
-    public function setCanvas(Canvas $canvas)
-    {
-        $this->canvas = $canvas;
-        // Still write deprecated pdf for now. It might be used by a parent class.
-        $this->pdf = $canvas;
-        return $this;
     }
 
     /**
@@ -517,12 +442,49 @@ class FontMetrics
     }
 
     /**
+     * @param string $type
+     * @return string
+     */
+    public function getType($type)
+    {
+        if (preg_match('/bold/i', $type)) {
+            $weight = 700;
+        } elseif (preg_match('/([1-9]00)/', $type, $match)) {
+            $weight = (int)$match[0];
+        } else {
+            $weight = 400;
+        }
+        $weight = $weight === 400 ? 'normal' : $weight;
+        $weight = $weight === 700 ? 'bold' : $weight;
+
+        $style = preg_match('/italic|oblique/i', $type) ? 'italic' : null;
+
+        if ($weight === 'normal' && $style !== null) {
+            return $style;
+        }
+
+        return $style === null
+            ? $weight
+            : $weight.'_'.$style;
+    }
+
+    /**
      * @return array
      * @deprecated
      */
     public function get_font_families()
     {
         return $this->getFontFamilies();
+    }
+
+    /**
+     * Returns the current font lookup table
+     *
+     * @return array
+     */
+    public function getFontFamilies()
+    {
+        return $this->fontLookup;
     }
 
     /**
@@ -533,5 +495,60 @@ class FontMetrics
     public function set_font_family($fontname, $entry)
     {
         $this->setFontFamily($fontname, $entry);
+    }
+
+    /**
+     * @param string $fontname
+     * @param mixed $entry
+     */
+    public function setFontFamily($fontname, $entry)
+    {
+        $this->fontLookup[mb_strtolower($fontname)] = $entry;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCacheFile()
+    {
+        return $this->getOptions()->getFontDir() . '/' . self::CACHE_FILE;
+    }
+
+    /**
+     * @param Options $options
+     * @return $this
+     */
+    public function setOptions(Options $options)
+    {
+        $this->options = $options;
+        return $this;
+    }
+
+    /**
+     * @return Options
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * @param Canvas $canvas
+     * @return $this
+     */
+    public function setCanvas(Canvas $canvas)
+    {
+        $this->canvas = $canvas;
+        // Still write deprecated pdf for now. It might be used by a parent class.
+        $this->pdf = $canvas;
+        return $this;
+    }
+
+    /**
+     * @return Canvas
+     */
+    public function getCanvas()
+    {
+        return $this->canvas;
     }
 }

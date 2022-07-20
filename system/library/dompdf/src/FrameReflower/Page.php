@@ -44,6 +44,48 @@ class Page extends AbstractFrameReflower
     }
 
     /**
+     * @param Frame $frame
+     * @param $page_number
+     */
+    function apply_page_style(Frame $frame, $page_number)
+    {
+        $style = $frame->get_style();
+        $page_styles = $style->get_stylesheet()->get_page_styles();
+
+        // http://www.w3.org/TR/CSS21/page.html#page-selectors
+        if (count($page_styles) > 1) {
+            $odd = $page_number % 2 == 1;
+            $first = $page_number == 1;
+
+            $style = clone $page_styles["base"];
+
+            // FIXME RTL
+            if ($odd && isset($page_styles[":right"])) {
+                $style->merge($page_styles[":right"]);
+            }
+
+            if ($odd && isset($page_styles[":odd"])) {
+                $style->merge($page_styles[":odd"]);
+            }
+
+            // FIXME RTL
+            if (!$odd && isset($page_styles[":left"])) {
+                $style->merge($page_styles[":left"]);
+            }
+
+            if (!$odd && isset($page_styles[":even"])) {
+                $style->merge($page_styles[":even"]);
+            }
+
+            if ($first && isset($page_styles[":first"])) {
+                $style->merge($page_styles[":first"]);
+            }
+
+            $frame->set_style($style);
+        }
+    }
+
+    /**
      * Paged layout:
      * http://www.w3.org/TR/CSS21/page.html
      *
@@ -125,48 +167,6 @@ class Page extends AbstractFrameReflower
         // Dispose of previous page if it still exists
         if ($prev_child) {
             $prev_child->dispose(true);
-        }
-    }
-
-    /**
-     * @param Frame $frame
-     * @param $page_number
-     */
-    function apply_page_style(Frame $frame, $page_number)
-    {
-        $style = $frame->get_style();
-        $page_styles = $style->get_stylesheet()->get_page_styles();
-
-        // http://www.w3.org/TR/CSS21/page.html#page-selectors
-        if (count($page_styles) > 1) {
-            $odd = $page_number % 2 == 1;
-            $first = $page_number == 1;
-
-            $style = clone $page_styles["base"];
-
-            // FIXME RTL
-            if ($odd && isset($page_styles[":right"])) {
-                $style->merge($page_styles[":right"]);
-            }
-
-            if ($odd && isset($page_styles[":odd"])) {
-                $style->merge($page_styles[":odd"]);
-            }
-
-            // FIXME RTL
-            if (!$odd && isset($page_styles[":left"])) {
-                $style->merge($page_styles[":left"]);
-            }
-
-            if (!$odd && isset($page_styles[":even"])) {
-                $style->merge($page_styles[":even"]);
-            }
-
-            if ($first && isset($page_styles[":first"])) {
-                $style->merge($page_styles[":first"]);
-            }
-
-            $frame->set_style($style);
         }
     }
 

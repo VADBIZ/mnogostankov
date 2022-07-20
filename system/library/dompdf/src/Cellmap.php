@@ -109,14 +109,14 @@ class Cellmap
     private $__row;
 
     /**
-     * Tells wether the columns' width can be modified
+     * Tells whether the columns' width can be modified
      *
      * @var bool
      */
     private $_columns_locked = false;
 
     /**
-     * Tells wether the table has table-layout:fixed
+     * Tells whether the table has table-layout:fixed
      *
      * @var bool
      */
@@ -178,6 +178,14 @@ class Cellmap
     }
 
     /**
+     * @return bool
+     */
+    public function is_layout_fixed()
+    {
+        return $this->_fixed_layout;
+    }
+
+    /**
      * @return int
      */
     public function get_num_rows()
@@ -210,6 +218,28 @@ class Cellmap
     }
 
     /**
+     * @param int $i
+     *
+     * @return mixed
+     */
+    public function &get_column($i)
+    {
+        if (!isset($this->_columns[$i])) {
+            $this->_columns[$i] = array(
+                "x"          => 0,
+                "min-width"  => 0,
+                "max-width"  => 0,
+                "used-width" => null,
+                "absolute"   => 0,
+                "percent"    => 0,
+                "auto"       => true,
+            );
+        }
+
+        return $this->_columns[$i];
+    }
+
+    /**
      * @return array
      */
     public function &get_rows()
@@ -218,19 +248,21 @@ class Cellmap
     }
 
     /**
-     * @param int $i
      * @param int $j
      *
-     * @return array
+     * @return mixed
      */
-    public function get_border_properties($i, $j)
+    public function &get_row($j)
     {
-        return array(
-            "top"    => $this->get_border($i, $j, "horizontal"),
-            "right"  => $this->get_border($i, $j + 1, "vertical"),
-            "bottom" => $this->get_border($i + 1, $j, "horizontal"),
-            "left"   => $this->get_border($i, $j, "vertical"),
-        );
+        if (!isset($this->_rows[$j])) {
+            $this->_rows[$j] = array(
+                "y"            => 0,
+                "first-column" => 0,
+                "height"       => null,
+            );
+        }
+
+        return $this->_rows[$j];
     }
 
     /**
@@ -256,6 +288,22 @@ class Cellmap
         }
 
         return $this->_borders[$i][$j][$h_v];
+    }
+
+    /**
+     * @param int $i
+     * @param int $j
+     *
+     * @return array
+     */
+    public function get_border_properties($i, $j)
+    {
+        return array(
+            "top"    => $this->get_border($i, $j, "horizontal"),
+            "right"  => $this->get_border($i, $j + 1, "vertical"),
+            "bottom" => $this->get_border($i + 1, $j, "horizontal"),
+            "left"   => $this->get_border($i, $j, "vertical"),
+        );
     }
 
     /**
@@ -391,28 +439,6 @@ class Cellmap
 
     /**
      * @param int $i
-     *
-     * @return mixed
-     */
-    public function &get_column($i)
-    {
-        if (!isset($this->_columns[$i])) {
-            $this->_columns[$i] = array(
-                "x"          => 0,
-                "min-width"  => 0,
-                "max-width"  => 0,
-                "used-width" => null,
-                "absolute"   => 0,
-                "percent"    => 0,
-                "auto"       => true,
-            );
-        }
-
-        return $this->_columns[$i];
-    }
-
-    /**
-     * @param int $i
      * @param mixed $height
      */
     public function set_row_height($i, $height)
@@ -426,25 +452,46 @@ class Cellmap
         $row["height"] = $height;
         $next_row =& $this->get_row($i + 1);
         $next_row["y"] = $row["y"] + $height;
-
     }
 
     /**
+     * @param int $i
      * @param int $j
+     * @param mixed $h_v
+     * @param mixed $border_spec
      *
      * @return mixed
      */
-    public function &get_row($j)
+    protected function _resolve_border($i, $j, $h_v, $border_spec)
     {
-        if (!isset($this->_rows[$j])) {
-            $this->_rows[$j] = array(
-                "y"            => 0,
-                "first-column" => 0,
-                "height"       => null,
-            );
+        $n_width = $border_spec["width"];
+        $n_style = $border_spec["style"];
+
+        if (!isset($this->_borders[$i][$j][$h_v])) {
+            $this->_borders[$i][$j][$h_v] = $border_spec;
+
+            return $this->_borders[$i][$j][$h_v]["width"];
         }
 
-        return $this->_rows[$j];
+        $border = & $this->_borders[$i][$j][$h_v];
+
+        $o_width = $border["width"];
+        $o_style = $border["style"];
+
+        if (($n_style === "hidden" ||
+                $n_width > $o_width ||
+                $o_style === "none")
+
+            or
+
+            ($o_width == $n_width &&
+                in_array($n_style, self::$_BORDER_STYLE_SCORE) &&
+                self::$_BORDER_STYLE_SCORE[$n_style] > self::$_BORDER_STYLE_SCORE[$o_style])
+        ) {
+            $border = $border_spec;
+        }
+
+        return $border["width"];
     }
 
     /**
@@ -671,76 +718,6 @@ class Cellmap
     }
 
     /**
-     * @param int $i
-     * @param int $j
-     * @param mixed $h_v
-     * @param mixed $border_spec
-     *
-     * @return mixed
-     */
-    protected function _resolve_border($i, $j, $h_v, $border_spec)
-    {
-        $n_width = $border_spec["width"];
-        $n_style = $border_spec["style"];
-
-        if (!isset($this->_borders[$i][$j][$h_v])) {
-            $this->_borders[$i][$j][$h_v] = $border_spec;
-
-            return $this->_borders[$i][$j][$h_v]["width"];
-        }
-
-        $border = & $this->_borders[$i][$j][$h_v];
-
-        $o_width = $border["width"];
-        $o_style = $border["style"];
-
-        if (($n_style === "hidden" ||
-                $n_width > $o_width ||
-                $o_style === "none")
-
-            or
-
-            ($o_width == $n_width &&
-                in_array($n_style, self::$_BORDER_STYLE_SCORE) &&
-                self::$_BORDER_STYLE_SCORE[$n_style] > self::$_BORDER_STYLE_SCORE[$o_style])
-        ) {
-            $border = $border_spec;
-        }
-
-        return $border["width"];
-    }
-
-    /**
-     * @return bool
-     */
-    public function is_layout_fixed()
-    {
-        return $this->_fixed_layout;
-    }
-
-    /**
-     * Remove a row group from the cellmap.
-     *
-     * @param Frame $group The group to remove
-     */
-    public function remove_row_group(Frame $group)
-    {
-        $key = $group->get_id();
-        if (!isset($this->_frames[$key])) {
-            return; // Presumably this row has alredy been removed
-        }
-
-        $iter = $group->get_first_child();
-        while ($iter) {
-            $this->remove_row($iter);
-            $iter = $iter->get_next_sibling();
-        }
-
-        $this->_frames[$key] = null;
-        unset($this->_frames[$key]);
-    }
-
-    /**
      * Remove a row from the cellmap.
      *
      * @param Frame
@@ -782,6 +759,28 @@ class Cellmap
 
             $this->_rows[$r] = null;
             unset($this->_rows[$r]);
+        }
+
+        $this->_frames[$key] = null;
+        unset($this->_frames[$key]);
+    }
+
+    /**
+     * Remove a row group from the cellmap.
+     *
+     * @param Frame $group The group to remove
+     */
+    public function remove_row_group(Frame $group)
+    {
+        $key = $group->get_id();
+        if (!isset($this->_frames[$key])) {
+            return; // Presumably this row has alredy been removed
+        }
+
+        $iter = $group->get_first_child();
+        while ($iter) {
+            $this->remove_row($iter);
+            $iter = $iter->get_next_sibling();
         }
 
         $this->_frames[$key] = null;

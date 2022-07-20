@@ -34,55 +34,58 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // all flags are in hyphenated form
 
 class HTML5_Tokenizer {
-    const PCDATA    = 0;
-    const RCDATA    = 1;
-    const CDATA     = 2;
-    const PLAINTEXT = 3;
-
-    // These are constants describing the content model
-    const DOCTYPE        = 0;
-    const STARTTAG       = 1;
-    const ENDTAG         = 2;
-    const COMMENT        = 3;
-
-    // These are constants describing tokens
-    // XXX should probably be moved somewhere else, probably the
-    // HTML5 class.
-    const CHARACTER      = 4;
-    const SPACECHARACTER = 5;
-    const EOF            = 6;
-    const PARSEERROR     = 7;
-    const ALPHA       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-    const UPPER_ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const LOWER_ALPHA = 'abcdefghijklmnopqrstuvwxyz';
-    const DIGIT       = '0123456789';
-
-    // These are constants representing bunches of characters.
-    const HEX         = '0123456789ABCDEFabcdef';
-    const WHITESPACE  = "\t\n\x0c ";
     /**
      * @var HTML5_InputStream
      *
      * Points to an InputStream object.
      */
     protected $stream;
-    /**
-     * @var int
-     *
-     * Current content model we are parsing as.
-     */
-    protected $content_model;
-    /**
-     * Current token that is being built, but not yet emitted. Also
-     * is the last token emitted, if applicable.
-     */
-    protected $token;
+
     /**
      * @var HTML5_TreeBuilder
      *
      * Tree builder that the tokenizer emits token to.
      */
     private $tree;
+
+    /**
+     * @var int
+     *
+     * Current content model we are parsing as.
+     */
+    protected $content_model;
+
+    /**
+     * Current token that is being built, but not yet emitted. Also
+     * is the last token emitted, if applicable.
+     */
+    protected $token;
+
+    // These are constants describing the content model
+    const PCDATA    = 0;
+    const RCDATA    = 1;
+    const CDATA     = 2;
+    const PLAINTEXT = 3;
+
+    // These are constants describing tokens
+    // XXX should probably be moved somewhere else, probably the
+    // HTML5 class.
+    const DOCTYPE        = 0;
+    const STARTTAG       = 1;
+    const ENDTAG         = 2;
+    const COMMENT        = 3;
+    const CHARACTER      = 4;
+    const SPACECHARACTER = 5;
+    const EOF            = 6;
+    const PARSEERROR     = 7;
+
+    // These are constants representing bunches of characters.
+    const ALPHA       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    const UPPER_ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const LOWER_ALPHA = 'abcdefghijklmnopqrstuvwxyz';
+    const DIGIT       = '0123456789';
+    const HEX         = '0123456789ABCDEFabcdef';
+    const WHITESPACE  = "\t\n\x0c ";
 
     /**
      * @param $data | Data to parse
@@ -2110,60 +2113,30 @@ class HTML5_Tokenizer {
     }
 
     /**
-     * Emits a token, passing it on to the tree builder.
+     * Returns a serialized representation of the tree.
      *
-     * @param $token
-     * @param bool $checkStream
-     * @param bool $dry
+     * @return DOMDocument|DOMNodeList
      */
-    protected function emitToken($token, $checkStream = true, $dry = false) {
-        if ($checkStream === true) {
-            // Emit errors from input stream.
-            while ($this->stream->errors) {
-                $this->emitToken(array_shift($this->stream->errors), false);
-            }
-        }
-        if ($token['type'] === self::ENDTAG && !empty($token['attr'])) {
-            for ($i = 0; $i < count($token['attr']); $i++) {
-                $this->emitToken(array(
-                    'type' => self::PARSEERROR,
-                    'data' => 'attributes-in-end-tag'
-                ));
-            }
-        }
-        if ($token['type'] === self::ENDTAG && !empty($token['self-closing'])) {
-            $this->emitToken(array(
-                'type' => self::PARSEERROR,
-                'data' => 'self-closing-flag-on-end-tag',
-            ));
-        }
-        if ($token['type'] === self::STARTTAG) {
-            // This could be changed to actually pass the tree-builder a hash
-            $hash = array();
-            foreach ($token['attr'] as $keypair) {
-                if (isset($hash[$keypair['name']])) {
-                    $this->emitToken(array(
-                        'type' => self::PARSEERROR,
-                        'data' => 'duplicate-attribute',
-                    ));
-                } else {
-                    $hash[$keypair['name']] = $keypair['value'];
-                }
-            }
-        }
+    public function save() {
+        return $this->tree->save();
+    }
 
-        if ($dry === false) {
-            // the current structure of attributes is not a terribly good one
-            $this->tree->emitToken($token);
-        }
+    /**
+     * @return HTML5_TreeBuilder The tree
+     */
+    public function getTree()
+    {
+        return $this->tree;
+    }
 
-        if ($dry === false && is_int($this->tree->content_model)) {
-            $this->content_model = $this->tree->content_model;
-            $this->tree->content_model = null;
 
-        } elseif ($token['type'] === self::ENDTAG) {
-            $this->content_model = self::PCDATA;
-        }
+    /**
+     * Returns the input stream.
+     *
+     * @return HTML5_InputStream
+     */
+    public function stream() {
+        return $this->stream;
     }
 
     /**
@@ -2438,29 +2411,60 @@ class HTML5_Tokenizer {
     }
 
     /**
-     * Returns a serialized representation of the tree.
+     * Emits a token, passing it on to the tree builder.
      *
-     * @return DOMDocument|DOMNodeList
+     * @param $token
+     * @param bool $checkStream
+     * @param bool $dry
      */
-    public function save() {
-        return $this->tree->save();
-    }
+    protected function emitToken($token, $checkStream = true, $dry = false) {
+        if ($checkStream === true) {
+            // Emit errors from input stream.
+            while ($this->stream->errors) {
+                $this->emitToken(array_shift($this->stream->errors), false);
+            }
+        }
+        if ($token['type'] === self::ENDTAG && !empty($token['attr'])) {
+            for ($i = 0; $i < count($token['attr']); $i++) {
+                $this->emitToken(array(
+                    'type' => self::PARSEERROR,
+                    'data' => 'attributes-in-end-tag'
+                ));
+            }
+        }
+        if ($token['type'] === self::ENDTAG && !empty($token['self-closing'])) {
+            $this->emitToken(array(
+                'type' => self::PARSEERROR,
+                'data' => 'self-closing-flag-on-end-tag',
+            ));
+        }
+        if ($token['type'] === self::STARTTAG) {
+            // This could be changed to actually pass the tree-builder a hash
+            $hash = array();
+            foreach ($token['attr'] as $keypair) {
+                if (isset($hash[$keypair['name']])) {
+                    $this->emitToken(array(
+                        'type' => self::PARSEERROR,
+                        'data' => 'duplicate-attribute',
+                    ));
+                } else {
+                    $hash[$keypair['name']] = $keypair['value'];
+                }
+            }
+        }
 
-    /**
-     * @return HTML5_TreeBuilder The tree
-     */
-    public function getTree()
-    {
-        return $this->tree;
-    }
+        if ($dry === false) {
+            // the current structure of attributes is not a terribly good one
+            $this->tree->emitToken($token);
+        }
 
-    /**
-     * Returns the input stream.
-     *
-     * @return HTML5_InputStream
-     */
-    public function stream() {
-        return $this->stream;
+        if ($dry === false && is_int($this->tree->content_model)) {
+            $this->content_model = $this->tree->content_model;
+            $this->tree->content_model = null;
+
+        } elseif ($token['type'] === self::ENDTAG) {
+            $this->content_model = self::PCDATA;
+        }
     }
 }
 

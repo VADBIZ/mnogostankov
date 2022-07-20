@@ -16,6 +16,14 @@ use FontLib\BinaryStream;
  * @package php-font-lib
  */
 class nameRecord extends BinaryStream {
+  public $platformID;
+  public $platformSpecificID;
+  public $languageID;
+  public $nameID;
+  public $length;
+  public $offset;
+  public $string;
+
   public static $format = array(
     "platformID"         => self::uint16,
     "platformSpecificID" => self::uint16,
@@ -24,13 +32,6 @@ class nameRecord extends BinaryStream {
     "length"             => self::uint16,
     "offset"             => self::uint16,
   );
-  public $platformID;
-  public $platformSpecificID;
-  public $languageID;
-  public $nameID;
-  public $length;
-  public $offset;
-  public $string;
 
   public function map($data) {
     foreach ($data as $key => $value) {

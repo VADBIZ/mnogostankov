@@ -22,7 +22,7 @@ use Dompdf\Frame;
  *
  * The FrameTree consists of {@link Frame} objects each tied to specific
  * DOMNode objects in a specific DomDocument.  The FrameTree has the same
- * structure as the DomDocument, but adds additional capabalities for
+ * structure as the DomDocument, but adds additional capabilities for
  * styling and layout.
  *
  * @package dompdf
@@ -90,7 +90,7 @@ class FrameTree
     }
 
     /**
-     * Returns the DOMDocument object representing the curent html document
+     * Returns the DOMDocument object representing the current html document
      *
      * @return DOMDocument
      */
@@ -107,6 +107,18 @@ class FrameTree
     public function get_root()
     {
         return $this->_root;
+    }
+
+    /**
+     * Returns a specific frame given its id
+     *
+     * @param string $id
+     *
+     * @return Frame|null
+     */
+    public function get_frame($id)
+    {
+        return isset($this->_registry[$id]) ? $this->_registry[$id] : null;
     }
 
     /**
@@ -178,6 +190,32 @@ class FrameTree
         }
     }
 
+    // FIXME: temporary hack, preferably we will improve rendering of sequential #text nodes
+    /**
+     * Remove a child from a node
+     *
+     * Remove a child from a node. If the removed node results in two
+     * adjacent #text nodes then combine them.
+     *
+     * @param DOMNode $node the current DOMNode being considered
+     * @param array $children an array of nodes that are the children of $node
+     * @param int $index index from the $children array of the node to remove
+     */
+    protected function _remove_node(DOMNode $node, array &$children, $index)
+    {
+        $child = $children[$index];
+        $previousChild = $child->previousSibling;
+        $nextChild = $child->nextSibling;
+        $node->removeChild($child);
+        if (isset($previousChild, $nextChild)) {
+            if ($previousChild->nodeName === "#text" && $nextChild->nodeName === "#text") {
+                $previousChild->nodeValue .= $nextChild->nodeValue;
+                $this->_remove_node($node, $children, $index+1);
+            }
+        }
+        array_splice($children, $index, 1);
+    }
+
     /**
      * Recursively adds {@link Frame} objects to the tree
      *
@@ -241,33 +279,6 @@ class FrameTree
         return $frame;
     }
 
-    // FIXME: temporary hack, preferably we will improve rendering of sequential #text nodes
-
-    /**
-     * Remove a child from a node
-     *
-     * Remove a child from a node. If the removed node results in two
-     * adjacent #text nodes then combine them.
-     *
-     * @param DOMNode $node the current DOMNode being considered
-     * @param array $children an array of nodes that are the children of $node
-     * @param int $index index from the $children array of the node to remove
-     */
-    protected function _remove_node(DOMNode $node, array &$children, $index)
-    {
-        $child = $children[$index];
-        $previousChild = $child->previousSibling;
-        $nextChild = $child->nextSibling;
-        $node->removeChild($child);
-        if (isset($previousChild, $nextChild)) {
-            if ($previousChild->nodeName === "#text" && $nextChild->nodeName === "#text") {
-                $previousChild->nodeValue .= $nextChild->nodeValue;
-                $this->_remove_node($node, $children, $index+1);
-            }
-        }
-        array_splice($children, $index, 1);
-    }
-
     /**
      * @param DOMElement $node
      * @param DOMElement $new_node
@@ -300,17 +311,5 @@ class FrameTree
         }
 
         return $frame_id;
-    }
-
-    /**
-     * Returns a specific frame given its id
-     *
-     * @param string $id
-     *
-     * @return Frame|null
-     */
-    public function get_frame($id)
-    {
-        return isset($this->_registry[$id]) ? $this->_registry[$id] : null;
     }
 }

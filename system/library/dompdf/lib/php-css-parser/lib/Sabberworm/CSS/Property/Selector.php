@@ -45,9 +45,17 @@ class Selector {
 		}
 	}
 
+	public function getSelector() {
+		return $this->sSelector;
+	}
+
 	public function setSelector($sSelector) {
 		$this->sSelector = trim($sSelector);
 		$this->iSpecificity = null;
+	}
+
+	public function __toString() {
+		return $this->getSelector();
 	}
 
 	public function getSpecificity() {
@@ -61,14 +69,6 @@ class Selector {
 			$this->iSpecificity = ($a * 1000) + ($b * 100) + ($c * 10) + $d;
 		}
 		return $this->iSpecificity;
-	}
-
-	public function __toString() {
-		return $this->getSelector();
-	}
-
-	public function getSelector() {
-		return $this->sSelector;
 	}
 
 }

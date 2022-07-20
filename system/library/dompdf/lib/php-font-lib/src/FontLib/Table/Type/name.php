@@ -17,6 +17,12 @@ use FontLib\Font;
  * @package php-font-lib
  */
 class name extends Table {
+  private static $header_format = array(
+    "format"       => self::uint16,
+    "count"        => self::uint16,
+    "stringOffset" => self::uint16,
+  );
+
   const NAME_COPYRIGHT          = 0;
   const NAME_NAME               = 1;
   const NAME_SUBFAMILY          = 2;
@@ -36,6 +42,7 @@ class name extends Table {
   const NAME_PREFERRE_SUBFAMILY = 17;
   const NAME_COMPAT_FULL_NAME   = 18;
   const NAME_SAMPLE_TEXT        = 19;
+
   static $nameIdCodes = array(
     0  => "Copyright",
     1  => "FontName",
@@ -58,12 +65,14 @@ class name extends Table {
     18 => "CompatibleFullName",
     19 => "SampleText",
   );
+
   static $platforms = array(
     0 => "Unicode",
     1 => "Macintosh",
     // 2 =>  Reserved
     3 => "Microsoft",
   );
+
   static $platformSpecific = array(
     // Unicode
     0 => array(
@@ -123,11 +132,6 @@ class name extends Table {
       //  9 => Reserved
       10 => "Unicode UCS-4",
     ),
-  );
-  private static $header_format = array(
-    "format"       => self::uint16,
-    "count"        => self::uint16,
-    "stringOffset" => self::uint16,
   );
 
   protected function _parse() {

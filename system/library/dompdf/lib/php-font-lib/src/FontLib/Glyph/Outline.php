@@ -18,26 +18,22 @@ use FontLib\BinaryStream;
  * @package php-font-lib
  */
 class Outline extends BinaryStream {
-  public $numberOfContours;
-  public $xMin;
-  public $yMin;
-
-  // Data
-  public $xMax;
-  public $yMax;
-  public $raw;
   /**
    * @var \FontLib\Table\Type\glyf
    */
   protected $table;
+
   protected $offset;
   protected $size;
 
-  function __construct(glyf $table, $offset = null, $size = null) {
-    $this->table  = $table;
-    $this->offset = $offset;
-    $this->size   = $size;
-  }
+  // Data
+  public $numberOfContours;
+  public $xMin;
+  public $yMin;
+  public $xMax;
+  public $yMax;
+
+  public $raw;
 
   /**
    * @param glyf $table
@@ -63,6 +59,19 @@ class Outline extends BinaryStream {
     return $glyph;
   }
 
+  /**
+   * @return File
+   */
+  function getFont() {
+    return $this->table->getFont();
+  }
+
+  function __construct(glyf $table, $offset = null, $size = null) {
+    $this->table  = $table;
+    $this->offset = $offset;
+    $this->size   = $size;
+  }
+
   function parse(BinaryStream $font) {
     $font->seek($this->offset);
 
@@ -82,13 +91,6 @@ class Outline extends BinaryStream {
     $this->yMin             = $font->readFWord();
     $this->xMax             = $font->readFWord();
     $this->yMax             = $font->readFWord();
-  }
-
-  /**
-   * @return File
-   */
-  function getFont() {
-    return $this->table->getFont();
   }
 
   function encode() {

@@ -3,7 +3,7 @@
  * @package php-svg-lib
  * @link    http://github.com/PhenX/php-svg-lib
  * @author  Fabien M�nager <fabien.menager@gmail.com>
- * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ * @license GNU LGPLv3+ http://www.gnu.org/copyleft/lesser.html
  */
 
 namespace Svg\Tag;
@@ -17,39 +17,6 @@ class UseTag extends AbstractTag
 
     /** @var AbstractTag */
     protected $reference;
-
-    public function handle($attributes)
-    {
-        parent::handle($attributes);
-
-        if (!$this->reference) {
-            return;
-        }
-
-        $attributes = array_merge($this->reference->attributes, $attributes);
-
-        $this->reference->handle($attributes);
-
-        foreach ($this->reference->children as $_child) {
-            $_attributes = array_merge($_child->attributes, $attributes);
-            $_child->handle($_attributes);
-        }
-    }
-
-    public function handleEnd()
-    {
-        parent::handleEnd();
-
-        if (!$this->reference) {
-            return;
-        }
-
-        $this->reference->handleEnd();
-
-        foreach ($this->reference->children as $_child) {
-            $_child->handleEnd();
-        }
-    }
 
     protected function before($attributes)
     {
@@ -93,4 +60,37 @@ class UseTag extends AbstractTag
 
         $this->getDocument()->getSurface()->restore();
     }
-}
+
+    public function handle($attributes)
+    {
+        parent::handle($attributes);
+
+        if (!$this->reference) {
+            return;
+        }
+
+        $attributes = array_merge($this->reference->attributes, $attributes);
+
+        $this->reference->handle($attributes);
+
+        foreach ($this->reference->children as $_child) {
+            $_attributes = array_merge($_child->attributes, $attributes);
+            $_child->handle($_attributes);
+        }
+    }
+
+    public function handleEnd()
+    {
+        parent::handleEnd();
+
+        if (!$this->reference) {
+            return;
+        }
+
+        $this->reference->handleEnd();
+
+        foreach ($this->reference->children as $_child) {
+            $_child->handleEnd();
+        }
+    }
+} 

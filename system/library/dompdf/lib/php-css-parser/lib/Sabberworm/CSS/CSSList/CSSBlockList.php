@@ -18,6 +18,16 @@ abstract class CSSBlockList extends CSSList {
 		parent::__construct($iLineNo);
 	}
 
+	protected function allDeclarationBlocks(&$aResult) {
+		foreach ($this->aContents as $mContent) {
+			if ($mContent instanceof DeclarationBlock) {
+				$aResult[] = $mContent;
+			} else if ($mContent instanceof CSSBlockList) {
+				$mContent->allDeclarationBlocks($aResult);
+			}
+		}
+	}
+
 	protected function allRuleSets(&$aResult) {
 		foreach ($this->aContents as $mContent) {
 			if ($mContent instanceof RuleSet) {
@@ -65,16 +75,6 @@ abstract class CSSBlockList extends CSSList {
 						$aResult[] = $oSelector;
 					}
 				}
-			}
-		}
-	}
-
-	protected function allDeclarationBlocks(&$aResult) {
-		foreach ($this->aContents as $mContent) {
-			if ($mContent instanceof DeclarationBlock) {
-				$aResult[] = $mContent;
-			} else if ($mContent instanceof CSSBlockList) {
-				$mContent->allDeclarationBlocks($aResult);
 			}
 		}
 	}

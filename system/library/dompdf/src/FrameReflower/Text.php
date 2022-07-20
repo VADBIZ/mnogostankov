@@ -21,15 +21,18 @@ use Dompdf\Helpers;
 class Text extends AbstractFrameReflower
 {
 
-        public static $_whitespace_pattern = "/[ \t\r\n\f]+/u"; // Nearest block-level ancestor
-/**
+    /**
      * @var BlockFrameDecorator
      */
-    protected $_block_parent;
+    protected $_block_parent; // Nearest block-level ancestor
+
     /**
      * @var TextFrameDecorator
      */
     protected $_frame;
+
+    public static $_whitespace_pattern = "/[ \t\r\n\f]+/u";
+
     /**
      * @var FontMetrics
      */
@@ -46,36 +49,136 @@ class Text extends AbstractFrameReflower
     }
 
     /**
-     * @param BlockFrameDecorator|null $block
+     * @param $text
+     * @return mixed
      */
-    function reflow(BlockFrameDecorator $block = null)
+    protected function _collapse_white_space($text)
     {
-        $frame = $this->_frame;
-        $page = $frame->get_root();
-        $page->check_forced_page_break($this->_frame);
+        return preg_replace(self::$_whitespace_pattern, " ", $text);
+    }
 
-        if ($page->is_full()) {
-            return;
+    /**
+     * @param $text
+     * @return bool|int
+     */
+    protected function _line_break($text)
+    {
+        $style = $this->_frame->get_style();
+        $size = $style->font_size;
+        $font = $style->font_family;
+        $current_line = $this->_block_parent->get_current_line_box();
+
+        // Determine the available width
+        $line_width = $this->_frame->get_containing_block("w");
+        $current_line_width = $current_line->left + $current_line->w + $current_line->right;
+
+        $available_width = $line_width - $current_line_width;
+
+        // Account for word-spacing
+        $word_spacing = (float)$style->length_in_pt($style->word_spacing);
+        $char_spacing = (float)$style->length_in_pt($style->letter_spacing);
+
+        // Determine the frame width including margin, padding & border
+        $text_width = $this->getFontMetrics()->getTextWidth($text, $font, $size, $word_spacing, $char_spacing);
+        $mbp_width =
+            (float)$style->length_in_pt(array($style->margin_left,
+                $style->border_left_width,
+                $style->padding_left,
+                $style->padding_right,
+                $style->border_right_width,
+                $style->margin_right), $line_width);
+
+        $frame_width = $text_width + $mbp_width;
+
+// Debugging:
+//    Helpers::pre_r("Text: '" . htmlspecialchars($text). "'");
+//    Helpers::pre_r("width: " .$frame_width);
+//    Helpers::pre_r("textwidth + delta: $text_width + $mbp_width");
+//    Helpers::pre_r("font-size: $size");
+//    Helpers::pre_r("cb[w]: " .$line_width);
+//    Helpers::pre_r("available width: " . $available_width);
+//    Helpers::pre_r("current line width: " . $current_line_width);
+
+//     Helpers::pre_r($words);
+
+        if ($frame_width <= $available_width) {
+            return false;
         }
 
-        $this->_block_parent = /*isset($block) ? $block : */
-        $frame->find_block_parent();
+        // split the text into words
+        // The regex splits on everything that's a separator (^\S double negative), excluding nbsp (\xa0), plus dashes
+        // This currently excludes the "narrow nbsp" character
+        $words = preg_split('/([^\S\xA0]+|-+)/u', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $wc = count($words);
 
-        // Left trim the text if this is the first text on the line and we're
-        // collapsing white space
-//     if ( $this->_block_parent->get_current_line()->w == 0 &&
-//          ($frame->get_style()->white_space !== "pre" ||
-//           $frame->get_style()->white_space !== "pre-wrap") ) {
-//       $frame->set_text( ltrim( $frame->get_text() ) );
-//     }
+        // Determine the split point
+        $width = 0;
+        $str = "";
+        reset($words);
 
-        $frame->position();
+        // @todo support <shy>, <wbr>
+        for ($i = 0; $i < $wc; $i += 2) {
+            $word = $words[$i] . (isset($words[$i + 1]) ? $words[$i + 1] : "");
+            $word_width = $this->getFontMetrics()->getTextWidth($word, $font, $size, $word_spacing, $char_spacing);
+            if ($width + $word_width + $mbp_width > $available_width) {
+                break;
+            }
 
-        $this->_layout_line();
-
-        if ($block) {
-            $block->add_frame_to_line($frame);
+            $width += $word_width;
+            $str .= $word;
         }
+
+        $break_word = ($style->word_wrap === "break-word");
+
+        // The first word has overflowed.   Force it onto the line
+        if ($current_line_width == 0 && $width == 0) {
+            $s = "";
+            $last_width = 0;
+
+            if ($break_word) {
+                for ($j = 0; $j < strlen($word); $j++) {
+                    $s .= $word[$j];
+                    $_width = $this->getFontMetrics()->getTextWidth($s, $font, $size, $word_spacing, $char_spacing);
+                    if ($_width > $available_width) {
+                        break;
+                    }
+
+                    $last_width = $_width;
+                }
+            }
+
+            if ($break_word && $last_width > 0) {
+                //$width += $last_width;
+                $str .= substr($s, 0, -1);
+            } else {
+                //$width += $word_width;
+                $str .= $word;
+            }
+        }
+
+        $offset = mb_strlen($str);
+
+        // More debugging:
+        //     var_dump($str);
+        //     print_r("Width: ". $width);
+        //     print_r("Offset: " . $offset);
+
+        return $offset;
+    }
+
+    //........................................................................
+
+    /**
+     * @param $text
+     * @return bool|int
+     */
+    protected function _newline_break($text)
+    {
+        if (($i = mb_strpos($text, "\n")) === false) {
+            return false;
+        }
+
+        return $i + 1;
     }
 
     /**
@@ -239,163 +342,43 @@ class Text extends AbstractFrameReflower
         $width = $frame->recalculate_width();
     }
 
-    //........................................................................
-
     /**
-     * @return FontMetrics
+     * @param BlockFrameDecorator|null $block
      */
-    public function getFontMetrics()
+    function reflow(BlockFrameDecorator $block = null)
     {
-        return $this->fontMetrics;
-    }
+        $frame = $this->_frame;
+        $page = $frame->get_root();
+        $page->check_forced_page_break($this->_frame);
 
-    /**
-     * @param FontMetrics $fontMetrics
-     * @return $this
-     */
-    public function setFontMetrics(FontMetrics $fontMetrics)
-    {
-        $this->fontMetrics = $fontMetrics;
-        return $this;
-    }
+        if ($page->is_full()) {
+            return;
+        }
 
-    /**
-     * @param $text
-     * @return mixed
-     */
-    protected function _collapse_white_space($text)
-    {
-        //$text = $this->_frame->get_text();
-//     if ( $this->_block_parent->get_current_line_box->w == 0 )
-//       $text = ltrim($text, " \n\r\t");
-        return preg_replace(self::$_whitespace_pattern, " ", $text);
+        $this->_block_parent = /*isset($block) ? $block : */
+        $frame->find_block_parent();
+
+        // Left trim the text if this is the first text on the line and we're
+        // collapsing white space
+//     if ( $this->_block_parent->get_current_line()->w == 0 &&
+//          ($frame->get_style()->white_space !== "pre" ||
+//           $frame->get_style()->white_space !== "pre-wrap") ) {
+//       $frame->set_text( ltrim( $frame->get_text() ) );
+//     }
+
+        $frame->position();
+
+        $this->_layout_line();
+
+        if ($block) {
+            $block->add_frame_to_line($frame);
+        }
     }
 
     //........................................................................
 
     // Returns an array(0 => min, 1 => max, "min" => min, "max" => max) of the
     // minimum and maximum widths of this frame
-
-    /**
-     * @param $text
-     * @return bool|int
-     */
-    protected function _line_break($text)
-    {
-        $style = $this->_frame->get_style();
-        $size = $style->font_size;
-        $font = $style->font_family;
-        $current_line = $this->_block_parent->get_current_line_box();
-
-        // Determine the available width
-        $line_width = $this->_frame->get_containing_block("w");
-        $current_line_width = $current_line->left + $current_line->w + $current_line->right;
-
-        $available_width = $line_width - $current_line_width;
-
-        // Account for word-spacing
-        $word_spacing = (float)$style->length_in_pt($style->word_spacing);
-        $char_spacing = (float)$style->length_in_pt($style->letter_spacing);
-
-        // Determine the frame width including margin, padding & border
-        $text_width = $this->getFontMetrics()->getTextWidth($text, $font, $size, $word_spacing, $char_spacing);
-        $mbp_width =
-            (float)$style->length_in_pt(array($style->margin_left,
-                $style->border_left_width,
-                $style->padding_left,
-                $style->padding_right,
-                $style->border_right_width,
-                $style->margin_right), $line_width);
-
-        $frame_width = $text_width + $mbp_width;
-
-// Debugging:
-//    Helpers::pre_r("Text: '" . htmlspecialchars($text). "'");
-//    Helpers::pre_r("width: " .$frame_width);
-//    Helpers::pre_r("textwidth + delta: $text_width + $mbp_width");
-//    Helpers::pre_r("font-size: $size");
-//    Helpers::pre_r("cb[w]: " .$line_width);
-//    Helpers::pre_r("available width: " . $available_width);
-//    Helpers::pre_r("current line width: " . $current_line_width);
-
-//     Helpers::pre_r($words);
-
-        if ($frame_width <= $available_width) {
-            return false;
-        }
-
-        // split the text into words
-        $words = preg_split('/([\s-]+)/u', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
-        $wc = count($words);
-
-        // Determine the split point
-        $width = 0;
-        $str = "";
-        reset($words);
-
-        // @todo support <shy>, <wbr>
-        for ($i = 0; $i < $wc; $i += 2) {
-            $word = $words[$i] . (isset($words[$i + 1]) ? $words[$i + 1] : "");
-            $word_width = $this->getFontMetrics()->getTextWidth($word, $font, $size, $word_spacing, $char_spacing);
-            if ($width + $word_width + $mbp_width > $available_width) {
-                break;
-            }
-
-            $width += $word_width;
-            $str .= $word;
-        }
-
-        $break_word = ($style->word_wrap === "break-word");
-
-        // The first word has overflowed.   Force it onto the line
-        if ($current_line_width == 0 && $width == 0) {
-            $s = "";
-            $last_width = 0;
-
-            if ($break_word) {
-                for ($j = 0; $j < strlen($word); $j++) {
-                    $s .= $word[$j];
-                    $_width = $this->getFontMetrics()->getTextWidth($s, $font, $size, $word_spacing, $char_spacing);
-                    if ($_width > $available_width) {
-                        break;
-                    }
-
-                    $last_width = $_width;
-                }
-            }
-
-            if ($break_word && $last_width > 0) {
-                //$width += $last_width;
-                $str .= substr($s, 0, -1);
-            } else {
-                //$width += $word_width;
-                $str .= $word;
-            }
-        }
-
-        $offset = mb_strlen($str);
-
-        // More debugging:
-        //     var_dump($str);
-        //     print_r("Width: ". $width);
-        //     print_r("Offset: " . $offset);
-
-        return $offset;
-    }
-
-    /**
-     * @param $text
-     * @return bool|int
-     */
-    protected function _newline_break($text)
-    {
-        if (($i = mb_strpos($text, "\n")) === false) {
-            return false;
-        }
-
-        return $i + 1;
-    }
-
     function get_min_max_width()
     {
         /*if ( !is_null($this->_min_max_cache)  )
@@ -421,10 +404,10 @@ class Text extends AbstractFrameReflower
 
                 // Find the longest word (i.e. minimum length)
 
-                // This technique (using arrays & an anonymous function) is actually
-                // faster than doing a single-pass character by character scan.  Heh,
-                // yes I took the time to bench it ;)
-                $words = array_flip(preg_split("/[\s-]+/u", $str, -1, PREG_SPLIT_DELIM_CAPTURE));
+                // split the text into words
+                // The regex splits on everything that's a separator (^\S double negative), excluding nbsp (\xa0), plus dashes
+                // This currently excludes the "narrow nbsp" character
+                $words = array_flip(preg_split('/([^\S\xA0]+|-+)/u', $text, -1, PREG_SPLIT_DELIM_CAPTURE));
                 $root = $this;
                 array_walk($words, function(&$val, $str) use ($font, $size, $word_spacing, $char_spacing, $root) {
                     $val = $root->getFontMetrics()->getTextWidth($str, $font, $size, $word_spacing, $char_spacing);
@@ -435,7 +418,7 @@ class Text extends AbstractFrameReflower
                 break;
 
             case "pre":
-                $lines = array_flip(preg_split("/\n/u", $str));
+                $lines = array_flip(preg_split("/\R/u", $str));
                 $root = $this;
                 array_walk($lines, function(&$val, $str) use ($font, $size, $word_spacing, $char_spacing, $root) {
                     $val = $root->getFontMetrics()->getTextWidth($str, $font, $size, $word_spacing, $char_spacing);
@@ -463,7 +446,7 @@ class Text extends AbstractFrameReflower
 
             case "pre-wrap":
                 // Find the longest word (i.e. minimum length)
-                $lines = array_flip(preg_split("/\n/", $text));
+                $lines = array_flip(preg_split("/\R/u", $text));
                 $root = $this;
                 array_walk($lines, function(&$val, $str) use ($font, $size, $word_spacing, $char_spacing, $root) {
                     $val = $root->getFontMetrics()->getTextWidth($str, $font, $size, $word_spacing, $char_spacing);
@@ -483,9 +466,36 @@ class Text extends AbstractFrameReflower
             $style->border_right_width,
             $style->margin_right), $line_width);
         $min += $delta;
+        $min_word = $min;
         $max += $delta;
 
-        return $this->_min_max_cache = array($min, $max, "min" => $min, "max" => $max);
+        if ($style->word_wrap === 'break-word') {
+            // If it is allowed to break words, the min width is the widest character.
+            // But for performance reasons, we only check the first character.
+            $char = mb_substr($str, 0, 1);
+            $min_char = $this->getFontMetrics()->getTextWidth($char, $font, $size, $word_spacing, $char_spacing);
+            $min = $delta + $min_char;
+        }
+
+        return $this->_min_max_cache = array($min, $max, $min_word, "min" => $min, "max" => $max, 'min_word' => $min_word);
+    }
+
+    /**
+     * @param FontMetrics $fontMetrics
+     * @return $this
+     */
+    public function setFontMetrics(FontMetrics $fontMetrics)
+    {
+        $this->fontMetrics = $fontMetrics;
+        return $this;
+    }
+
+    /**
+     * @return FontMetrics
+     */
+    public function getFontMetrics()
+    {
+        return $this->fontMetrics;
     }
 
     /**

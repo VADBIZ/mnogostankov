@@ -40,14 +40,6 @@ class ListBullet extends AbstractFrameDecorator
     /**
      * @return float|int
      */
-    function get_width()
-    {
-        return $this->get_margin_width();
-    }
-
-    /**
-     * @return float|int
-     */
     function get_margin_width()
     {
         $style = $this->_frame->get_style();
@@ -56,15 +48,7 @@ class ListBullet extends AbstractFrameDecorator
             return 0;
         }
 
-        return $style->get_font_size() * self::BULLET_SIZE + 2 * self::BULLET_PADDING;
-    }
-
-    /**
-     * @return float|int
-     */
-    function get_height()
-    {
-        return $this->get_margin_height();
+        return $style->font_size * self::BULLET_SIZE + 2 * self::BULLET_PADDING;
     }
 
     /**
@@ -80,7 +64,23 @@ class ListBullet extends AbstractFrameDecorator
             return 0;
         }
 
-        return $style->get_font_size() * self::BULLET_SIZE + 2 * self::BULLET_PADDING;
+        return $style->font_size * self::BULLET_SIZE + 2 * self::BULLET_PADDING;
+    }
+
+    /**
+     * @return float|int
+     */
+    function get_width()
+    {
+        return $this->get_margin_width();
+    }
+
+    /**
+     * @return float|int
+     */
+    function get_height()
+    {
+        return $this->get_margin_height();
     }
 
     //........................................................................

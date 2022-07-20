@@ -25,6 +25,103 @@ class OutlineSimple extends Outline {
   public $instructions;
   public $points;
 
+  function parseData() {
+    parent::parseData();
+
+    if (!$this->size) {
+      return;
+    }
+
+    $font = $this->getFont();
+
+    $noc = $this->numberOfContours;
+
+    if ($noc == 0) {
+      return;
+    }
+
+    $endPtsOfContours = $font->r(array(self::uint16, $noc));
+
+    $instructionLength  = $font->readUInt16();
+    $this->instructions = $font->r(array(self::uint8, $instructionLength));
+
+    $count = $endPtsOfContours[$noc - 1] + 1;
+
+    // Flags
+    $flags = array();
+    for ($index = 0; $index < $count; $index++) {
+      $flags[$index] = $font->readUInt8();
+
+      if ($flags[$index] & self::REPEAT) {
+        $repeats = $font->readUInt8();
+
+        for ($i = 1; $i <= $repeats; $i++) {
+          $flags[$index + $i] = $flags[$index];
+        }
+
+        $index += $repeats;
+      }
+    }
+
+    $points = array();
+    foreach ($flags as $i => $flag) {
+      $points[$i]["onCurve"]      = $flag & self::ON_CURVE;
+      $points[$i]["endOfContour"] = in_array($i, $endPtsOfContours);
+    }
+
+    // X Coords
+    $x = 0;
+    for ($i = 0; $i < $count; $i++) {
+      $flag = $flags[$i];
+
+      if ($flag & self::THIS_X_IS_SAME) {
+        if ($flag & self::X_SHORT_VECTOR) {
+          $x += $font->readUInt8();
+        }
+      }
+      else {
+        if ($flag & self::X_SHORT_VECTOR) {
+          $x -= $font->readUInt8();
+        }
+        else {
+          $x += $font->readInt16();
+        }
+      }
+
+      $points[$i]["x"] = $x;
+    }
+
+    // Y Coords
+    $y = 0;
+    for ($i = 0; $i < $count; $i++) {
+      $flag = $flags[$i];
+
+      if ($flag & self::THIS_Y_IS_SAME) {
+        if ($flag & self::Y_SHORT_VECTOR) {
+          $y += $font->readUInt8();
+        }
+      }
+      else {
+        if ($flag & self::Y_SHORT_VECTOR) {
+          $y -= $font->readUInt8();
+        }
+        else {
+          $y += $font->readInt16();
+        }
+      }
+
+      $points[$i]["y"] = $y;
+    }
+
+    $this->points = $points;
+  }
+
+  public function splitSVGPath($path) {
+    preg_match_all('/([a-z])|(-?\d+(?:\.\d+)?)/i', $path, $matches, PREG_PATTERN_ORDER);
+
+    return $matches[0];
+  }
+
   public function makePoints($path) {
     $path = $this->splitSVGPath($path);
     $l    = count($path);
@@ -82,12 +179,6 @@ class OutlineSimple extends Outline {
     }
 
     return $points;
-  }
-
-  public function splitSVGPath($path) {
-    preg_match_all('/([a-z])|(-?\d+(?:\.\d+)?)/i', $path, $matches, PREG_PATTERN_ORDER);
-
-    return $matches[0];
   }
 
   function encode() {
@@ -189,97 +280,6 @@ class OutlineSimple extends Outline {
     }
 
     return $path;
-  }
-
-  function parseData() {
-    parent::parseData();
-
-    if (!$this->size) {
-      return;
-    }
-
-    $font = $this->getFont();
-
-    $noc = $this->numberOfContours;
-
-    if ($noc == 0) {
-      return;
-    }
-
-    $endPtsOfContours = $font->r(array(self::uint16, $noc));
-
-    $instructionLength  = $font->readUInt16();
-    $this->instructions = $font->r(array(self::uint8, $instructionLength));
-
-    $count = $endPtsOfContours[$noc - 1] + 1;
-
-    // Flags
-    $flags = array();
-    for ($index = 0; $index < $count; $index++) {
-      $flags[$index] = $font->readUInt8();
-
-      if ($flags[$index] & self::REPEAT) {
-        $repeats = $font->readUInt8();
-
-        for ($i = 1; $i <= $repeats; $i++) {
-          $flags[$index + $i] = $flags[$index];
-        }
-
-        $index += $repeats;
-      }
-    }
-
-    $points = array();
-    foreach ($flags as $i => $flag) {
-      $points[$i]["onCurve"]      = $flag & self::ON_CURVE;
-      $points[$i]["endOfContour"] = in_array($i, $endPtsOfContours);
-    }
-
-    // X Coords
-    $x = 0;
-    for ($i = 0; $i < $count; $i++) {
-      $flag = $flags[$i];
-
-      if ($flag & self::THIS_X_IS_SAME) {
-        if ($flag & self::X_SHORT_VECTOR) {
-          $x += $font->readUInt8();
-        }
-      }
-      else {
-        if ($flag & self::X_SHORT_VECTOR) {
-          $x -= $font->readUInt8();
-        }
-        else {
-          $x += $font->readInt16();
-        }
-      }
-
-      $points[$i]["x"] = $x;
-    }
-
-    // Y Coords
-    $y = 0;
-    for ($i = 0; $i < $count; $i++) {
-      $flag = $flags[$i];
-
-      if ($flag & self::THIS_Y_IS_SAME) {
-        if ($flag & self::Y_SHORT_VECTOR) {
-          $y += $font->readUInt8();
-        }
-      }
-      else {
-        if ($flag & self::Y_SHORT_VECTOR) {
-          $y -= $font->readUInt8();
-        }
-        else {
-          $y += $font->readInt16();
-        }
-      }
-
-      $points[$i]["y"] = $y;
-    }
-
-    $this->points = $points;
   }
 
   protected function getSVGPath($points, $startIndex, $count) {

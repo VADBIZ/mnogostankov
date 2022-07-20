@@ -14,6 +14,11 @@ namespace FontLib;
  * @package php-font-lib
  */
 class BinaryStream {
+  /**
+   * @var resource The file pointer
+   */
+  protected $f;
+
   const uint8        = 1;
   const  int8        = 2;
   const uint16       = 3;
@@ -27,36 +32,13 @@ class BinaryStream {
   const F2Dot14      = 11;
   const longDateTime = 12;
   const char         = 13;
+
   const modeRead      = "rb";
   const modeWrite     = "wb";
   const modeReadWrite = "rb+";
-  /**
-   * @var resource The file pointer
-   */
-  protected $f;
 
   static function backtrace() {
     var_dump(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
-  }
-
-  /**
-   * Create a temporary file in write mode
-   *
-   * @param bool $allow_memory Allow in-memory files
-   *
-   * @return resource the temporary file pointer resource
-   */
-  public static function getTempFile($allow_memory = true) {
-    $f = null;
-
-    if ($allow_memory) {
-      $f = fopen("php://temp", "rb+");
-    }
-    else {
-      $f = fopen(tempnam(sys_get_temp_dir(), "fnt"), "rb+");
-    }
-
-    return $f;
   }
 
   /**
@@ -112,6 +94,26 @@ class BinaryStream {
   }
 
   /**
+   * Create a temporary file in write mode
+   *
+   * @param bool $allow_memory Allow in-memory files
+   *
+   * @return resource the temporary file pointer resource
+   */
+  public static function getTempFile($allow_memory = true) {
+    $f = null;
+
+    if ($allow_memory) {
+      $f = fopen("php://temp", "rb+");
+    }
+    else {
+      $f = fopen(tempnam(sys_get_temp_dir(), "fnt"), "rb+");
+    }
+
+    return $f;
+  }
+
+  /**
    * Move the internal file pinter to $offset bytes
    *
    * @param int $offset
@@ -135,30 +137,12 @@ class BinaryStream {
     fseek($this->f, $n, SEEK_CUR);
   }
 
-  public function readUFWord() {
-    return $this->readUInt16();
-  }
-
-  public function readUInt16() {
-    $a = unpack("nn", $this->read(2));
-
-    return $a["n"];
-  }
-
   public function read($n) {
     if ($n < 1) {
       return "";
     }
 
     return fread($this->f, $n);
-  }
-
-  public function writeUFWord($data) {
-    return $this->writeUInt16($data);
-  }
-
-  public function writeUInt16($data) {
-    return $this->write(pack("n", $data), 2);
   }
 
   public function write($data, $length = null) {
@@ -169,8 +153,60 @@ class BinaryStream {
     return fwrite($this->f, $data, $length);
   }
 
-  public function readFWord() {
-    return $this->readInt16();
+  public function readUInt8() {
+    return ord($this->read(1));
+  }
+
+  public function readUInt8Many($count) {
+    return array_values(unpack("C*", $this->read($count)));
+  }
+
+  public function writeUInt8($data) {
+    return $this->write(chr($data), 1);
+  }
+
+  public function readInt8() {
+    $v = $this->readUInt8();
+
+    if ($v >= 0x80) {
+      $v -= 0x100;
+    }
+
+    return $v;
+  }
+
+  public function readInt8Many($count) {
+    return array_values(unpack("c*", $this->read($count)));
+  }
+
+  public function writeInt8($data) {
+    if ($data < 0) {
+      $data += 0x100;
+    }
+
+    return $this->writeUInt8($data);
+  }
+
+  public function readUInt16() {
+    $a = unpack("nn", $this->read(2));
+
+    return $a["n"];
+  }
+
+  public function readUInt16Many($count) {
+    return array_values(unpack("n*", $this->read($count * 2)));
+  }
+
+  public function readUFWord() {
+    return $this->readUInt16();
+  }
+
+  public function writeUInt16($data) {
+    return $this->write(pack("n", $data), 2);
+  }
+
+  public function writeUFWord($data) {
+    return $this->writeUInt16($data);
   }
 
   public function readInt16() {
@@ -184,8 +220,19 @@ class BinaryStream {
     return $v;
   }
 
-  public function writeFWord($data) {
-    return $this->writeInt16($data);
+  public function readInt16Many($count) {
+    $vals = array_values(unpack("n*", $this->read($count * 2)));
+    foreach ($vals as &$v) {
+      if ($v >= 0x8000) {
+        $v -= 0x10000;
+      }
+    }
+
+    return $vals;
+  }
+
+  public function readFWord() {
+    return $this->readInt16();
   }
 
   public function writeInt16($data) {
@@ -196,6 +243,55 @@ class BinaryStream {
     return $this->writeUInt16($data);
   }
 
+  public function writeFWord($data) {
+    return $this->writeInt16($data);
+  }
+
+  public function readUInt32() {
+    $a = unpack("NN", $this->read(4));
+
+    return $a["N"];
+  }
+
+  public function writeUInt32($data) {
+    return $this->write(pack("N", $data), 4);
+  }
+
+  public function readFixed() {
+    $d  = $this->readInt16();
+    $d2 = $this->readUInt16();
+
+    return round($d + $d2 / 0x10000, 4);
+  }
+
+  public function writeFixed($data) {
+    $left  = floor($data);
+    $right = ($data - $left) * 0x10000;
+
+    return $this->writeInt16($left) + $this->writeUInt16($right);
+  }
+
+  public function readLongDateTime() {
+    $this->readUInt32(); // ignored
+    $date = $this->readUInt32() - 2082844800;
+    
+    # PHP_INT_MIN isn't defined in PHP < 7.0
+    $php_int_min = defined("PHP_INT_MIN") ? PHP_INT_MIN : ~PHP_INT_MAX;
+
+    if (is_string($date) || $date > PHP_INT_MAX || $date < $php_int_min) {
+      $date = 0;
+    }
+
+    return strftime("%Y-%m-%d %H:%M:%S", $date);
+  }
+
+  public function writeLongDateTime($data) {
+    $date = strtotime($data);
+    $date += 2082844800;
+
+    return $this->writeUInt32(0) + $this->writeUInt32($date);
+  }
+
   public function unpack($def) {
     $d = array();
     foreach ($def as $name => $type) {
@@ -203,6 +299,15 @@ class BinaryStream {
     }
 
     return $d;
+  }
+
+  public function pack($def, $data) {
+    $bytes = 0;
+    foreach ($def as $name => $type) {
+      $bytes += $this->w($type, $data[$name]);
+    }
+
+    return $bytes;
   }
 
   /**
@@ -270,79 +375,6 @@ class BinaryStream {
     }
   }
 
-  public function readUInt8() {
-    return ord($this->read(1));
-  }
-
-  public function readInt8() {
-    $v = $this->readUInt8();
-
-    if ($v >= 0x80) {
-      $v -= 0x100;
-    }
-
-    return $v;
-  }
-
-  public function readUInt32() {
-    $a = unpack("NN", $this->read(4));
-
-    return $a["N"];
-  }
-
-  public function readFixed() {
-    $d  = $this->readInt16();
-    $d2 = $this->readUInt16();
-
-    return round($d + $d2 / 0x10000, 4);
-  }
-
-  public function readLongDateTime() {
-    $this->readUInt32(); // ignored
-    $date = $this->readUInt32() - 2082844800;
-
-    # PHP_INT_MIN isn't defined in PHP < 7.0
-    $php_int_min = defined("PHP_INT_MIN") ? PHP_INT_MIN : ~PHP_INT_MAX;
-
-    if (is_string($date) || $date > PHP_INT_MAX || $date < $php_int_min) {
-      $date = 0;
-    }
-
-    return strftime("%Y-%m-%d %H:%M:%S", $date);
-  }
-
-  public function readUInt16Many($count) {
-    return array_values(unpack("n*", $this->read($count * 2)));
-  }
-
-  public function readInt16Many($count) {
-    $vals = array_values(unpack("n*", $this->read($count * 2)));
-    foreach ($vals as &$v) {
-      if ($v >= 0x8000) {
-        $v -= 0x10000;
-      }
-    }
-
-    return $vals;
-  }
-
-  public function readUInt8Many($count) {
-    return array_values(unpack("C*", $this->read($count)));
-  }
-
-  public function readInt8Many($count) {
-    return array_values(unpack("c*", $this->read($count)));
-  }
-
-  public function pack($def, $data) {
-    $bytes = 0;
-    foreach ($def as $name => $type) {
-      $bytes += $this->w($type, $data[$name]);
-    }
-
-    return $bytes;
-  }
-
   /**
    * Write $data of type $type in the file from the current position
    *
@@ -397,36 +429,6 @@ class BinaryStream {
 
         return null;
     }
-  }
-
-  public function writeUInt8($data) {
-    return $this->write(chr($data), 1);
-  }
-
-  public function writeInt8($data) {
-    if ($data < 0) {
-      $data += 0x100;
-    }
-
-    return $this->writeUInt8($data);
-  }
-
-  public function writeUInt32($data) {
-    return $this->write(pack("N", $data), 4);
-  }
-
-  public function writeFixed($data) {
-    $left  = floor($data);
-    $right = ($data - $left) * 0x10000;
-
-    return $this->writeInt16($left) + $this->writeUInt16($right);
-  }
-
-  public function writeLongDateTime($data) {
-    $date = strtotime($data);
-    $date += 2082844800;
-
-    return $this->writeUInt32(0) + $this->writeUInt32($date);
   }
 
   /**
