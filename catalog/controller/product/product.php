@@ -232,6 +232,8 @@ class ControllerProductProduct extends Controller {
             $this->document->addStyle('catalog/view/javascript/slick/slick.css');
             $this->document->addStyle('catalog/view/javascript/slick/slick-theme.css');
 
+            $this->document->addScript('catalog/view/javascript/clipboard.min.js');
+
             $data['heading_title'] = $product_info['name'];
 
 			$data['text_minimum'] = sprintf($this->language->get('text_minimum'), $product_info['minimum']);
@@ -249,6 +251,7 @@ class ControllerProductProduct extends Controller {
             $data['mpn'] = $product_info['mpn'];
 			$data['reward'] = $product_info['reward'];
 			$data['points'] = $product_info['points'];
+            $data['currentUrl'] = $this->url->link('product/product', $url . '&product_id=' . $this->request->get['product_id']);
 
             if ($product_info['length'] > 0) {
 				$data['length'] = $this->length->format($product_info['length'], $product_info['length_class_id']);
