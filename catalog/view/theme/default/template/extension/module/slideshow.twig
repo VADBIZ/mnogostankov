@@ -46,51 +46,30 @@
       opacity: 0.8;
     }
   }
-  @media (min-width: 768px) and (max-width: 992px) {
-    #list-group{{ module }} .list-group-item {
-      padding: 10px 20px;
-    }
-    #list-group{{ module }} .list-group-item-heading {
-      color: white;
-      font-size: 8px;
-    }
-    #list-group{{ module }} a {
-      color: white;
-      font-size: 6px;
-      font-family: 'Inter';
-      font-style: normal;
-      line-height: 100%;
-    }
-    #list-group{{ module }} .list-group-item-text {
-      font-size: 6px;
-      opacity: 0.8;
-    }
-  }
 </style>
-<div class="row hidden-xs">
-<div class="col-sm-9">
-<div class="slideshow swiper-viewport" style="margin-bottom: 0; box-shadow: none">
-  <div id="slideshow{{ module }}" class="swiper-container">
-    <div class="swiper-wrapper"> {% for banner in banners %}
-      <div class="swiper-slide text-center" style="padding: unset; border: none">{% if banner.link %}<a href="{{ banner.link }}"><img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" /></a>{% else %}<img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" />{% endif %}</div>
-      {% endfor %} </div>
+<div class="row">
+<div class="col-sm-12 col-lg-9 col-md-9">
+  <div class="slideshow swiper-viewport" style="margin-bottom: 0; box-shadow: none">
+    <div id="slideshow{{ module }}" class="swiper-container">
+      <div class="swiper-wrapper"> {% for banner in banners %}
+        <div class="swiper-slide text-center" style="padding: unset; border: none">{% if banner.link %}<a href="{{ banner.link }}"><img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" /></a>{% else %}<img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" />{% endif %}</div>
+        {% endfor %} </div>
+    </div>
+    <div class="swiper-pagination slideshow{{ module }}" style="bottom: 10px;"></div>
   </div>
-  <div class="swiper-pagination slideshow{{ module }}" style="bottom: 10px;"></div>
 </div>
-</div>
-
-  <div id="list-group{{ module }}" class="list-group col-sm-3">
-    <a href="#" class="list-group-item">
-      <span class="list-group-item-heading">Акции</span>
+<div id="list-group{{ module }}" class="list-group col-md-3 col-lg-3 hidden-xs hidden-sm">
+  <a href="#" class="list-group-item">
+    <span class="list-group-item-heading">{{ name }}</span>
+  </a>
+  {% for menu in blue_menu %}
+    <a href="{{ menu.href }}" class="list-group-item">
+      <span class="list-group-item-heading">{{ menu.name }}</span>
+      <p class="list-group-item-text">Посмотреть</p>
+      <img src="/image/arrow.svg">
     </a>
-    {% for menu in blue_menu %}
-      <a href="{{ menu.href }}" class="list-group-item">
-        <span class="list-group-item-heading">{{ menu.name }}</span>
-        <p class="list-group-item-text">Посмотреть</p>
-        <img src="/image/arrow.svg">
-      </a>
-    {% endfor %}
-  </div>
+  {% endfor %}
+</div>
 <script type="text/javascript"><!--
 $('#slideshow{{ module }}').swiper({
 	mode: 'horizontal',
