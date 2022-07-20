@@ -307,7 +307,7 @@
                 data-social="vk,telegram,email"></div>
                <!-- /uSocial -->
             </div>
-            <div class="col-sm-8"><button class="btn toCopy" data-clipboard-text="{{ hrr }}">Скопировать ссылку</button></div>
+            <div class="col-sm-8"><button class="btn toCopy" data-clipboard-text="{{ currentUrl }}">Скопировать ссылку</button></div>
 
             <div class="col-sm-12" style="margin-top: 20px">
                 {% if video %}
@@ -676,7 +676,7 @@ new_text = ('Text:', e.text); alert('Скопировано : ' + new_text);
 e.clearSelection();
 });
 clipboard.on('error', function(e) {
-alert('не скопировано');
+console.log(e);
 });
 
 $(document).ready(function() {
