@@ -2,8 +2,8 @@
 /**
  * @package php-svg-lib
  * @link    http://github.com/PhenX/php-svg-lib
- * @author  Fabien M�nager <fabien.menager@gmail.com>
- * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ * @author  Fabien Ménager <fabien.menager@gmail.com>
+ * @license GNU LGPLv3+ http://www.gnu.org/copyleft/lesser.html
  */
 
 namespace Svg;
@@ -29,8 +29,9 @@ use Svg\Tag\UseTag;
 
 class Document extends AbstractTag
 {
-    public $inDefs = false;
     protected $filename;
+    public $inDefs = false;
+
     protected $x;
     protected $y;
     protected $width;
@@ -55,13 +56,37 @@ class Document extends AbstractTag
     /** @var \Sabberworm\CSS\CSSList\Document[] */
     protected $styleSheets = array();
 
+    public function loadFile($filename)
+    {
+        $this->filename = $filename;
+    }
+
+    protected function initParser() {
+        $parser = xml_parser_create("utf-8");
+        xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, false);
+        xml_set_element_handler(
+            $parser,
+            array($this, "_tagStart"),
+            array($this, "_tagEnd")
+        );
+        xml_set_character_data_handler(
+            $parser,
+            array($this, "_charData")
+        );
+
+        return $this->parser = $parser;
+    }
+
     public function __construct() {
 
     }
 
-    public function loadFile($filename)
+    /**
+     * @return SurfaceInterface
+     */
+    public function getSurface()
     {
-        $this->filename = $filename;
+        return $this->surface;
     }
 
     public function getStack()
@@ -169,6 +194,19 @@ class Document extends AbstractTag
         return $this->styleSheets;
     }
 
+    protected function before($attributes)
+    {
+        $surface = $this->getSurface();
+
+        $style = new DefaultStyle();
+        $style->inherit($this);
+        $style->fromAttributes($attributes);
+
+        $this->setStyle($style);
+
+        $surface->setStyle($style);
+    }
+
     public function render(SurfaceInterface $surface)
     {
         $this->inDefs = false;
@@ -190,93 +228,17 @@ class Document extends AbstractTag
         xml_parser_free($parser);
     }
 
-    protected function initParser() {
-        $parser = xml_parser_create("utf-8");
-        xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, false);
-        xml_set_element_handler(
-            $parser,
-            array($this, "_tagStart"),
-            array($this, "_tagEnd")
-        );
-        xml_set_character_data_handler(
-            $parser,
-            array($this, "_charData")
-        );
+    protected function svgOffset($attributes)
+    {
+        $this->attributes = $attributes;
 
-        return $this->parser = $parser;
+        $this->handleSizeAttributes($attributes);
     }
 
     public function getDef($id) {
         $id = ltrim($id, "#");
 
         return isset($this->defs[$id]) ? $this->defs[$id] : null;
-    }
-
-    function _charData($parser, $data)
-    {
-        $stack_top = end($this->stack);
-
-        if ($stack_top instanceof Text || $stack_top instanceof StyleTag) {
-            $stack_top->appendText($data);
-        }
-    }
-
-    function _tagEnd($parser, $name)
-    {
-        /** @var AbstractTag $tag */
-        $tag = null;
-        switch (strtolower($name)) {
-            case 'defs':
-                $this->inDefs = false;
-                return;
-
-            case 'svg':
-            case 'path':
-            case 'rect':
-            case 'circle':
-            case 'ellipse':
-            case 'image':
-            case 'line':
-            case 'polyline':
-            case 'polygon':
-            case 'radialgradient':
-            case 'lineargradient':
-            case 'stop':
-            case 'style':
-            case 'text':
-            case 'g':
-            case 'symbol':
-            case 'clippath':
-            case 'use':
-            case 'a':
-                $tag = array_pop($this->stack);
-                break;
-        }
-
-        if (!$this->inDefs && $tag) {
-            $tag->handleEnd();
-        }
-    }
-
-    protected function before($attributes)
-    {
-        $surface = $this->getSurface();
-
-        $style = new DefaultStyle();
-        $style->inherit($this);
-        $style->fromAttributes($attributes);
-
-        $this->setStyle($style);
-
-        $surface->setStyle($style);
-    }
-
-    /**
-     * @return SurfaceInterface
-     */
-    public function getSurface()
-    {
-        return $this->surface;
     }
 
     private function _tagStart($parser, $name, $attributes)
@@ -371,6 +333,9 @@ class Document extends AbstractTag
             case 'text':
                 $tag = new Text($this, $name);
                 break;
+
+            case 'desc':
+                return;
         }
 
         if ($tag) {
@@ -388,15 +353,52 @@ class Document extends AbstractTag
             $this->stack[] = $tag;
 
             $tag->handle($attributes);
-        } else {
-            echo "Unknown: '$name'\n";
         }
     }
 
-    protected function svgOffset($attributes)
+    function _charData($parser, $data)
     {
-        $this->attributes = $attributes;
+        $stack_top = end($this->stack);
 
-        $this->handleSizeAttributes($attributes);
+        if ($stack_top instanceof Text || $stack_top instanceof StyleTag) {
+            $stack_top->appendText($data);
+        }
     }
-}
+
+    function _tagEnd($parser, $name)
+    {
+        /** @var AbstractTag $tag */
+        $tag = null;
+        switch (strtolower($name)) {
+            case 'defs':
+                $this->inDefs = false;
+                return;
+
+            case 'svg':
+            case 'path':
+            case 'rect':
+            case 'circle':
+            case 'ellipse':
+            case 'image':
+            case 'line':
+            case 'polyline':
+            case 'polygon':
+            case 'radialgradient':
+            case 'lineargradient':
+            case 'stop':
+            case 'style':
+            case 'text':
+            case 'g':
+            case 'symbol':
+            case 'clippath':
+            case 'use':
+            case 'a':
+                $tag = array_pop($this->stack);
+                break;
+        }
+
+        if (!$this->inDefs && $tag) {
+            $tag->handleEnd();
+        }
+    }
+} 

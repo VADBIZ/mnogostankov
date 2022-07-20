@@ -3,7 +3,7 @@
  * @package php-svg-lib
  * @link    http://github.com/PhenX/php-svg-lib
  * @author  Fabien Ménager <fabien.menager@gmail.com>
- * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ * @license GNU LGPLv3+ http://www.gnu.org/copyleft/lesser.html
  */
 
 namespace Svg\Tag;
@@ -53,9 +53,9 @@ class Text extends Shape
         $surface->fillText($this->getText(), $x, $y);
     }
 
-    public function getText()
+    protected function after()
     {
-        return trim($this->text);
+        $this->document->getSurface()->restore();
     }
 
     public function appendText($text)
@@ -63,8 +63,8 @@ class Text extends Shape
         $this->text .= $text;
     }
 
-    protected function after()
+    public function getText()
     {
-        $this->document->getSurface()->restore();
+        return trim($this->text);
     }
-}
+} 

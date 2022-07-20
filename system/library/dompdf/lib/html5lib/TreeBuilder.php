@@ -35,82 +35,36 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //          this is not (yet) in helper functions.
 
 class HTML5_TreeBuilder {
-    const INITIAL           = 0;
-    const BEFORE_HTML       = 1;
-    const BEFORE_HEAD       = 2;
-    const IN_HEAD           = 3;
-    const IN_HEAD_NOSCRIPT  = 4;
-    const AFTER_HEAD        = 5;
-    // Whether or not normal insertion of nodes should actually foster
-    // parent (used in one case in spec)
-    const IN_BODY           = 6;
-    const IN_CDATA_RCDATA   = 7;
-    const IN_TABLE          = 8;
-    const IN_TABLE_TEXT     = 9;
-    const IN_CAPTION        = 10;
-    const IN_COLUMN_GROUP   = 11;
-    const IN_TABLE_BODY     = 12;
-    const IN_ROW            = 13;
-    // this gets to 2 when we want to ignore the next lf character, and
-    // is decrement at the beginning of each processed token (this way,
-    // code can check for (bool)$ignore_lf_token, but it phases out
-    // appropriately)
-    const IN_CELL           = 14;
-    const IN_SELECT         = 15;
-    const IN_SELECT_IN_TABLE= 16;
-    const IN_FOREIGN_CONTENT= 17;
-    const AFTER_BODY        = 18;
-    // dl and ds are speculative
-    const IN_FRAMESET       = 19;
-    const AFTER_FRAMESET    = 20;
-    const AFTER_AFTER_BODY  = 21;
-
-    // Tree construction modes
-    const AFTER_AFTER_FRAMESET = 22;
-    const SPECIAL    = 100;
-    const SCOPING    = 101;
-    const FORMATTING = 102;
-    const PHRASING   = 103;
-    const NO_QUIRKS             = 200;
-    const QUIRKS_MODE           = 201;
-    const LIMITED_QUIRKS_MODE   = 202;
-    const MARKER     = 300;
-const NS_HTML   = null;
-    const NS_MATHML = 'http://www.w3.org/1998/Math/MathML';
-    const NS_SVG    = 'http://www.w3.org/2000/svg';
-    const NS_XLINK  = 'http://www.w3.org/1999/xlink';
-    const NS_XML    = 'http://www.w3.org/XML/1998/namespace';
-    const NS_XMLNS  = 'http://www.w3.org/2000/xmlns/';
-    const SCOPE = 0;
-    const SCOPE_LISTITEM = 1;
-    const SCOPE_TABLE = 2;
     public $stack = array();
     public $content_model;
+
     private $mode;
     private $original_mode;
     private $secondary_mode;
     private $dom;
-
-    // The different types of elements.
+    // Whether or not normal insertion of nodes should actually foster
+    // parent (used in one case in spec)
     private $foster_parent = false;
     private $a_formatting  = array();
+
     private $head_pointer = null;
     private $form_pointer = null;
 
-    // Quirks modes in $quirks_mode
     private $flag_frameset_ok = true;
     private $flag_force_quirks = false;
     private $ignored = false;
-
-    // Marker to be placed in $a_formatting
     private $quirks_mode = null;
-
-    // Namespaces for foreign content
-        private $ignore_lf_token = 0; // to prevent DOM from requiring NS on everything
+    // this gets to 2 when we want to ignore the next lf character, and
+    // is decrement at the beginning of each processed token (this way,
+    // code can check for (bool)$ignore_lf_token, but it phases out
+    // appropriately)
+    private $ignore_lf_token = 0;
     private $fragment = false;
     private $root;
+
     private $scoping = array('applet','button','caption','html','marquee','object','table','td','th', 'svg:foreignObject');
     private $formatting = array('a','b','big','code','em','font','i','nobr','s','small','strike','strong','tt','u');
+    // dl and ds are speculative
     private $special = array('address','area','article','aside','base','basefont','bgsound',
     'blockquote','body','br','center','col','colgroup','command','dc','dd','details','dir','div','dl','ds',
     'dt','embed','fieldset','figure','footer','form','frame','frameset','h1','h2','h3','h4','h5',
@@ -119,9 +73,79 @@ const NS_HTML   = null;
     'p','param','plaintext','pre','script','select','spacer','style',
     'tbody','textarea','tfoot','thead','title','tr','ul','wbr');
 
-    // Different types of scopes to test for elements
     private $pendingTableCharacters;
     private $pendingTableCharactersDirty;
+
+    // Tree construction modes
+    const INITIAL           = 0;
+    const BEFORE_HTML       = 1;
+    const BEFORE_HEAD       = 2;
+    const IN_HEAD           = 3;
+    const IN_HEAD_NOSCRIPT  = 4;
+    const AFTER_HEAD        = 5;
+    const IN_BODY           = 6;
+    const IN_CDATA_RCDATA   = 7;
+    const IN_TABLE          = 8;
+    const IN_TABLE_TEXT     = 9;
+    const IN_CAPTION        = 10;
+    const IN_COLUMN_GROUP   = 11;
+    const IN_TABLE_BODY     = 12;
+    const IN_ROW            = 13;
+    const IN_CELL           = 14;
+    const IN_SELECT         = 15;
+    const IN_SELECT_IN_TABLE= 16;
+    const IN_FOREIGN_CONTENT= 17;
+    const AFTER_BODY        = 18;
+    const IN_FRAMESET       = 19;
+    const AFTER_FRAMESET    = 20;
+    const AFTER_AFTER_BODY  = 21;
+    const AFTER_AFTER_FRAMESET = 22;
+
+    /**
+     * Converts a magic number to a readable name. Use for debugging.
+     */
+    private function strConst($number) {
+        static $lookup;
+        if (!$lookup) {
+            $lookup = array();
+            $r = new ReflectionClass('HTML5_TreeBuilder');
+            $consts = $r->getConstants();
+            foreach ($consts as $const => $num) {
+                if (!is_int($num)) {
+                    continue;
+                }
+                $lookup[$num] = $const;
+            }
+        }
+        return $lookup[$number];
+    }
+
+    // The different types of elements.
+    const SPECIAL    = 100;
+    const SCOPING    = 101;
+    const FORMATTING = 102;
+    const PHRASING   = 103;
+
+    // Quirks modes in $quirks_mode
+    const NO_QUIRKS             = 200;
+    const QUIRKS_MODE           = 201;
+    const LIMITED_QUIRKS_MODE   = 202;
+
+    // Marker to be placed in $a_formatting
+    const MARKER     = 300;
+
+    // Namespaces for foreign content
+    const NS_HTML   = null; // to prevent DOM from requiring NS on everything
+    const NS_MATHML = 'http://www.w3.org/1998/Math/MathML';
+    const NS_SVG    = 'http://www.w3.org/2000/svg';
+    const NS_XLINK  = 'http://www.w3.org/1999/xlink';
+    const NS_XML    = 'http://www.w3.org/XML/1998/namespace';
+    const NS_XMLNS  = 'http://www.w3.org/2000/xmlns/';
+
+    // Different types of scopes to test for elements
+    const SCOPE = 0;
+    const SCOPE_LISTITEM = 1;
+    const SCOPE_TABLE = 2;
 
     /**
      * HTML5_TreeBuilder constructor.
@@ -3189,6 +3213,33 @@ const NS_HTML   = null;
     }
 
     /**
+     * @param $data
+     */
+    private function insertText($data) {
+        if ($data === '') {
+            return;
+        }
+        if ($this->ignore_lf_token) {
+            if ($data[0] === "\n") {
+                $data = substr($data, 1);
+                if ($data === false) {
+                    return;
+                }
+            }
+        }
+        $text = $this->dom->createTextNode($data);
+        $this->appendToRealParent($text);
+    }
+
+    /**
+     * @param $data
+     */
+    private function insertComment($data) {
+        $comment = $this->dom->createComment($data);
+        $this->appendToRealParent($comment);
+    }
+
+    /**
      * @param $node
      */
     private function appendToRealParent($node) {
@@ -3210,135 +3261,61 @@ const NS_HTML   = null;
     }
 
     /**
-     * @param $node
+     * @param $el
+     * @param int $scope
+     * @return bool|null
      */
-    public function fosterParent($node) {
-        $foster_parent = $this->getFosterParent();
-        $table = $this->getCurrentTable(); // almost equivalent to last table element, except it can be html
-        /* When a node node is to be foster parented, the node node must be
-         * be inserted into the foster parent element. */
-        /* If the foster parent element is the parent element of the last table
-         * element in the stack of open elements, then node must be inserted
-         * immediately before the last table element in the stack of open
-         * elements in the foster parent element; otherwise, node must be
-         * appended to the foster parent element. */
-        if ($table->tagName === 'table' && $table->parentNode->isSameNode($foster_parent)) {
-            $foster_parent->insertBefore($node, $table);
-        } else {
-            $foster_parent->appendChild($node);
-        }
-    }
-
-    /**
-     * @return mixed
-     */
-    private function getFosterParent() {
-        /* The foster parent element is the parent element of the last
-        table element in the stack of open elements, if there is a
-        table element and it has such a parent element. If there is no
-        table element in the stack of open elements (innerHTML case),
-        then the foster parent element is the first element in the
-        stack of open elements (the html  element). Otherwise, if there
-        is a table element in the stack of open elements, but the last
-        table element in the stack of open elements has no parent, or
-        its parent node is not an element, then the foster parent
-        element is the element before the last table element in the
-        stack of open elements. */
-        for ($n = count($this->stack) - 1; $n >= 0; $n--) {
-            if ($this->stack[$n]->tagName === 'table') {
-                $table = $this->stack[$n];
-                break;
-            }
-        }
-
-        if (isset($table) && $table->parentNode !== null) {
-            return $table->parentNode;
-
-        } elseif (!isset($table)) {
-            return $this->stack[0];
-
-        } elseif (isset($table) && ($table->parentNode === null ||
-        $table->parentNode->nodeType !== XML_ELEMENT_NODE)) {
-            return $this->stack[$n - 1];
-        }
-
-        return null;
-    }
-
-    /**
-     * @return mixed
-     */
-    private function getCurrentTable() {
-        /* The current table is the last table  element in the stack of open
-         * elements, if there is one. If there is no table element in the stack
-         * of open elements (fragment case), then the current table is the
-         * first element in the stack of open elements (the html element). */
-        for ($i = count($this->stack) - 1; $i >= 0; $i--) {
-            if ($this->stack[$i]->tagName === 'table') {
-                return $this->stack[$i];
-            }
-        }
-        return $this->stack[0];
-    }
-
-    /**
-     * @param $data
-     */
-    private function insertComment($data) {
-        $comment = $this->dom->createComment($data);
-        $this->appendToRealParent($comment);
-    }
-
-    /**
-     * @param $token
-     * @param $mode
-     */
-    private function processWithRulesFor($token, $mode) {
-        /* "using the rules for the m insertion mode", where m is one of these
-         * modes, the user agent must use the rules described under the m
-         * insertion mode's section, but must leave the insertion mode
-         * unchanged unless the rules in m themselves switch the insertion mode
-         * to a new value. */
-        $this->emitToken($token, $mode);
-    }
-
-    /**
-     * @param $data
-     */
-    private function insertText($data) {
-        if ($data === '') {
-            return;
-        }
-        if ($this->ignore_lf_token) {
-            if ($data[0] === "\n") {
-                $data = substr($data, 1);
-                if ($data === false) {
-                    return;
+    private function elementInScope($el, $scope = self::SCOPE) {
+        if (is_array($el)) {
+            foreach($el as $element) {
+                if ($this->elementInScope($element, $scope)) {
+                    return true;
                 }
             }
+
+            return false;
         }
-        $text = $this->dom->createTextNode($data);
-        $this->appendToRealParent($text);
-    }
 
-    /**
-     * @param $token
-     */
-    private function insertRCDATAElement($token) {
-        $this->insertElement($token);
-        $this->original_mode = $this->mode;
-        $this->mode = self::IN_CDATA_RCDATA;
-        $this->content_model = HTML5_Tokenizer::RCDATA;
-    }
+        $leng = count($this->stack);
 
-    /**
-     * @param $token
-     */
-    private function insertCDATAElement($token) {
-        $this->insertElement($token);
-        $this->original_mode = $this->mode;
-        $this->mode = self::IN_CDATA_RCDATA;
-        $this->content_model = HTML5_Tokenizer::CDATA;
+        for ($n = 0; $n < $leng; $n++) {
+            /* 1. Initialise node to be the current node (the bottommost node of
+            the stack). */
+            $node = $this->stack[$leng - 1 - $n];
+
+            if ($node->tagName === $el) {
+                /* 2. If node is the target node, terminate in a match state. */
+                return true;
+
+                // We've expanded the logic for these states a little differently;
+                // Hixie's refactoring into "specific scope" is more general, but
+                // this "gets the job done"
+
+            // these are the common states for all scopes
+            } elseif ($node->tagName === 'table' || $node->tagName === 'html') {
+                return false;
+
+            // these are valid for "in scope" and "in list item scope"
+            } elseif ($scope !== self::SCOPE_TABLE &&
+            (in_array($node->tagName, array('applet', 'caption', 'td',
+                'th', 'button', 'marquee', 'object')) ||
+                $node->tagName === 'foreignObject' && $node->namespaceURI === self::NS_SVG)) {
+                return false;
+
+
+            // these are valid for "in list item scope"
+            } elseif ($scope === self::SCOPE_LISTITEM && in_array($node->tagName, array('ol', 'ul'))) {
+                return false;
+            }
+
+            /* Otherwise, set node to the previous entry in the stack of open
+            elements and return to step 2. (This will never fail, since the loop
+            will always terminate in the previous step if the top of the stack
+            is reached.) */
+        }
+
+        // To fix warning. This never happens or should return true/false
+        return null;
     }
 
     /**
@@ -3419,99 +3396,27 @@ const NS_HTML   = null;
     }
 
     /**
-     * @param $el
-     * @param int $scope
-     * @return bool|null
+     *
      */
-    private function elementInScope($el, $scope = self::SCOPE) {
-        if (is_array($el)) {
-            foreach($el as $element) {
-                if ($this->elementInScope($element, $scope)) {
-                    return true;
-                }
-            }
+    private function clearTheActiveFormattingElementsUpToTheLastMarker() {
+        /* When the steps below require the UA to clear the list of active
+        formatting elements up to the last marker, the UA must perform the
+        following steps: */
 
-            return false;
-        }
+        while (true) {
+            /* 1. Let entry be the last (most recently added) entry in the list
+            of active formatting elements. */
+            $entry = end($this->a_formatting);
 
-        $leng = count($this->stack);
+            /* 2. Remove entry from the list of active formatting elements. */
+            array_pop($this->a_formatting);
 
-        for ($n = 0; $n < $leng; $n++) {
-            /* 1. Initialise node to be the current node (the bottommost node of
-            the stack). */
-            $node = $this->stack[$leng - 1 - $n];
-
-            if ($node->tagName === $el) {
-                /* 2. If node is the target node, terminate in a match state. */
-                return true;
-
-                // We've expanded the logic for these states a little differently;
-                // Hixie's refactoring into "specific scope" is more general, but
-                // this "gets the job done"
-
-            // these are the common states for all scopes
-            } elseif ($node->tagName === 'table' || $node->tagName === 'html') {
-                return false;
-
-            // these are valid for "in scope" and "in list item scope"
-            } elseif ($scope !== self::SCOPE_TABLE &&
-            (in_array($node->tagName, array('applet', 'caption', 'td',
-                'th', 'button', 'marquee', 'object')) ||
-                $node->tagName === 'foreignObject' && $node->namespaceURI === self::NS_SVG)) {
-                return false;
-
-
-            // these are valid for "in list item scope"
-            } elseif ($scope === self::SCOPE_LISTITEM && in_array($node->tagName, array('ol', 'ul'))) {
-                return false;
-            }
-
-            /* Otherwise, set node to the previous entry in the stack of open
-            elements and return to step 2. (This will never fail, since the loop
-            will always terminate in the previous step if the top of the stack
-            is reached.) */
-        }
-
-        // To fix warning. This never happens or should return true/false
-        return null;
-    }
-
-    /**
-     * @param $node
-     * @return int
-     */
-    private function getElementCategory($node) {
-        if (!is_object($node)) {
-            debug_print_backtrace();
-        }
-        $name = $node->tagName;
-        if (in_array($name, $this->special)) {
-            return self::SPECIAL;
-        } elseif (in_array($name, $this->scoping)) {
-            return self::SCOPING;
-        } elseif (in_array($name, $this->formatting)) {
-            return self::FORMATTING;
-        } else {
-            return self::PHRASING;
-        }
-    }
-
-    /**
-     * @param $token
-     * @param $key
-     * @return bool
-     */
-    private function getAttr($token, $key) {
-        if (!isset($token['attr'])) {
-            return false;
-        }
-        $ret = false;
-        foreach ($token['attr'] as $keypair) {
-            if ($keypair['name'] === $key) {
-                $ret = $keypair['value'];
+            /* 3. If entry was a marker, then stop the algorithm at this point.
+            The list has been cleared up to the last marker. */
+            if ($entry === self::MARKER) {
+                break;
             }
         }
-        return $ret;
     }
 
     /**
@@ -3532,159 +3437,23 @@ const NS_HTML   = null;
     }
 
     /**
-     * @param $token
-     * @return mixed
+     * @param $node
+     * @return int
      */
-    public function adjustMathMLAttributes($token) {
-        foreach ($token['attr'] as &$kp) {
-            if ($kp['name'] === 'definitionurl') {
-                $kp['name'] = 'definitionURL';
-            }
+    private function getElementCategory($node) {
+        if (!is_object($node)) {
+            debug_print_backtrace();
         }
-        return $token;
-    }
-
-    /**
-     * @param $token
-     * @return mixed
-     */
-    public function adjustForeignAttributes($token) {
-        static $lookup = array(
-            'xlink:actuate' => array('xlink', 'actuate', self::NS_XLINK),
-            'xlink:arcrole' => array('xlink', 'arcrole', self::NS_XLINK),
-            'xlink:href' => array('xlink', 'href', self::NS_XLINK),
-            'xlink:role' => array('xlink', 'role', self::NS_XLINK),
-            'xlink:show' => array('xlink', 'show', self::NS_XLINK),
-            'xlink:title' => array('xlink', 'title', self::NS_XLINK),
-            'xlink:type' => array('xlink', 'type', self::NS_XLINK),
-            'xml:base' => array('xml', 'base', self::NS_XML),
-            'xml:lang' => array('xml', 'lang', self::NS_XML),
-            'xml:space' => array('xml', 'space', self::NS_XML),
-            'xmlns' => array(null, 'xmlns', self::NS_XMLNS),
-            'xmlns:xlink' => array('xmlns', 'xlink', self::NS_XMLNS),
-        );
-        foreach ($token['attr'] as &$kp) {
-            if (isset($lookup[$kp['name']])) {
-                $kp['name'] = $lookup[$kp['name']];
-            }
+        $name = $node->tagName;
+        if (in_array($name, $this->special)) {
+            return self::SPECIAL;
+        } elseif (in_array($name, $this->scoping)) {
+            return self::SCOPING;
+        } elseif (in_array($name, $this->formatting)) {
+            return self::FORMATTING;
+        } else {
+            return self::PHRASING;
         }
-        return $token;
-    }
-
-    /**
-     * @param $token
-     * @param $namespaceURI
-     */
-    public function insertForeignElement($token, $namespaceURI) {
-        $el = $this->dom->createElementNS($namespaceURI, $token['name']);
-
-        if (!empty($token['attr'])) {
-            foreach ($token['attr'] as $kp) {
-                $attr = $kp['name'];
-                if (is_array($attr)) {
-                    $ns = $attr[2];
-                    $attr = $attr[1];
-                } else {
-                    $ns = self::NS_HTML;
-                }
-                if (!$el->hasAttributeNS($ns, $attr)) {
-                    // XSKETCHY: work around godawful libxml bug
-                    if ($ns === self::NS_XLINK) {
-                        $el->setAttribute('xlink:'.$attr, $kp['value']);
-                    } elseif ($ns === self::NS_HTML) {
-                        // Another godawful libxml bug
-                        $el->setAttribute($attr, $kp['value']);
-                    } else {
-                        $el->setAttributeNS($ns, $attr, $kp['value']);
-                    }
-                }
-            }
-        }
-        $this->appendToRealParent($el);
-        $this->stack[] = $el;
-        // XERROR: see below
-        /* If the newly created element has an xmlns attribute in the XMLNS
-         * namespace  whose value is not exactly the same as the element's
-         * namespace, that is a parse error. Similarly, if the newly created
-         * element has an xmlns:xlink attribute in the XMLNS namespace whose
-         * value is not the XLink Namespace, that is a parse error. */
-    }
-
-    /**
-     * @param $token
-     * @return mixed
-     */
-    public function adjustSVGAttributes($token) {
-        static $lookup = array(
-            'attributename' => 'attributeName',
-            'attributetype' => 'attributeType',
-            'basefrequency' => 'baseFrequency',
-            'baseprofile' => 'baseProfile',
-            'calcmode' => 'calcMode',
-            'clippathunits' => 'clipPathUnits',
-            'contentscripttype' => 'contentScriptType',
-            'contentstyletype' => 'contentStyleType',
-            'diffuseconstant' => 'diffuseConstant',
-            'edgemode' => 'edgeMode',
-            'externalresourcesrequired' => 'externalResourcesRequired',
-            'filterres' => 'filterRes',
-            'filterunits' => 'filterUnits',
-            'glyphref' => 'glyphRef',
-            'gradienttransform' => 'gradientTransform',
-            'gradientunits' => 'gradientUnits',
-            'kernelmatrix' => 'kernelMatrix',
-            'kernelunitlength' => 'kernelUnitLength',
-            'keypoints' => 'keyPoints',
-            'keysplines' => 'keySplines',
-            'keytimes' => 'keyTimes',
-            'lengthadjust' => 'lengthAdjust',
-            'limitingconeangle' => 'limitingConeAngle',
-            'markerheight' => 'markerHeight',
-            'markerunits' => 'markerUnits',
-            'markerwidth' => 'markerWidth',
-            'maskcontentunits' => 'maskContentUnits',
-            'maskunits' => 'maskUnits',
-            'numoctaves' => 'numOctaves',
-            'pathlength' => 'pathLength',
-            'patterncontentunits' => 'patternContentUnits',
-            'patterntransform' => 'patternTransform',
-            'patternunits' => 'patternUnits',
-            'pointsatx' => 'pointsAtX',
-            'pointsaty' => 'pointsAtY',
-            'pointsatz' => 'pointsAtZ',
-            'preservealpha' => 'preserveAlpha',
-            'preserveaspectratio' => 'preserveAspectRatio',
-            'primitiveunits' => 'primitiveUnits',
-            'refx' => 'refX',
-            'refy' => 'refY',
-            'repeatcount' => 'repeatCount',
-            'repeatdur' => 'repeatDur',
-            'requiredextensions' => 'requiredExtensions',
-            'requiredfeatures' => 'requiredFeatures',
-            'specularconstant' => 'specularConstant',
-            'specularexponent' => 'specularExponent',
-            'spreadmethod' => 'spreadMethod',
-            'startoffset' => 'startOffset',
-            'stddeviation' => 'stdDeviation',
-            'stitchtiles' => 'stitchTiles',
-            'surfacescale' => 'surfaceScale',
-            'systemlanguage' => 'systemLanguage',
-            'tablevalues' => 'tableValues',
-            'targetx' => 'targetX',
-            'targety' => 'targetY',
-            'textlength' => 'textLength',
-            'viewbox' => 'viewBox',
-            'viewtarget' => 'viewTarget',
-            'xchannelselector' => 'xChannelSelector',
-            'ychannelselector' => 'yChannelSelector',
-            'zoomandpan' => 'zoomAndPan',
-        );
-        foreach ($token['attr'] as &$kp) {
-            if (isset($lookup[$kp['name']])) {
-                $kp['name'] = $lookup[$kp['name']];
-            }
-        }
-        return $token;
     }
 
     /**
@@ -3820,30 +3589,6 @@ const NS_HTML   = null;
     /**
      *
      */
-    private function clearTheActiveFormattingElementsUpToTheLastMarker() {
-        /* When the steps below require the UA to clear the list of active
-        formatting elements up to the last marker, the UA must perform the
-        following steps: */
-
-        while (true) {
-            /* 1. Let entry be the last (most recently added) entry in the list
-            of active formatting elements. */
-            $entry = end($this->a_formatting);
-
-            /* 2. Remove entry from the list of active formatting elements. */
-            array_pop($this->a_formatting);
-
-            /* 3. If entry was a marker, then stop the algorithm at this point.
-            The list has been cleared up to the last marker. */
-            if ($entry === self::MARKER) {
-                break;
-            }
-        }
-    }
-
-    /**
-     *
-     */
     private function closeCell() {
         /* If the stack of open elements has a td or th element in table scope,
         then act as if an end tag token with that tag name had been seen. */
@@ -3857,6 +3602,158 @@ const NS_HTML   = null;
                 break;
             }
         }
+    }
+
+    /**
+     * @param $token
+     * @param $mode
+     */
+    private function processWithRulesFor($token, $mode) {
+        /* "using the rules for the m insertion mode", where m is one of these
+         * modes, the user agent must use the rules described under the m
+         * insertion mode's section, but must leave the insertion mode
+         * unchanged unless the rules in m themselves switch the insertion mode
+         * to a new value. */
+        $this->emitToken($token, $mode);
+    }
+
+    /**
+     * @param $token
+     */
+    private function insertCDATAElement($token) {
+        $this->insertElement($token);
+        $this->original_mode = $this->mode;
+        $this->mode = self::IN_CDATA_RCDATA;
+        $this->content_model = HTML5_Tokenizer::CDATA;
+    }
+
+    /**
+     * @param $token
+     */
+    private function insertRCDATAElement($token) {
+        $this->insertElement($token);
+        $this->original_mode = $this->mode;
+        $this->mode = self::IN_CDATA_RCDATA;
+        $this->content_model = HTML5_Tokenizer::RCDATA;
+    }
+
+    /**
+     * @param $token
+     * @param $key
+     * @return bool
+     */
+    private function getAttr($token, $key) {
+        if (!isset($token['attr'])) {
+            return false;
+        }
+        $ret = false;
+        foreach ($token['attr'] as $keypair) {
+            if ($keypair['name'] === $key) {
+                $ret = $keypair['value'];
+            }
+        }
+        return $ret;
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getCurrentTable() {
+        /* The current table is the last table  element in the stack of open
+         * elements, if there is one. If there is no table element in the stack
+         * of open elements (fragment case), then the current table is the
+         * first element in the stack of open elements (the html element). */
+        for ($i = count($this->stack) - 1; $i >= 0; $i--) {
+            if ($this->stack[$i]->tagName === 'table') {
+                return $this->stack[$i];
+            }
+        }
+        return $this->stack[0];
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getFosterParent() {
+        /* The foster parent element is the parent element of the last
+        table element in the stack of open elements, if there is a
+        table element and it has such a parent element. If there is no
+        table element in the stack of open elements (innerHTML case),
+        then the foster parent element is the first element in the
+        stack of open elements (the html  element). Otherwise, if there
+        is a table element in the stack of open elements, but the last
+        table element in the stack of open elements has no parent, or
+        its parent node is not an element, then the foster parent
+        element is the element before the last table element in the
+        stack of open elements. */
+        for ($n = count($this->stack) - 1; $n >= 0; $n--) {
+            if ($this->stack[$n]->tagName === 'table') {
+                $table = $this->stack[$n];
+                break;
+            }
+        }
+
+        if (isset($table) && $table->parentNode !== null) {
+            return $table->parentNode;
+
+        } elseif (!isset($table)) {
+            return $this->stack[0];
+
+        } elseif (isset($table) && ($table->parentNode === null ||
+        $table->parentNode->nodeType !== XML_ELEMENT_NODE)) {
+            return $this->stack[$n - 1];
+        }
+
+        return null;
+    }
+
+    /**
+     * @param $node
+     */
+    public function fosterParent($node) {
+        $foster_parent = $this->getFosterParent();
+        $table = $this->getCurrentTable(); // almost equivalent to last table element, except it can be html
+        /* When a node node is to be foster parented, the node node must be
+         * be inserted into the foster parent element. */
+        /* If the foster parent element is the parent element of the last table
+         * element in the stack of open elements, then node must be inserted
+         * immediately before the last table element in the stack of open
+         * elements in the foster parent element; otherwise, node must be
+         * appended to the foster parent element. */
+        if ($table->tagName === 'table' && $table->parentNode->isSameNode($foster_parent)) {
+            $foster_parent->insertBefore($node, $table);
+        } else {
+            $foster_parent->appendChild($node);
+        }
+    }
+
+    /**
+     * For debugging, prints the stack
+     */
+    private function printStack() {
+        $names = array();
+        foreach ($this->stack as $i => $element) {
+            $names[] = $element->tagName;
+        }
+        echo "  -> stack [" . implode(', ', $names) . "]\n";
+    }
+
+    /**
+     * For debugging, prints active formatting elements
+     */
+    private function printActiveFormattingElements() {
+        if (!$this->a_formatting) {
+            return;
+        }
+        $names = array();
+        foreach ($this->a_formatting as $node) {
+            if ($node === self::MARKER) {
+                $names[] = 'MARKER';
+            } else {
+                $names[] = $node->tagName;
+            }
+        }
+        echo "  -> active formatting [" . implode(', ', $names) . "]\n";
     }
 
     /**
@@ -3918,6 +3815,162 @@ const NS_HTML   = null;
     }
 
     /**
+     * @param $token
+     * @return mixed
+     */
+    public function adjustMathMLAttributes($token) {
+        foreach ($token['attr'] as &$kp) {
+            if ($kp['name'] === 'definitionurl') {
+                $kp['name'] = 'definitionURL';
+            }
+        }
+        return $token;
+    }
+
+    /**
+     * @param $token
+     * @return mixed
+     */
+    public function adjustSVGAttributes($token) {
+        static $lookup = array(
+            'attributename' => 'attributeName',
+            'attributetype' => 'attributeType',
+            'basefrequency' => 'baseFrequency',
+            'baseprofile' => 'baseProfile',
+            'calcmode' => 'calcMode',
+            'clippathunits' => 'clipPathUnits',
+            'contentscripttype' => 'contentScriptType',
+            'contentstyletype' => 'contentStyleType',
+            'diffuseconstant' => 'diffuseConstant',
+            'edgemode' => 'edgeMode',
+            'externalresourcesrequired' => 'externalResourcesRequired',
+            'filterres' => 'filterRes',
+            'filterunits' => 'filterUnits',
+            'glyphref' => 'glyphRef',
+            'gradienttransform' => 'gradientTransform',
+            'gradientunits' => 'gradientUnits',
+            'kernelmatrix' => 'kernelMatrix',
+            'kernelunitlength' => 'kernelUnitLength',
+            'keypoints' => 'keyPoints',
+            'keysplines' => 'keySplines',
+            'keytimes' => 'keyTimes',
+            'lengthadjust' => 'lengthAdjust',
+            'limitingconeangle' => 'limitingConeAngle',
+            'markerheight' => 'markerHeight',
+            'markerunits' => 'markerUnits',
+            'markerwidth' => 'markerWidth',
+            'maskcontentunits' => 'maskContentUnits',
+            'maskunits' => 'maskUnits',
+            'numoctaves' => 'numOctaves',
+            'pathlength' => 'pathLength',
+            'patterncontentunits' => 'patternContentUnits',
+            'patterntransform' => 'patternTransform',
+            'patternunits' => 'patternUnits',
+            'pointsatx' => 'pointsAtX',
+            'pointsaty' => 'pointsAtY',
+            'pointsatz' => 'pointsAtZ',
+            'preservealpha' => 'preserveAlpha',
+            'preserveaspectratio' => 'preserveAspectRatio',
+            'primitiveunits' => 'primitiveUnits',
+            'refx' => 'refX',
+            'refy' => 'refY',
+            'repeatcount' => 'repeatCount',
+            'repeatdur' => 'repeatDur',
+            'requiredextensions' => 'requiredExtensions',
+            'requiredfeatures' => 'requiredFeatures',
+            'specularconstant' => 'specularConstant',
+            'specularexponent' => 'specularExponent',
+            'spreadmethod' => 'spreadMethod',
+            'startoffset' => 'startOffset',
+            'stddeviation' => 'stdDeviation',
+            'stitchtiles' => 'stitchTiles',
+            'surfacescale' => 'surfaceScale',
+            'systemlanguage' => 'systemLanguage',
+            'tablevalues' => 'tableValues',
+            'targetx' => 'targetX',
+            'targety' => 'targetY',
+            'textlength' => 'textLength',
+            'viewbox' => 'viewBox',
+            'viewtarget' => 'viewTarget',
+            'xchannelselector' => 'xChannelSelector',
+            'ychannelselector' => 'yChannelSelector',
+            'zoomandpan' => 'zoomAndPan',
+        );
+        foreach ($token['attr'] as &$kp) {
+            if (isset($lookup[$kp['name']])) {
+                $kp['name'] = $lookup[$kp['name']];
+            }
+        }
+        return $token;
+    }
+
+    /**
+     * @param $token
+     * @return mixed
+     */
+    public function adjustForeignAttributes($token) {
+        static $lookup = array(
+            'xlink:actuate' => array('xlink', 'actuate', self::NS_XLINK),
+            'xlink:arcrole' => array('xlink', 'arcrole', self::NS_XLINK),
+            'xlink:href' => array('xlink', 'href', self::NS_XLINK),
+            'xlink:role' => array('xlink', 'role', self::NS_XLINK),
+            'xlink:show' => array('xlink', 'show', self::NS_XLINK),
+            'xlink:title' => array('xlink', 'title', self::NS_XLINK),
+            'xlink:type' => array('xlink', 'type', self::NS_XLINK),
+            'xml:base' => array('xml', 'base', self::NS_XML),
+            'xml:lang' => array('xml', 'lang', self::NS_XML),
+            'xml:space' => array('xml', 'space', self::NS_XML),
+            'xmlns' => array(null, 'xmlns', self::NS_XMLNS),
+            'xmlns:xlink' => array('xmlns', 'xlink', self::NS_XMLNS),
+        );
+        foreach ($token['attr'] as &$kp) {
+            if (isset($lookup[$kp['name']])) {
+                $kp['name'] = $lookup[$kp['name']];
+            }
+        }
+        return $token;
+    }
+
+    /**
+     * @param $token
+     * @param $namespaceURI
+     */
+    public function insertForeignElement($token, $namespaceURI) {
+        $el = $this->dom->createElementNS($namespaceURI, $token['name']);
+
+        if (!empty($token['attr'])) {
+            foreach ($token['attr'] as $kp) {
+                $attr = $kp['name'];
+                if (is_array($attr)) {
+                    $ns = $attr[2];
+                    $attr = $attr[1];
+                } else {
+                    $ns = self::NS_HTML;
+                }
+                if (!$el->hasAttributeNS($ns, $attr)) {
+                    // XSKETCHY: work around godawful libxml bug
+                    if ($ns === self::NS_XLINK) {
+                        $el->setAttribute('xlink:'.$attr, $kp['value']);
+                    } elseif ($ns === self::NS_HTML) {
+                        // Another godawful libxml bug
+                        $el->setAttribute($attr, $kp['value']);
+                    } else {
+                        $el->setAttributeNS($ns, $attr, $kp['value']);
+                    }
+                }
+            }
+        }
+        $this->appendToRealParent($el);
+        $this->stack[] = $el;
+        // XERROR: see below
+        /* If the newly created element has an xmlns attribute in the XMLNS
+         * namespace  whose value is not exactly the same as the element's
+         * namespace, that is a parse error. Similarly, if the newly created
+         * element has an xmlns:xlink attribute in the XMLNS namespace whose
+         * value is not the XLink Namespace, that is a parse error. */
+    }
+
+    /**
      * @return DOMDocument|DOMNodeList
      */
     public function save() {
@@ -3931,54 +3984,6 @@ const NS_HTML   = null;
                 return $this->dom->childNodes;
             }
         }
-    }
-
-    /**
-     * Converts a magic number to a readable name. Use for debugging.
-     */
-    private function strConst($number) {
-        static $lookup;
-        if (!$lookup) {
-            $lookup = array();
-            $r = new ReflectionClass('HTML5_TreeBuilder');
-            $consts = $r->getConstants();
-            foreach ($consts as $const => $num) {
-                if (!is_int($num)) {
-                    continue;
-                }
-                $lookup[$num] = $const;
-            }
-        }
-        return $lookup[$number];
-    }
-
-    /**
-     * For debugging, prints the stack
-     */
-    private function printStack() {
-        $names = array();
-        foreach ($this->stack as $i => $element) {
-            $names[] = $element->tagName;
-        }
-        echo "  -> stack [" . implode(', ', $names) . "]\n";
-    }
-
-    /**
-     * For debugging, prints active formatting elements
-     */
-    private function printActiveFormattingElements() {
-        if (!$this->a_formatting) {
-            return;
-        }
-        $names = array();
-        foreach ($this->a_formatting as $node) {
-            if ($node === self::MARKER) {
-                $names[] = 'MARKER';
-            } else {
-                $names[] = $node->tagName;
-            }
-        }
-        echo "  -> active formatting [" . implode(', ', $names) . "]\n";
     }
 }
 

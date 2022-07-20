@@ -19,6 +19,24 @@ use FontLib\Glyph\OutlineSimple;
  * @property Outline[] $data
  */
 class glyf extends Table {
+  protected function _parse() {
+    $font   = $this->getFont();
+    $offset = $font->pos();
+
+    $loca      = $font->getData("loca");
+    $real_loca = array_slice($loca, 0, -1); // Not the last dummy loca entry
+
+    $data = array();
+
+    foreach ($real_loca as $gid => $location) {
+      $_offset    = $offset + $loca[$gid];
+      $_size      = $loca[$gid + 1] - $loca[$gid];
+      $data[$gid] = Outline::init($this, $_offset, $_size, $font);
+    }
+
+    $this->data = $data;
+  }
+
   public function getGlyphIDs($gids = array()) {
     $glyphIDs = array();
 
@@ -114,23 +132,6 @@ class glyf extends Table {
     return $s;
   }
 
-  protected function _parse() {
-    $font   = $this->getFont();
-    $offset = $font->pos();
-
-    $loca      = $font->getData("loca");
-    $real_loca = array_slice($loca, 0, -1); // Not the last dummy loca entry
-
-    $data = array();
-
-    foreach ($real_loca as $gid => $location) {
-      $_offset    = $offset + $loca[$gid];
-      $_size      = $loca[$gid + 1] - $loca[$gid];
-      $data[$gid] = Outline::init($this, $_offset, $_size, $font);
-    }
-
-    $this->data = $data;
-  }
 
   protected function _encode() {
     $font   = $this->getFont();

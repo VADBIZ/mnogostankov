@@ -23,6 +23,22 @@ use FontLib\Table\Type\nameRecord;
  * @package php-font-lib
  */
 class File extends BinaryStream {
+  /**
+   * @var Header
+   */
+  public $header = array();
+
+  private $tableOffset = 0; // Used for TTC
+
+  private static $raw = false;
+
+  protected $directory = array();
+  protected $data = array();
+
+  protected $glyph_subset = array();
+
+  public $glyph_all = array();
+
   static $macCharNames = array(
     ".notdef", ".null", "CR",
     "space", "exclam", "quotedbl", "numbersign",
@@ -84,61 +100,11 @@ class File extends BinaryStream {
     "Scedilla", "scedilla", "Cacute", "cacute",
     "Ccaron", "ccaron", "dmacron"
   );
-  private static $raw = false; // Used for TTC
-  /**
-   * @var Header
-   */
-  public $header = array();
-  public $glyph_all = array();
-  protected $directory = array();
-  protected $data = array();
-  protected $glyph_subset = array();
-private $tableOffset = 0;
 
   function getTable() {
     $this->parseTableEntries();
 
     return $this->directory;
-  }
-
-  function parseTableEntries() {
-    $this->parseHeader();
-
-    if (!empty($this->directory)) {
-      return;
-    }
-
-    if (empty($this->header->data["numTables"])) {
-      return;
-    }
-
-
-    $type = $this->getFontType();
-    $class = "FontLib\\$type\\TableDirectoryEntry";
-
-    for ($i = 0; $i < $this->header->data["numTables"]; $i++) {
-      /** @var TableDirectoryEntry $entry */
-      $entry = new $class($this);
-      $entry->parse();
-
-      $this->directory[$entry->tag] = $entry;
-    }
-  }
-
-  function parseHeader() {
-    if (!empty($this->header)) {
-      return;
-    }
-
-    $this->seek($this->tableOffset);
-
-    $this->header = new Header($this);
-    $this->header->parse();
-  }
-
-  function getFontType(){
-    $class_parts = explode("\\", get_class($this));
-    return $class_parts[1];
   }
 
   function setTableOffset($offset) {
@@ -155,66 +121,6 @@ private $tableOffset = 0;
         $this->readTable($tag);
       }
     }
-  }
-
-  protected function readTable($tag) {
-    $this->parseTableEntries();
-
-    if (!self::$raw) {
-      $name_canon = preg_replace("/[^a-z0-9]/", "", strtolower($tag));
-
-      $class = "FontLib\\Table\\Type\\$name_canon";
-
-      if (!isset($this->directory[$tag]) || !@class_exists($class)) {
-        return;
-      }
-    }
-    else {
-      $class = "FontLib\\Table\\Table";
-    }
-
-    /** @var Table $table */
-    $table = new $class($this->directory[$tag]);
-    $table->parse();
-
-    $this->data[$tag] = $table;
-  }
-
-  function setSubset($subset) {
-    if (!is_array($subset)) {
-      $subset = $this->utf8toUnicode($subset);
-    }
-
-    $subset = array_unique($subset);
-
-    $glyphIndexArray = $this->getUnicodeCharMap();
-
-    if (!$glyphIndexArray) {
-      return;
-    }
-
-    $gids = array(
-      0, // .notdef
-      1, // .null
-    );
-
-    foreach ($subset as $code) {
-      if (!isset($glyphIndexArray[$code])) {
-        continue;
-      }
-
-      $gid        = $glyphIndexArray[$code];
-      $gids[$gid] = $gid;
-    }
-
-    /** @var glyf $glyf */
-    $glyf = $this->getTableObject("glyf");
-    $gids = $glyf->getGlyphIDs($gids);
-
-    sort($gids);
-
-    $this->glyph_subset = $gids;
-    $this->glyph_all    = array_values($glyphIndexArray); // FIXME
   }
 
   function utf8toUnicode($str) {
@@ -264,32 +170,41 @@ private $tableOffset = 0;
     return null;
   }
 
-  public function getData($name, $key = null) {
-    $this->parseTableEntries();
-
-    if (empty($this->data[$name])) {
-      $this->readTable($name);
+  function setSubset($subset) {
+    if (!is_array($subset)) {
+      $subset = $this->utf8toUnicode($subset);
     }
 
-    if (!isset($this->data[$name])) {
-      return null;
+    $subset = array_unique($subset);
+
+    $glyphIndexArray = $this->getUnicodeCharMap();
+
+    if (!$glyphIndexArray) {
+      return;
     }
 
-    if (!$key) {
-      return $this->data[$name]->data;
-    }
-    else {
-      return $this->data[$name]->data[$key];
-    }
-  }
+    $gids = array(
+      0, // .notdef
+      1, // .null
+    );
 
-  /**
-   * @param $name
-   *
-   * @return Table
-   */
-  public function getTableObject($name) {
-    return $this->data[$name];
+    foreach ($subset as $code) {
+      if (!isset($glyphIndexArray[$code])) {
+        continue;
+      }
+
+      $gid        = $glyphIndexArray[$code];
+      $gids[$gid] = $gid;
+    }
+
+    /** @var glyf $glyf */
+    $glyf = $this->getTableObject("glyf");
+    $gids = $glyf->getGlyphIDs($gids);
+
+    sort($gids);
+
+    $this->glyph_subset = $gids;
+    $this->glyph_all    = array_values($glyphIndexArray); // FIXME
   }
 
   function getSubset() {
@@ -338,12 +253,103 @@ private $tableOffset = 0;
     }
   }
 
+  function parseHeader() {
+    if (!empty($this->header)) {
+      return;
+    }
+
+    $this->seek($this->tableOffset);
+
+    $this->header = new Header($this);
+    $this->header->parse();
+  }
+
+  function getFontType(){
+    $class_parts = explode("\\", get_class($this));
+    return $class_parts[1];
+  }
+
+  function parseTableEntries() {
+    $this->parseHeader();
+
+    if (!empty($this->directory)) {
+      return;
+    }
+
+    if (empty($this->header->data["numTables"])) {
+      return;
+    }
+
+
+    $type = $this->getFontType();
+    $class = "FontLib\\$type\\TableDirectoryEntry";
+
+    for ($i = 0; $i < $this->header->data["numTables"]; $i++) {
+      /** @var TableDirectoryEntry $entry */
+      $entry = new $class($this);
+      $entry->parse();
+
+      $this->directory[$entry->tag] = $entry;
+    }
+  }
+
   function normalizeFUnit($value, $base = 1000) {
     return round($value * ($base / $this->getData("head", "unitsPerEm")));
   }
 
+  protected function readTable($tag) {
+    $this->parseTableEntries();
+
+    if (!self::$raw) {
+      $name_canon = preg_replace("/[^a-z0-9]/", "", strtolower($tag));
+
+      $class = "FontLib\\Table\\Type\\$name_canon";
+
+      if (!isset($this->directory[$tag]) || !@class_exists($class)) {
+        return;
+      }
+    }
+    else {
+      $class = "FontLib\\Table\\Table";
+    }
+
+    /** @var Table $table */
+    $table = new $class($this->directory[$tag]);
+    $table->parse();
+
+    $this->data[$tag] = $table;
+  }
+
+  /**
+   * @param $name
+   *
+   * @return Table
+   */
+  public function getTableObject($name) {
+    return $this->data[$name];
+  }
+
   public function setTableObject($name, Table $data) {
     $this->data[$name] = $data;
+  }
+
+  public function getData($name, $key = null) {
+    $this->parseTableEntries();
+
+    if (empty($this->data[$name])) {
+      $this->readTable($name);
+    }
+
+    if (!isset($this->data[$name])) {
+      return null;
+    }
+
+    if (!$key) {
+      return $this->data[$name]->data;
+    }
+    else {
+      return $this->data[$name]->data[$key];
+    }
   }
 
   function addDirectoryEntry(DirectoryEntry $entry) {
@@ -353,15 +359,6 @@ private $tableOffset = 0;
   function saveAdobeFontMetrics($file, $encoding = null) {
     $afm = new AdobeFontMetrics($this);
     $afm->write($file, $encoding);
-  }
-
-  /**
-   * Get font copyright
-   *
-   * @return string|null
-   */
-  function getFontCopyright() {
-    return $this->getNameTableString(name::NAME_COPYRIGHT);
   }
 
   /**
@@ -380,6 +377,15 @@ private $tableOffset = 0;
     }
 
     return $records[$nameID]->string;
+  }
+
+  /**
+   * Get font copyright
+   *
+   * @return string|null
+   */
+  function getFontCopyright() {
+    return $this->getNameTableString(name::NAME_COPYRIGHT);
   }
 
   /**

@@ -63,6 +63,136 @@ abstract class AbstractFrameReflower
     }
 
     /**
+     * Collapse frames margins
+     * http://www.w3.org/TR/CSS2/box.html#collapsing-margins
+     */
+    protected function _collapse_margins()
+    {
+        $frame = $this->_frame;
+        $cb = $frame->get_containing_block();
+        $style = $frame->get_style();
+
+        // Margins of float/absolutely positioned/inline-block elements do not collapse.
+        if (!$frame->is_in_flow() || $frame->is_inline_block() || $frame->get_root() == $frame || $frame->get_parent() == $frame->get_root()) {
+            return;
+        }
+
+        $t = $style->length_in_pt($style->margin_top, $cb["h"]);
+        $b = $style->length_in_pt($style->margin_bottom, $cb["h"]);
+
+        // Handle 'auto' values
+        if ($t === "auto") {
+            $style->margin_top = "0pt";
+            $t = 0;
+        }
+
+        if ($b === "auto") {
+            $style->margin_bottom = "0pt";
+            $b = 0;
+        }
+
+        // Collapse vertical margins:
+        $n = $frame->get_next_sibling();
+        if ( $n && !$n->is_block() & !$n->is_table() ) {
+            while ($n = $n->get_next_sibling()) {
+                if ($n->is_block() || $n->is_table()) {
+                    break;
+                }
+
+                if (!$n->get_first_child()) {
+                    $n = null;
+                    break;
+                }
+            }
+        }
+
+        if ($n) {
+            $n_style = $n->get_style();
+            $n_t = (float)$n_style->length_in_pt($n_style->margin_top, $cb["h"]);
+
+            $b = $this->_get_collapsed_margin_length($b, $n_t);
+            $style->margin_bottom = $b . "pt";
+            $n_style->margin_top = "0pt";
+        }
+
+        // Collapse our first child's margin, if there is no border or padding
+        if ($style->border_top_width == 0 && $style->length_in_pt($style->padding_top) == 0) {
+            $f = $this->_frame->get_first_child();
+            if ( $f && !$f->is_block() && !$f->is_table() ) {
+                while ( $f = $f->get_next_sibling() ) {
+                    if ( $f->is_block() || $f->is_table() ) {
+                        break;
+                    }
+
+                    if ( !$f->get_first_child() ) {
+                        $f = null;
+                        break;
+                    }
+                }
+            }
+
+            // Margin are collapsed only between block-level boxes
+            if ($f) {
+                $f_style = $f->get_style();
+                $f_t = (float)$f_style->length_in_pt($f_style->margin_top, $cb["h"]);
+
+                $t = $this->_get_collapsed_margin_length($t, $f_t);
+                $style->margin_top = $t."pt";
+                $f_style->margin_top = "0pt";
+            }
+        }
+
+        // Collapse our last child's margin, if there is no border or padding
+        if ($style->border_bottom_width == 0 && $style->length_in_pt($style->padding_bottom) == 0) {
+            $l = $this->_frame->get_last_child();
+            if ( $l && !$l->is_block() && !$l->is_table() ) {
+                while ( $l = $l->get_prev_sibling() ) {
+                    if ( $l->is_block() || $l->is_table() ) {
+                        break;
+                    }
+
+                    if ( !$l->get_last_child() ) {
+                        $l = null;
+                        break;
+                    }
+                }
+            }
+
+            // Margin are collapsed only between block-level boxes
+            if ($l) {
+                $l_style = $l->get_style();
+                $l_b = (float)$l_style->length_in_pt($l_style->margin_bottom, $cb["h"]);
+
+                $b = $this->_get_collapsed_margin_length($b, $l_b);
+                $style->margin_bottom = $b."pt";
+                $l_style->margin_bottom = "0pt";
+            }
+        }
+    }
+
+    /**
+     * Get the combined (collapsed) length of two adjoining margins.
+     * 
+     * See http://www.w3.org/TR/CSS2/box.html#collapsing-margins.
+     * 
+     * @param number $length1
+     * @param number $length2
+     * @return number
+     */
+    private function _get_collapsed_margin_length($length1, $length2)
+    {
+        if ($length1 < 0 && $length2 < 0) {
+            return min($length1, $length2); // min(x, y) = - max(abs(x), abs(y)), if x < 0 && y < 0
+        }
+        
+        if ($length1 < 0 || $length2 < 0) {
+            return $length1 + $length2; // x + y = x - abs(y), if y < 0
+        }
+        
+        return max($length1, $length2);
+    }
+
+    /**
      * @param Block|null $block
      * @return mixed
      */
@@ -161,183 +291,58 @@ abstract class AbstractFrameReflower
     }
 
     /**
-     * Determine current frame width based on contents
+     * Parses a CSS string containing quotes and escaped hex characters
      *
-     * @return float
+     * @param $string string The CSS string to parse
+     * @param $single_trim
+     * @return string
      */
-    public function calculate_auto_width()
+    protected function _parse_string($string, $single_trim = false)
     {
-        return $this->_frame->get_margin_width();
+        if ($single_trim) {
+            $string = preg_replace('/^[\"\']/', "", $string);
+            $string = preg_replace('/[\"\']$/', "", $string);
+        } else {
+            $string = trim($string, "'\"");
+        }
+
+        $string = str_replace(array("\\\n", '\\"', "\\'"),
+            array("", '"', "'"), $string);
+
+        // Convert escaped hex characters into ascii characters (e.g. \A => newline)
+        $string = preg_replace_callback("/\\\\([0-9a-fA-F]{0,6})/",
+            function ($matches) { return \Dompdf\Helpers::unichr(hexdec($matches[1])); },
+            $string);
+        return $string;
     }
 
     /**
-     * Collapse frames margins
-     * http://www.w3.org/TR/CSS2/box.html#collapsing-margins
-     */
-    protected function _collapse_margins()
-    {
-        $frame = $this->_frame;
-        $cb = $frame->get_containing_block();
-        $style = $frame->get_style();
-
-        // Margins of float/absolutely positioned/inline-block elements do not collapse.
-        if (!$frame->is_in_flow() || $frame->is_inline_block()) {
-            return;
-        }
-
-        $t = $style->length_in_pt($style->margin_top, $cb["h"]);
-        $b = $style->length_in_pt($style->margin_bottom, $cb["h"]);
-
-        // Handle 'auto' values
-        if ($t === "auto") {
-            $style->margin_top = "0pt";
-            $t = 0;
-        }
-
-        if ($b === "auto") {
-            $style->margin_bottom = "0pt";
-            $b = 0;
-        }
-
-        // Collapse vertical margins:
-        $n = $frame->get_next_sibling();
-        if ( $n && !$n->is_block() & !$n->is_table() ) {
-            while ($n = $n->get_next_sibling()) {
-                if ($n->is_block() || $n->is_table()) {
-                    break;
-                }
-
-                if (!$n->get_first_child()) {
-                    $n = null;
-                    break;
-                }
-            }
-        }
-
-        if ($n) {
-            $n_style = $n->get_style();
-            $n_t = (float)$n_style->length_in_pt($n_style->margin_top, $cb["h"]);
-
-            $b = $this->_get_collapsed_margin_length($b, $n_t);
-            $style->margin_bottom = $b . "pt";
-            $n_style->margin_top = "0pt";
-        }
-
-        // Collapse our first child's margin, if there is no border or padding
-        if ($style->get_border_top_width() == 0 && $style->length_in_pt($style->padding_top) == 0) {
-            $f = $this->_frame->get_first_child();
-            if ( $f && !$f->is_block() && !$f->is_table() ) {
-                while ( $f = $f->get_next_sibling() ) {
-                    if ( $f->is_block() || $f->is_table() ) {
-                        break;
-                    }
-
-                    if ( !$f->get_first_child() ) {
-                        $f = null;
-                        break;
-                    }
-                }
-            }
-
-            // Margin are collapsed only between block-level boxes
-            if ($f) {
-                $f_style = $f->get_style();
-                $f_t = (float)$f_style->length_in_pt($f_style->margin_top, $cb["h"]);
-
-                $t = $this->_get_collapsed_margin_length($t, $f_t);
-                $style->margin_top = $t."pt";
-                $f_style->margin_top = "0pt";
-            }
-        }
-
-        // Collapse our last child's margin, if there is no border or padding
-        if ($style->get_border_bottom_width() == 0 && $style->length_in_pt($style->padding_bottom) == 0) {
-            $l = $this->_frame->get_last_child();
-            if ( $l && !$l->is_block() && !$l->is_table() ) {
-                while ( $l = $l->get_prev_sibling() ) {
-                    if ( $l->is_block() || $l->is_table() ) {
-                        break;
-                    }
-
-                    if ( !$l->get_last_child() ) {
-                        $l = null;
-                        break;
-                    }
-                }
-            }
-
-            // Margin are collapsed only between block-level boxes
-            if ($l) {
-                $l_style = $l->get_style();
-                $l_b = (float)$l_style->length_in_pt($l_style->margin_bottom, $cb["h"]);
-
-                $b = $this->_get_collapsed_margin_length($b, $l_b);
-                $style->margin_bottom = $b."pt";
-                $l_style->margin_bottom = "0pt";
-            }
-        }
-    }
-
-    /**
-     * Get the combined (collapsed) length of two adjoining margins.
+     * Parses a CSS "quotes" property
      *
-     * See http://www.w3.org/TR/CSS2/box.html#collapsing-margins.
-     *
-     * @param number $length1
-     * @param number $length2
-     * @return number
+     * @return array|null An array of pairs of quotes
      */
-    private function _get_collapsed_margin_length($length1, $length2)
+    protected function _parse_quotes()
     {
-        if ($length1 < 0 && $length2 < 0) {
-            return min($length1, $length2); // min(x, y) = - max(abs(x), abs(y)), if x < 0 && y < 0
+        // Matches quote types
+        $re = '/(\'[^\']*\')|(\"[^\"]*\")/';
+
+        $quotes = $this->_frame->get_style()->quotes;
+
+        // split on spaces, except within quotes
+        if (!preg_match_all($re, "$quotes", $matches, PREG_SET_ORDER)) {
+            return null;
         }
 
-        if ($length1 < 0 || $length2 < 0) {
-            return $length1 + $length2; // x + y = x - abs(y), if y < 0
+        $quotes_array = array();
+        foreach ($matches as $_quote) {
+            $quotes_array[] = $this->_parse_string($_quote[0], true);
         }
 
-        return max($length1, $length2);
-    }
-
-    /**
-     * Sets the generated content of a generated frame
-     */
-    protected function _set_content()
-    {
-        $frame = $this->_frame;
-        $style = $frame->get_style();
-
-        // if the element was pushed to a new page use the saved counter value, otherwise use the CSS reset value
-        if ($style->counter_reset && ($reset = $style->counter_reset) !== "none") {
-            $vars = preg_split('/\s+/', trim($reset), 2);
-            $frame->reset_counter($vars[0], (isset($frame->_counters['__' . $vars[0]]) ? $frame->_counters['__' . $vars[0]] : (isset($vars[1]) ? $vars[1] : 0)));
+        if (empty($quotes_array)) {
+            $quotes_array = array('"', '"');
         }
 
-        if ($style->counter_increment && ($increment = $style->counter_increment) !== "none") {
-            $frame->increment_counters($increment);
-        }
-
-        if ($style->content && $frame->get_node()->nodeName === "dompdf_generated") {
-            $content = $this->_parse_content();
-            // add generated content to the font subset
-            // FIXME: This is currently too late because the font subset has already been generated.
-            //        See notes in issue #750.
-            if ($frame->get_dompdf()->getOptions()->getIsFontSubsettingEnabled() && $frame->get_dompdf()->get_canvas() instanceof CPDF) {
-                $frame->get_dompdf()->get_canvas()->register_string_subset($style->font_family, $content);
-            }
-
-            $node = $frame->get_node()->ownerDocument->createTextNode($content);
-
-            $new_style = $style->get_stylesheet()->create_style();
-            $new_style->inherit($style);
-
-            $new_frame = new Frame($node);
-            $new_frame->set_style($new_style);
-
-            Factory::decorate_frame($new_frame, $frame->get_dompdf(), $frame->get_root());
-            $frame->append_child($new_frame);
-        }
+        return array_chunk($quotes_array, 2);
     }
 
     /**
@@ -393,7 +398,7 @@ abstract class AbstractFrameReflower
                     continue;
                 }
 
-                preg_match('/(counters?)(^\()*?\(\s*([^\s,]+)\s*(,\s*["\']?([^"\'\)]+)["\']?\s*(,\s*([^\s)]+)\s*)?)?\)/i', $match[1], $args);
+                preg_match('/(counters?)(^\()*?\(\s*([^\s,]+)\s*(,\s*["\']?([^"\'\)]*)["\']?\s*(,\s*([^\s)]+)\s*)?)?\)/i', $match[1], $args);
                 $counter_id = $args[3];
                 if (strtolower($args[1]) == 'counter') {
                     // counter(name [,style])
@@ -473,57 +478,52 @@ abstract class AbstractFrameReflower
     }
 
     /**
-     * Parses a CSS "quotes" property
-     *
-     * @return array|null An array of pairs of quotes
+     * Sets the generated content of a generated frame
      */
-    protected function _parse_quotes()
+    protected function _set_content()
     {
-        // Matches quote types
-        $re = '/(\'[^\']*\')|(\"[^\"]*\")/';
+        $frame = $this->_frame;
+        $style = $frame->get_style();
 
-        $quotes = $this->_frame->get_style()->quotes;
-
-        // split on spaces, except within quotes
-        if (!preg_match_all($re, "$quotes", $matches, PREG_SET_ORDER)) {
-            return null;
+        // if the element was pushed to a new page use the saved counter value, otherwise use the CSS reset value
+        if ($style->counter_reset && ($reset = $style->counter_reset) !== "none") {
+            $vars = preg_split('/\s+/', trim($reset), 2);
+            $frame->reset_counter($vars[0], (isset($frame->_counters['__' . $vars[0]]) ? $frame->_counters['__' . $vars[0]] : (isset($vars[1]) ? $vars[1] : 0)));
         }
 
-        $quotes_array = array();
-        foreach ($matches as $_quote) {
-            $quotes_array[] = $this->_parse_string($_quote[0], true);
+        if ($style->counter_increment && ($increment = $style->counter_increment) !== "none") {
+            $frame->increment_counters($increment);
         }
 
-        if (empty($quotes_array)) {
-            $quotes_array = array('"', '"');
-        }
+        if ($style->content && $frame->get_node()->nodeName === "dompdf_generated") {
+            $content = $this->_parse_content();
+            // add generated content to the font subset
+            // FIXME: This is currently too late because the font subset has already been generated.
+            //        See notes in issue #750.
+            if ($frame->get_dompdf()->getOptions()->getIsFontSubsettingEnabled() && $frame->get_dompdf()->get_canvas() instanceof CPDF) {
+                $frame->get_dompdf()->get_canvas()->register_string_subset($style->font_family, $content);
+            }
 
-        return array_chunk($quotes_array, 2);
+            $node = $frame->get_node()->ownerDocument->createTextNode($content);
+
+            $new_style = $style->get_stylesheet()->create_style();
+            $new_style->inherit($style);
+
+            $new_frame = new Frame($node);
+            $new_frame->set_style($new_style);
+
+            Factory::decorate_frame($new_frame, $frame->get_dompdf(), $frame->get_root());
+            $frame->append_child($new_frame);
+        }
     }
 
     /**
-     * Parses a CSS string containing quotes and escaped hex characters
+     * Determine current frame width based on contents
      *
-     * @param $string string The CSS string to parse
-     * @param $single_trim
-     * @return string
+     * @return float
      */
-    protected function _parse_string($string, $single_trim = false)
+    public function calculate_auto_width()
     {
-        if ($single_trim) {
-            $string = preg_replace('/^[\"\']/', "", $string);
-            $string = preg_replace('/[\"\']$/', "", $string);
-        } else {
-            $string = trim($string, "'\"");
-        }
-
-        $string = str_replace(array("\\\n", '\\"', "\\'"),
-            array("", '"', "'"), $string);
-
-        // Convert escaped hex characters into ascii characters (e.g. \A => newline)
-        $string = preg_replace_callback("/\\\\([0-9a-fA-F]{0,6})/",
-            function ($matches) { return \Dompdf\Helpers::unichr(hexdec($matches[1])); },
-            $string);
-        return $string;
+        return $this->_frame->get_margin_width();
     }
 }

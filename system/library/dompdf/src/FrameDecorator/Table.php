@@ -96,26 +96,6 @@ class Table extends AbstractFrameDecorator
         $this->_footers = array();
     }
 
-    /**
-     * Static function to locate the parent table of a frame
-     *
-     * @param Frame $frame
-     *
-     * @return Table the table that is an ancestor of $frame
-     */
-    public static function find_parent_table(Frame $frame)
-    {
-        while ($frame = $frame->get_parent()) {
-            if ($frame->is_table()) {
-                break;
-            }
-        }
-
-        return $frame;
-    }
-
-    //........................................................................
-
     public function reset()
     {
         parent::reset();
@@ -126,6 +106,8 @@ class Table extends AbstractFrameDecorator
         $this->_footers = array();
         $this->_reflower->reset();
     }
+
+    //........................................................................
 
     /**
      * split the table at $row.  $row and all subsequent rows will be
@@ -203,6 +185,24 @@ class Table extends AbstractFrameDecorator
     }
 
     /**
+     * Static function to locate the parent table of a frame
+     *
+     * @param Frame $frame
+     *
+     * @return Table the table that is an ancestor of $frame
+     */
+    public static function find_parent_table(Frame $frame)
+    {
+        while ($frame = $frame->get_parent()) {
+            if ($frame->is_table()) {
+                break;
+            }
+        }
+
+        return $frame;
+    }
+
+    /**
      * Return this table's Cellmap
      *
      * @return \Dompdf\Cellmap
@@ -223,16 +223,6 @@ class Table extends AbstractFrameDecorator
     }
 
     /**
-     * Set the minimum width of the table
-     *
-     * @param float $width the new minimum width
-     */
-    public function set_min_width($width)
-    {
-        $this->_min_width = $width;
-    }
-
-    /**
      * Return the maximum width of this table
      *
      * @return float
@@ -240,6 +230,16 @@ class Table extends AbstractFrameDecorator
     public function get_max_width()
     {
         return $this->_max_width;
+    }
+
+    /**
+     * Set the minimum width of the table
+     *
+     * @param float $width the new minimum width
+     */
+    public function set_min_width($width)
+    {
+        $this->_min_width = $width;
     }
 
     /**

@@ -155,7 +155,7 @@ class ControllerSaleContract extends Controller {
 
 				$html .= '<style type="text/css">';
 					$html .= '
-						* {padding:0;margin:0;font-family:arial;font-size: 14px;line-height: 16px}
+						* {padding:0;margin:0;font-family:arial;font-size: 14px;line-height: 16px; font-family: "DejaVu Sans", sans-serif;}
 						body{padding:0 50px;margin-top:2.3cm;margin-bottom:1cm;}
 						header {position: fixed;top: 0cm;left: 0cm;right: 0cm;height: 2cm;padding: 15px 50px;}
 						table{width:100%}

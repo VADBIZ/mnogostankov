@@ -152,7 +152,7 @@ class CPDF implements Canvas
     private $_page_text;
 
     /**
-     * Array of pages for accesing after rendering is initially complete
+     * Array of pages for accessing after rendering is initially complete
      *
      * @var array
      */
@@ -195,7 +195,7 @@ class CPDF implements Canvas
 
         $this->_dompdf = $dompdf;
 
-        $this->_pdf = new \Cpdf(
+        $this->_pdf = new \Dompdf\Cpdf(
             $size,
             true,
             $dompdf->getOptions()->getFontCache(),
@@ -215,7 +215,15 @@ class CPDF implements Canvas
 
         $this->_pages = array($this->_pdf->getFirstPageId());
 
-        $this->_image_cache = array();
+        $this->_image_cache = array(); 
+    }
+
+    /**
+     * @return Dompdf
+     */
+    public function get_dompdf()
+    {
+        return $this->_dompdf;
     }
 
     /**
@@ -267,7 +275,7 @@ class CPDF implements Canvas
     /**
      * Opens a new 'object'
      *
-     * While an object is open, all drawing actions are recored in the object,
+     * While an object is open, all drawing actions are recorded in the object,
      * as opposed to being drawn on the current page.  Objects can be added
      * later to a specific page or to several pages.
      *
@@ -283,6 +291,29 @@ class CPDF implements Canvas
         $ret = $this->_pdf->openObject();
         $this->_pdf->saveState();
         return $ret;
+    }
+
+    /**
+     * Reopens an existing 'object'
+     *
+     * @see CPDF::open_object()
+     * @param int $object the ID of a previously opened object
+     */
+    public function reopen_object($object)
+    {
+        $this->_pdf->reopenObject($object);
+        $this->_pdf->saveState();
+    }
+
+    /**
+     * Closes the current 'object'
+     *
+     * @see CPDF::open_object()
+     */
+    public function close_object()
+    {
+        $this->_pdf->restoreState();
+        $this->_pdf->closeObject();
     }
 
     /**
@@ -338,6 +369,8 @@ class CPDF implements Canvas
         return $this->_pdf->restoreSerializedObject($obj);
     }
 
+    //........................................................................
+
     /**
      * Returns the PDF's width in points
      * @return float
@@ -365,7 +398,14 @@ class CPDF implements Canvas
         return $this->_page_number;
     }
 
-    //........................................................................
+    /**
+     * Returns the total number of pages in the document
+     * @return int
+     */
+    public function get_page_count()
+    {
+        return $this->_page_count;
+    }
 
     /**
      * Sets the current page number
@@ -375,15 +415,6 @@ class CPDF implements Canvas
     public function set_page_number($num)
     {
         $this->_page_number = $num;
-    }
-
-    /**
-     * Returns the total number of pages in the document
-     * @return int
-     */
-    public function get_page_count()
-    {
-        return $this->_page_count;
     }
 
     /**
@@ -397,16 +428,35 @@ class CPDF implements Canvas
     }
 
     /**
-     * Sets the opacity
+     * Sets the stroke color
      *
-     * @param $opacity
-     * @param $mode
+     * See {@link Style::set_color()} for the format of the color array.
+     * @param array $color
      */
-    public function set_opacity($opacity, $mode = "Normal")
+    protected function _set_stroke_color($color)
     {
-        $this->_set_line_transparency($mode, $opacity);
-        $this->_set_fill_transparency($mode, $opacity);
-        $this->_current_opacity = $opacity;
+        $this->_pdf->setStrokeColor($color);
+        $alpha = isset($color["alpha"]) ? $color["alpha"] : 1;
+        if ($this->_current_opacity != 1) {
+            $alpha *= $this->_current_opacity;
+        }
+        $this->_set_line_transparency("Normal", $alpha);
+    }
+
+    /**
+     * Sets the fill colour
+     *
+     * See {@link Style::set_color()} for the format of the colour array.
+     * @param array $color
+     */
+    protected function _set_fill_color($color)
+    {
+        $this->_pdf->setColor($color);
+        $alpha = isset($color["alpha"]) ? $color["alpha"] : 1;
+        if ($this->_current_opacity) {
+            $alpha *= $this->_current_opacity;
+        }
+        $this->_set_fill_transparency("Normal", $alpha);
     }
 
     /**
@@ -445,10 +495,49 @@ class CPDF implements Canvas
         $this->_pdf->setFillTransparency($mode, $opacity);
     }
 
+    /**
+     * Sets the line style
+     *
+     * @see Cpdf::setLineStyle()
+     *
+     * @param float $width
+     * @param string $cap
+     * @param string $join
+     * @param array $dash
+     */
+    protected function _set_line_style($width, $cap, $join, $dash)
+    {
+        $this->_pdf->setLineStyle($width, $cap, $join, $dash);
+    }
+
+    /**
+     * Sets the opacity
+     *
+     * @param $opacity
+     * @param $mode
+     */
+    public function set_opacity($opacity, $mode = "Normal")
+    {
+        $this->_set_line_transparency($mode, $opacity);
+        $this->_set_fill_transparency($mode, $opacity);
+        $this->_current_opacity = $opacity;
+    }
+
     public function set_default_view($view, $options = array())
     {
         array_unshift($options, $view);
         call_user_func_array(array($this->_pdf, "openHere"), $options);
+    }
+
+    /**
+     * Remaps y coords from 4th to 1st quadrant
+     *
+     * @param float $y
+     * @return float
+     */
+    protected function y($y)
+    {
+        return $this->_height - $y;
     }
 
     /**
@@ -473,45 +562,22 @@ class CPDF implements Canvas
     }
 
     /**
-     * Sets the stroke color
+     * Draw line at the specified coordinates on every page.
      *
-     * See {@link Style::set_color()} for the format of the color array.
+     * See {@link Style::munge_color()} for the format of the colour array.
+     *
+     * @param float $x1
+     * @param float $y1
+     * @param float $x2
+     * @param float $y2
      * @param array $color
-     */
-    protected function _set_stroke_color($color)
-    {
-        $this->_pdf->setStrokeColor($color);
-        $alpha = isset($color["alpha"]) ? $color["alpha"] : 1;
-        if ($this->_current_opacity != 1) {
-            $alpha *= $this->_current_opacity;
-        }
-        $this->_set_line_transparency("Normal", $alpha);
-    }
-
-    /**
-     * Sets the line style
-     *
-     * @see Cpdf::setLineStyle()
-     *
      * @param float $width
-     * @param string $cap
-     * @param string $join
-     * @param array $dash
+     * @param array $style optional
      */
-    protected function _set_line_style($width, $cap, $join, $dash)
+    public function page_line($x1, $y1, $x2, $y2, $color, $width, $style = array())
     {
-        $this->_pdf->setLineStyle($width, $cap, $join, $dash);
-    }
-
-    /**
-     * Remaps y coords from 4th to 1st quadrant
-     *
-     * @param float $y
-     * @return float
-     */
-    protected function y($y)
-    {
-        return $this->_height - $y;
+        $_t = 'line';
+        $this->_page_text[] = compact('_t', 'x1', 'y1', 'x2', 'y2', 'color', 'width', 'style');
     }
 
     /**
@@ -532,6 +598,49 @@ class CPDF implements Canvas
 
         $this->_pdf->ellipse($x, $this->y($y), $r1, $r2, 0, 8, $astart, $aend, false, false, true, false);
         $this->_set_line_transparency("Normal", $this->_current_opacity);
+    }
+
+    /**
+     * Convert a GIF or BMP image to a PNG image
+     *
+     * @param string $image_url
+     * @param integer $type
+     *
+     * @throws Exception
+     * @return string The url of the newly converted image
+     */
+    protected function _convert_gif_bmp_to_png($image_url, $type)
+    {
+        $func_name = "imagecreatefrom$type";
+
+        if (!function_exists($func_name)) {
+            if (!method_exists("Dompdf\Helpers", $func_name)) {
+                throw new Exception("Function $func_name() not found.  Cannot convert $type image: $image_url.  Please install the image PHP extension.");
+            }
+            $func_name = "\\Dompdf\\Helpers::" . $func_name;
+        }
+
+        set_error_handler(array("\\Dompdf\\Helpers", "record_warnings"));
+        $im = call_user_func($func_name, $image_url);
+
+        if ($im) {
+            imageinterlace($im, false);
+
+            $tmp_dir = $this->_dompdf->getOptions()->getTempDir();
+            $tmp_name = @tempnam($tmp_dir, "{$type}dompdf_img_");
+            @unlink($tmp_name);
+            $filename = "$tmp_name.png";
+            $this->_image_cache[] = $filename;
+
+            imagepng($im, $filename);
+            imagedestroy($im);
+        } else {
+            $filename = Cache::$broken_image;
+        }
+
+        restore_error_handler();
+
+        return $filename;
     }
 
     /**
@@ -563,22 +672,6 @@ class CPDF implements Canvas
         $this->_set_fill_color($color);
         $this->_pdf->filledRectangle($x1, $this->y($y1) - $h, $w, $h);
         $this->_set_fill_transparency("Normal", $this->_current_opacity);
-    }
-
-    /**
-     * Sets the fill colour
-     *
-     * See {@link Style::set_color()} for the format of the colour array.
-     * @param array $color
-     */
-    protected function _set_fill_color($color)
-    {
-        $this->_pdf->setColor($color);
-        $alpha = isset($color["alpha"]) ? $color["alpha"] : 1;
-        if ($this->_current_opacity) {
-            $alpha *= $this->_current_opacity;
-        }
-        $this->_set_fill_transparency("Normal", $alpha);
     }
 
     /**
@@ -783,291 +876,6 @@ class CPDF implements Canvas
     }
 
     /**
-     * @return Dompdf
-     */
-    public function get_dompdf()
-    {
-        return $this->_dompdf;
-    }
-
-    /**
-     * Convert a GIF or BMP image to a PNG image
-     *
-     * @param string $image_url
-     * @param integer $type
-     *
-     * @throws Exception
-     * @return string The url of the newly converted image
-     */
-    protected function _convert_gif_bmp_to_png($image_url, $type)
-    {
-        $func_name = "imagecreatefrom$type";
-
-        if (!function_exists($func_name)) {
-            if (!method_exists("Dompdf\Helpers", $func_name)) {
-                throw new Exception("Function $func_name() not found.  Cannot convert $type image: $image_url.  Please install the image PHP extension.");
-            }
-            $func_name = "\\Dompdf\\Helpers::" . $func_name;
-        }
-
-        set_error_handler(array("\\Dompdf\\Helpers", "record_warnings"));
-        $im = call_user_func($func_name, $image_url);
-
-        if ($im) {
-            imageinterlace($im, false);
-
-            $tmp_dir = $this->_dompdf->getOptions()->getTempDir();
-            $tmp_name = tempnam($tmp_dir, "{$type}dompdf_img_");
-            @unlink($tmp_name);
-            $filename = "$tmp_name.png";
-            $this->_image_cache[] = $filename;
-
-            imagepng($im, $filename);
-            imagedestroy($im);
-        } else {
-            $filename = Cache::$broken_image;
-        }
-
-        restore_error_handler();
-
-        return $filename;
-    }
-
-    /**
-     * @param string $code
-     */
-    public function javascript($code)
-    {
-        $this->_pdf->addJavascript($code);
-    }
-
-    /**
-     * Add a named destination (similar to <a name="foo">...</a> in html)
-     *
-     * @param string $anchorname The name of the named destination
-     */
-    public function add_named_dest($anchorname)
-    {
-        $this->_pdf->addDestination($anchorname, "Fit");
-    }
-
-    /**
-     * Add a link to the pdf
-     *
-     * @param string $url The url to link to
-     * @param float $x The x position of the link
-     * @param float $y The y position of the link
-     * @param float $width The width of the link
-     * @param float $height The height of the link
-     */
-    public function add_link($url, $x, $y, $width, $height)
-    {
-        $y = $this->y($y) - $height;
-
-        if (strpos($url, '#') === 0) {
-            // Local link
-            $name = substr($url, 1);
-            if ($name) {
-                $this->_pdf->addInternalLink($name, $x, $y, $x + $width, $y + $height);
-            }
-        } else {
-            $this->_pdf->addLink(rawurldecode($url), $x, $y, $x + $width, $y + $height);
-        }
-    }
-
-    /**
-     * @param string $text
-     * @param string $font
-     * @param float $size
-     * @param int $word_spacing
-     * @param int $char_spacing
-     * @return float|int
-     */
-    public function get_text_width($text, $font, $size, $word_spacing = 0, $char_spacing = 0)
-    {
-        $this->_pdf->selectFont($font);
-        return $this->_pdf->getTextWidth($size, $text, $word_spacing, $char_spacing);
-    }
-
-    //........................................................................
-
-    /**
-     * @param $font
-     * @param $string
-     */
-    public function register_string_subset($font, $string)
-    {
-        $this->_pdf->registerText($font, $string);
-    }
-
-    /**
-     * @param string $font
-     * @param float $size
-     * @return float
-     */
-    public function get_font_baseline($font, $size)
-    {
-        $ratio = $this->_dompdf->getOptions()->getFontHeightRatio();
-        return $this->get_font_height($font, $size) / $ratio;
-    }
-
-    /**
-     * @param string $font
-     * @param float $size
-     * @return float|int
-     */
-    public function get_font_height($font, $size)
-    {
-        $this->_pdf->selectFont($font);
-
-        $ratio = $this->_dompdf->getOptions()->getFontHeightRatio();
-        return $this->_pdf->getFontHeight($size) * $ratio;
-    }
-
-    /**
-     * Writes text at the specified x and y coordinates on every page
-     *
-     * The strings '{PAGE_NUM}' and '{PAGE_COUNT}' are automatically replaced
-     * with their current values.
-     *
-     * See {@link Style::munge_color()} for the format of the colour array.
-     *
-     * @param float $x
-     * @param float $y
-     * @param string $text the text to write
-     * @param string $font the font file to use
-     * @param float $size the font size, in points
-     * @param array $color
-     * @param float $word_space word spacing adjustment
-     * @param float $char_space char spacing adjustment
-     * @param float $angle angle to write the text at, measured CW starting from the x-axis
-     */
-    public function page_text($x, $y, $text, $font, $size, $color = array(0, 0, 0), $word_space = 0.0, $char_space = 0.0, $angle = 0.0)
-    {
-        $_t = "text";
-        $this->_page_text[] = compact("_t", "x", "y", "text", "font", "size", "color", "word_space", "char_space", "angle");
-    }
-
-    /**
-     * Processes a script on every page
-     *
-     * The variables $pdf, $PAGE_NUM, and $PAGE_COUNT are available.
-     *
-     * This function can be used to add page numbers to all pages
-     * after the first one, for example.
-     *
-     * @param string $code the script code
-     * @param string $type the language type for script
-     */
-    public function page_script($code, $type = "text/php")
-    {
-        $_t = "script";
-        $this->_page_text[] = compact("_t", "code", "type");
-    }
-
-    /*function get_font_x_height($font, $size) {
-      $this->_pdf->selectFont($font);
-      $ratio = $this->_dompdf->getOptions()->getFontHeightRatio();
-      return $this->_pdf->getFontXHeight($size) * $ratio;
-    }*/
-
-    /**
-     * @return int
-     */
-    public function new_page()
-    {
-        $this->_page_number++;
-        $this->_page_count++;
-
-        $ret = $this->_pdf->newPage();
-        $this->_pages[] = $ret;
-        return $ret;
-    }
-
-    /**
-     * Streams the PDF to the client.
-     *
-     * @param string $filename The filename to present to the client.
-     * @param array $options Associative array: 'compress' => 1 or 0 (default 1); 'Attachment' => 1 or 0 (default 1).
-     */
-    public function stream($filename = "document.pdf", $options = array())
-    {
-        if (headers_sent()) {
-            die("Unable to stream pdf: headers already sent");
-        }
-
-        if (!isset($options["compress"])) $options["compress"] = true;
-        if (!isset($options["Attachment"])) $options["Attachment"] = true;
-
-        $this->_add_page_text();
-
-        $debug = !$options['compress'];
-        $tmp = ltrim($this->_pdf->output($debug));
-
-        header("Cache-Control: private");
-        header("Content-Type: application/pdf");
-        header("Content-Length: " . mb_strlen($tmp, "8bit"));
-
-        $filename = str_replace(array("\n", "'"), "", basename($filename, ".pdf")) . ".pdf";
-        $attachment = $options["Attachment"] ? "attachment" : "inline";
-        header(Helpers::buildContentDispositionHeader($attachment, $filename));
-
-        echo $tmp;
-        flush();
-    }
-
-    /**
-     * Add text to each page after rendering is complete
-     */
-    protected function _add_page_text()
-    {
-        if (!count($this->_page_text)) {
-            return;
-        }
-
-        $page_number = 1;
-        $eval = null;
-
-        foreach ($this->_pages as $pid) {
-            $this->reopen_object($pid);
-
-            foreach ($this->_page_text as $pt) {
-                extract($pt);
-
-                switch ($_t) {
-                    case "text":
-                        $text = str_replace(array("{PAGE_NUM}", "{PAGE_COUNT}"),
-                            array($page_number, $this->_page_count), $text);
-                        $this->text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
-                        break;
-
-                    case "script":
-                        if (!$eval) {
-                            $eval = new PhpEvaluator($this);
-                        }
-                        $eval->evaluate($code, array('PAGE_NUM' => $page_number, 'PAGE_COUNT' => $this->_page_count));
-                        break;
-                }
-            }
-
-            $this->close_object();
-            $page_number++;
-        }
-    }
-
-    /**
-     * Reopens an existing 'object'
-     *
-     * @see CPDF::open_object()
-     * @param int $object the ID of a previously opened object
-     */
-    public function reopen_object($object)
-    {
-        $this->_pdf->reopenObject($object);
-        $this->_pdf->saveState();
-    }
-
-    /**
      * @param float $x
      * @param float $y
      * @param string $text
@@ -1122,14 +930,229 @@ class CPDF implements Canvas
     }
 
     /**
-     * Closes the current 'object'
-     *
-     * @see CPDF::open_object()
+     * @param string $code
      */
-    public function close_object()
+    public function javascript($code)
     {
-        $this->_pdf->restoreState();
-        $this->_pdf->closeObject();
+        $this->_pdf->addJavascript($code);
+    }
+
+    //........................................................................
+
+    /**
+     * Add a named destination (similar to <a name="foo">...</a> in html)
+     *
+     * @param string $anchorname The name of the named destination
+     */
+    public function add_named_dest($anchorname)
+    {
+        $this->_pdf->addDestination($anchorname, "Fit");
+    }
+
+    /**
+     * Add a link to the pdf
+     *
+     * @param string $url The url to link to
+     * @param float $x The x position of the link
+     * @param float $y The y position of the link
+     * @param float $width The width of the link
+     * @param float $height The height of the link
+     */
+    public function add_link($url, $x, $y, $width, $height)
+    {
+        $y = $this->y($y) - $height;
+
+        if (strpos($url, '#') === 0) {
+            // Local link
+            $name = substr($url, 1);
+            if ($name) {
+                $this->_pdf->addInternalLink($name, $x, $y, $x + $width, $y + $height);
+            }
+        } else {
+            $this->_pdf->addLink(rawurldecode($url), $x, $y, $x + $width, $y + $height);
+        }
+    }
+
+    /**
+     * @param string $text
+     * @param string $font
+     * @param float $size
+     * @param int $word_spacing
+     * @param int $char_spacing
+     * @return float|int
+     */
+    public function get_text_width($text, $font, $size, $word_spacing = 0, $char_spacing = 0)
+    {
+        $this->_pdf->selectFont($font);
+        return $this->_pdf->getTextWidth($size, $text, $word_spacing, $char_spacing);
+    }
+
+    /**
+     * @param $font
+     * @param $string
+     */
+    public function register_string_subset($font, $string)
+    {
+        $this->_pdf->registerText($font, $string);
+    }
+
+    /**
+     * @param string $font
+     * @param float $size
+     * @return float|int
+     */
+    public function get_font_height($font, $size)
+    {
+        $this->_pdf->selectFont($font);
+
+        $ratio = $this->_dompdf->getOptions()->getFontHeightRatio();
+        return $this->_pdf->getFontHeight($size) * $ratio;
+    }
+
+    /*function get_font_x_height($font, $size) {
+      $this->_pdf->selectFont($font);
+      $ratio = $this->_dompdf->getOptions()->getFontHeightRatio();
+      return $this->_pdf->getFontXHeight($size) * $ratio;
+    }*/
+
+    /**
+     * @param string $font
+     * @param float $size
+     * @return float
+     */
+    public function get_font_baseline($font, $size)
+    {
+        $ratio = $this->_dompdf->getOptions()->getFontHeightRatio();
+        return $this->get_font_height($font, $size) / $ratio;
+    }
+
+    /**
+     * Writes text at the specified x and y coordinates on every page
+     *
+     * The strings '{PAGE_NUM}' and '{PAGE_COUNT}' are automatically replaced
+     * with their current values.
+     *
+     * See {@link Style::munge_color()} for the format of the colour array.
+     *
+     * @param float $x
+     * @param float $y
+     * @param string $text the text to write
+     * @param string $font the font file to use
+     * @param float $size the font size, in points
+     * @param array $color
+     * @param float $word_space word spacing adjustment
+     * @param float $char_space char spacing adjustment
+     * @param float $angle angle to write the text at, measured CW starting from the x-axis
+     */
+    public function page_text($x, $y, $text, $font, $size, $color = array(0, 0, 0), $word_space = 0.0, $char_space = 0.0, $angle = 0.0)
+    {
+        $_t = "text";
+        $this->_page_text[] = compact("_t", "x", "y", "text", "font", "size", "color", "word_space", "char_space", "angle");
+    }
+
+    /**
+     * Processes a script on every page
+     *
+     * The variables $pdf, $PAGE_NUM, and $PAGE_COUNT are available.
+     *
+     * This function can be used to add page numbers to all pages
+     * after the first one, for example.
+     *
+     * @param string $code the script code
+     * @param string $type the language type for script
+     */
+    public function page_script($code, $type = "text/php")
+    {
+        $_t = "script";
+        $this->_page_text[] = compact("_t", "code", "type");
+    }
+
+    /**
+     * @return int
+     */
+    public function new_page()
+    {
+        $this->_page_number++;
+        $this->_page_count++;
+
+        $ret = $this->_pdf->newPage();
+        $this->_pages[] = $ret;
+        return $ret;
+    }
+
+    /**
+     * Add text to each page after rendering is complete
+     */
+    protected function _add_page_text()
+    {
+        if (!count($this->_page_text)) {
+            return;
+        }
+
+        $page_number = 1;
+        $eval = null;
+
+        foreach ($this->_pages as $pid) {
+            $this->reopen_object($pid);
+
+            foreach ($this->_page_text as $pt) {
+                extract($pt);
+
+                switch ($_t) {
+                    case "text":
+                        $text = str_replace(array("{PAGE_NUM}", "{PAGE_COUNT}"),
+                            array($page_number, $this->_page_count), $text);
+                        $this->text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
+                        break;
+
+                    case "script":
+                        if (!$eval) {
+                            $eval = new PhpEvaluator($this);
+                        }
+                        $eval->evaluate($code, array('PAGE_NUM' => $page_number, 'PAGE_COUNT' => $this->_page_count));
+                        break;
+
+                    case 'line':
+                        $this->line( $x1, $y1, $x2, $y2, $color, $width, $style );
+                        break;
+                }
+            }
+
+            $this->close_object();
+            $page_number++;
+        }
+    }
+
+    /**
+     * Streams the PDF to the client.
+     *
+     * @param string $filename The filename to present to the client.
+     * @param array $options Associative array: 'compress' => 1 or 0 (default 1); 'Attachment' => 1 or 0 (default 1).
+     */
+    public function stream($filename = "document.pdf", $options = array())
+    {
+        if (headers_sent()) {
+            die("Unable to stream pdf: headers already sent");
+        }
+
+        if (!isset($options["compress"])) $options["compress"] = true;
+        if (!isset($options["Attachment"])) $options["Attachment"] = true;
+
+        $this->_add_page_text();
+
+        $debug = !$options['compress'];
+        $tmp = ltrim($this->_pdf->output($debug));
+
+        header("Cache-Control: private");
+        header("Content-Type: application/pdf");
+        header("Content-Length: " . mb_strlen($tmp, "8bit"));
+
+        $filename = str_replace(array("\n", "'"), "", basename($filename, ".pdf")) . ".pdf";
+        $attachment = $options["Attachment"] ? "attachment" : "inline";
+        header(Helpers::buildContentDispositionHeader($attachment, $filename));
+
+        echo $tmp;
+        flush();
     }
 
     /**

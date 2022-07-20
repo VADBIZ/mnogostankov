@@ -2,6 +2,8 @@
 
 namespace Sabberworm\CSS\CSSList;
 
+use Sabberworm\CSS\Parsing\ParserState;
+
 /**
  * The root CSSList of a parsed file. Contains all top-level css contents, mostly declaration blocks, but also any @-rules encountered.
  */
@@ -14,11 +16,10 @@ class Document extends CSSBlockList {
 		parent::__construct($iLineNo);
 	}
 
-	/**
-	 * @deprecated use getAllDeclarationBlocks()
-	 */
-	public function getAllSelectors() {
-		return $this->getAllDeclarationBlocks();
+	public static function parse(ParserState $oParserState) {
+		$oDocument = new Document($oParserState->currentLine());
+		CSSList::parseList($oParserState, $oDocument);
+		return $oDocument;
 	}
 
 	/**
@@ -28,6 +29,13 @@ class Document extends CSSBlockList {
 		$aResult = array();
 		$this->allDeclarationBlocks($aResult);
 		return $aResult;
+	}
+
+	/**
+	 * @deprecated use getAllDeclarationBlocks()
+	 */
+	public function getAllSelectors() {
+		return $this->getAllDeclarationBlocks();
 	}
 
 	/**

@@ -75,13 +75,67 @@ class ListBullet extends AbstractRenderer
     }
 
     /**
+     * @param integer $n
+     * @param string $type
+     * @param integer $pad
+     *
+     * @return string
+     */
+    private function make_counter($n, $type, $pad = null)
+    {
+        $n = intval($n);
+        $text = "";
+        $uppercase = false;
+
+        switch ($type) {
+            case "decimal-leading-zero":
+            case "decimal":
+            case "1":
+                if ($pad) {
+                    $text = str_pad($n, $pad, "0", STR_PAD_LEFT);
+                } else {
+                    $text = $n;
+                }
+                break;
+
+            case "upper-alpha":
+            case "upper-latin":
+            case "A":
+                $uppercase = true;
+            case "lower-alpha":
+            case "lower-latin":
+            case "a":
+                $text = chr(($n % 26) + ord('a') - 1);
+                break;
+
+            case "upper-roman":
+            case "I":
+                $uppercase = true;
+            case "lower-roman":
+            case "i":
+                $text = Helpers::dec2roman($n);
+                break;
+
+            case "lower-greek":
+                $text = Helpers::unichr($n + 944);
+                break;
+        }
+
+        if ($uppercase) {
+            $text = strtoupper($text);
+        }
+
+        return "$text.";
+    }
+
+    /**
      * @param Frame $frame
      */
     function render(Frame $frame)
     {
         $style = $frame->get_style();
-        $font_size = $style->get_font_size();
-        $line_height = (float)$style->length_in_pt($style->line_height, $frame->get_containing_block("h"));
+        $font_size = $style->font_size;
+        $line_height = $style->line_height;
 
         $this->_set_opacity($frame->get_opacity($style->opacity));
 
@@ -181,6 +235,8 @@ class ListBullet extends AbstractRenderer
                     $x -= $this->_dompdf->getFontMetrics()->getTextWidth($text, $font_family, $font_size, $spacing);
 
                     // Take line-height into account
+                    // TODO: should the line height take into account the line height of the containing block (per previous logic)
+                    // $line_height = (float)$style->length_in_pt($style->line_height, $frame->get_containing_block("h"));
                     $line_height = $style->line_height;
                     $y += ($line_height - $font_size) / 4; // FIXME I thought it should be 2, but 4 gives better results
 
@@ -197,59 +253,5 @@ class ListBullet extends AbstractRenderer
         if (strlen($id) > 0)  {
             $this->_canvas->add_named_dest($id);
         }
-    }
-
-    /**
-     * @param integer $n
-     * @param string $type
-     * @param integer $pad
-     *
-     * @return string
-     */
-    private function make_counter($n, $type, $pad = null)
-    {
-        $n = intval($n);
-        $text = "";
-        $uppercase = false;
-
-        switch ($type) {
-            case "decimal-leading-zero":
-            case "decimal":
-            case "1":
-                if ($pad) {
-                    $text = str_pad($n, $pad, "0", STR_PAD_LEFT);
-                } else {
-                    $text = $n;
-                }
-                break;
-
-            case "upper-alpha":
-            case "upper-latin":
-            case "A":
-                $uppercase = true;
-            case "lower-alpha":
-            case "lower-latin":
-            case "a":
-                $text = chr(($n % 26) + ord('a') - 1);
-                break;
-
-            case "upper-roman":
-            case "I":
-                $uppercase = true;
-            case "lower-roman":
-            case "i":
-                $text = Helpers::dec2roman($n);
-                break;
-
-            case "lower-greek":
-                $text = Helpers::unichr($n + 944);
-                break;
-        }
-
-        if ($uppercase) {
-            $text = strtoupper($text);
-        }
-
-        return "$text.";
     }
 }

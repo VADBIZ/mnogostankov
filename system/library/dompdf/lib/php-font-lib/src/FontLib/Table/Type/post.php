@@ -28,6 +28,59 @@ class post extends Table {
     "maxMemType1"        => self::uint32,
   );
 
+  protected function _parse() {
+    $font = $this->getFont();
+    $data = $font->unpack($this->def);
+
+    $names = array();
+
+    switch ($data["format"]) {
+      case 1:
+        $names = File::$macCharNames;
+        break;
+
+      case 2:
+        $data["numberOfGlyphs"] = $font->readUInt16();
+
+        $glyphNameIndex = $font->readUInt16Many($data["numberOfGlyphs"]);
+
+        $data["glyphNameIndex"] = $glyphNameIndex;
+
+        $namesPascal = array();
+        for ($i = 0; $i < $data["numberOfGlyphs"]; $i++) {
+          $len           = $font->readUInt8();
+          $namesPascal[] = $font->read($len);
+        }
+
+        foreach ($glyphNameIndex as $g => $index) {
+          if ($index < 258) {
+            $names[$g] = File::$macCharNames[$index];
+          }
+          else {
+            $names[$g] = $namesPascal[$index - 258];
+          }
+        }
+
+        break;
+
+      case 2.5:
+        // TODO
+        break;
+
+      case 3:
+        // nothing
+        break;
+
+      case 4:
+        // TODO
+        break;
+    }
+
+    $data["names"] = $names;
+
+    $this->data = $data;
+  }
+
   function _encode() {
     $font           = $this->getFont();
     $data           = $this->data;
@@ -84,58 +137,5 @@ class post extends Table {
     }
 
     return $length;*/
-  }
-
-  protected function _parse() {
-    $font = $this->getFont();
-    $data = $font->unpack($this->def);
-
-    $names = array();
-
-    switch ($data["format"]) {
-      case 1:
-        $names = File::$macCharNames;
-        break;
-
-      case 2:
-        $data["numberOfGlyphs"] = $font->readUInt16();
-
-        $glyphNameIndex = $font->readUInt16Many($data["numberOfGlyphs"]);
-
-        $data["glyphNameIndex"] = $glyphNameIndex;
-
-        $namesPascal = array();
-        for ($i = 0; $i < $data["numberOfGlyphs"]; $i++) {
-          $len           = $font->readUInt8();
-          $namesPascal[] = $font->read($len);
-        }
-
-        foreach ($glyphNameIndex as $g => $index) {
-          if ($index < 258) {
-            $names[$g] = File::$macCharNames[$index];
-          }
-          else {
-            $names[$g] = $namesPascal[$index - 258];
-          }
-        }
-
-        break;
-
-      case 2.5:
-        // TODO
-        break;
-
-      case 3:
-        // nothing
-        break;
-
-      case 4:
-        // TODO
-        break;
-    }
-
-    $data["names"] = $names;
-
-    $this->data = $data;
   }
 }

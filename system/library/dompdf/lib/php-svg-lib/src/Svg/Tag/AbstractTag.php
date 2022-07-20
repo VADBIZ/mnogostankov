@@ -2,8 +2,8 @@
 /**
  * @package php-svg-lib
  * @link    http://github.com/PhenX/php-svg-lib
- * @author  Fabien Mï¿½nager <fabien.menager@gmail.com>
- * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ * @author  Fabien Ménager <fabien.menager@gmail.com>
+ * @license GNU LGPLv3+ http://www.gnu.org/copyleft/lesser.html
  */
 
 namespace Svg\Tag;
@@ -13,13 +13,15 @@ use Svg\Style;
 
 abstract class AbstractTag
 {
-    public $tagName;
     /** @var Document */
     protected $document;
+
+    public $tagName;
+
     /** @var Style */
     protected $style;
 
-    protected $attributes;
+    protected $attributes = array();
 
     protected $hasShape = true;
 
@@ -30,6 +32,10 @@ abstract class AbstractTag
     {
         $this->document = $document;
         $this->tagName = $tagName;
+    }
+
+    public function getDocument(){
+        return $this->document;
     }
 
     /**
@@ -48,10 +54,6 @@ abstract class AbstractTag
         return null;
     }
 
-    public function getDocument(){
-        return $this->document;
-    }
-
     public function handle($attributes)
     {
         $this->attributes = $attributes;
@@ -62,20 +64,20 @@ abstract class AbstractTag
         }
     }
 
-    protected function before($attributes)
-    {
-    }
-
-    protected function start($attributes)
-    {
-    }
-
     public function handleEnd()
     {
         if (!$this->getDocument()->inDefs) {
             $this->end();
             $this->after();
         }
+    }
+
+    protected function before($attributes)
+    {
+    }
+
+    protected function start($attributes)
+    {
     }
 
     protected function end()
@@ -91,14 +93,6 @@ abstract class AbstractTag
         return $this->attributes;
     }
 
-    /**
-     * @return Style
-     */
-    public function getStyle()
-    {
-        return $this->style;
-    }
-
     protected function setStyle(Style $style)
     {
         $this->style = $style;
@@ -106,6 +100,14 @@ abstract class AbstractTag
         if ($style->display === "none") {
             $this->hasShape = false;
         }
+    }
+
+    /**
+     * @return Style
+     */
+    public function getStyle()
+    {
+        return $this->style;
     }
 
     /**
@@ -164,7 +166,14 @@ abstract class AbstractTag
                         break;
 
                     case "rotate":
-                        $surface->rotate($t[1]);
+                        if (isset($t[2])) {
+                            $t[3] = isset($t[3]) ? $t[3] : 0;
+                            $surface->translate($t[2], $t[3]);
+                            $surface->rotate($t[1]);
+                            $surface->translate(-$t[2], -$t[3]);
+                        } else {
+                            $surface->rotate($t[1]);
+                        }
                         break;
 
                     case "skewX":
@@ -178,4 +187,4 @@ abstract class AbstractTag
             }
         }
     }
-}
+} 

@@ -11,9 +11,9 @@ namespace Sabberworm\CSS\Property;
  */
 class Charset implements AtRule {
 
+	private $sCharset;
 	protected $iLineNo;
 	protected $aComment;
-	private $sCharset;
 
 	public function __construct($sCharset, $iLineNo = 0) {
 		$this->sCharset = $sCharset;

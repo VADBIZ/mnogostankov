@@ -187,10 +187,6 @@ class AdobeFontMetrics {
     $this->endSection("FontMetrics");
   }
 
-  function startSection($name, $value = "") {
-    $this->addLine("Start$name $value");
-  }
-
   function addLine($line) {
     fwrite($this->f, "$line\n");
   }
@@ -209,6 +205,10 @@ class AdobeFontMetrics {
       $array[] = "$key $value";
     }
     $this->addLine(implode(" ; ", $array));
+  }
+
+  function startSection($name, $value = "") {
+    $this->addLine("Start$name $value");
   }
 
   function endSection($name) {

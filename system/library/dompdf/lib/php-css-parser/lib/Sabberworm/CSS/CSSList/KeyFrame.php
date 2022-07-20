@@ -15,20 +15,20 @@ class KeyFrame extends CSSList implements AtRule {
 		$this->animationName  = null;
 	}
 
-	public function getVendorKeyFrame() {
-		return $this->vendorKeyFrame;
-	}
-
 	public function setVendorKeyFrame($vendorKeyFrame) {
 		$this->vendorKeyFrame = $vendorKeyFrame;
 	}
 
-	public function getAnimationName() {
-		return $this->animationName;
+	public function getVendorKeyFrame() {
+		return $this->vendorKeyFrame;
 	}
 
 	public function setAnimationName($animationName) {
 		$this->animationName = $animationName;
+	}
+
+	public function getAnimationName() {
+		return $this->animationName;
 	}
 
 	public function __toString() {

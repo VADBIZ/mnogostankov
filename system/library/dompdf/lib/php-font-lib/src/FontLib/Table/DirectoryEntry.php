@@ -17,20 +17,48 @@ use FontLib\BinaryStream;
  * @package php-font-lib
  */
 class DirectoryEntry extends BinaryStream {
-  public $entryLength = 4;
-  public $tag;
-  public $checksum;
-  public $offset;
-  public $length;
   /**
    * @var File
    */
   protected $font;
+
   /**
    * @var Table
    */
   protected $font_table;
+
+  public $entryLength = 4;
+
+  public $tag;
+  public $checksum;
+  public $offset;
+  public $length;
+
   protected $origF;
+
+  static function computeChecksum($data) {
+    $len = strlen($data);
+    $mod = $len % 4;
+
+    if ($mod) {
+      $data = str_pad($data, $len + (4 - $mod), "\0");
+    }
+
+    $len = strlen($data);
+
+    $hi = 0x0000;
+    $lo = 0x0000;
+
+    for ($i = 0; $i < $len; $i += 4) {
+      $hi += (ord($data[$i]) << 8) + ord($data[$i + 1]);
+      $lo += (ord($data[$i + 2]) << 8) + ord($data[$i + 3]);
+      $hi += $lo >> 16;
+      $lo = $lo & 0xFFFF;
+      $hi = $hi & 0xFFFF;
+    }
+
+    return ($hi << 8) + $lo;
+  }
 
   function __construct(File $font) {
     $this->font = $font;
@@ -73,30 +101,6 @@ class DirectoryEntry extends BinaryStream {
     Font::d("Bytes written = $table_length");
 
     $font->seek($table_offset + $table_length);
-  }
-
-  static function computeChecksum($data) {
-    $len = strlen($data);
-    $mod = $len % 4;
-
-    if ($mod) {
-      $data = str_pad($data, $len + (4 - $mod), "\0");
-    }
-
-    $len = strlen($data);
-
-    $hi = 0x0000;
-    $lo = 0x0000;
-
-    for ($i = 0; $i < $len; $i += 4) {
-      $hi += (ord($data[$i]) << 8) + ord($data[$i + 1]);
-      $lo += (ord($data[$i + 2]) << 8) + ord($data[$i + 3]);
-      $hi += $lo >> 16;
-      $lo = $lo & 0xFFFF;
-      $hi = $hi & 0xFFFF;
-    }
-
-    return ($hi << 8) + $lo;
   }
 
   /**

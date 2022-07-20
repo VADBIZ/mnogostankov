@@ -31,21 +31,24 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 class HTML5_InputStream {
     /**
-     * Parse errors.
-     */
-    public $errors = array();
-    /**
      * The string data we're parsing.
      */
     private $data;
+
     /**
      * The current integer byte position we are in $data
      */
     private $char;
+
     /**
      * Length of $data; when $char === $data, we are at the end-of-file.
      */
     private $EOF;
+
+    /**
+     * Parse errors.
+     */
+    public $errors = array();
 
     /**
      * @param $data | Data to parse

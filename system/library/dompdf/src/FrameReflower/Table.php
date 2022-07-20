@@ -51,220 +51,6 @@ class Table extends AbstractFrameReflower
         $this->_min_max_cache = null;
     }
 
-    /**
-     * @param BlockFrameDecorator $block
-     */
-    function reflow(BlockFrameDecorator $block = null)
-    {
-        /** @var TableFrameDecorator */
-        $frame = $this->_frame;
-
-        // Check if a page break is forced
-        $page = $frame->get_root();
-        $page->check_forced_page_break($frame);
-
-        // Bail if the page is full
-        if ($page->is_full()) {
-            return;
-        }
-
-        // Let the page know that we're reflowing a table so that splits
-        // are suppressed (simply setting page-break-inside: avoid won't
-        // work because we may have an arbitrary number of block elements
-        // inside tds.)
-        $page->table_reflow_start();
-
-        // Collapse vertical margins, if required
-        $this->_collapse_margins();
-
-        $frame->position();
-
-        // Table layout algorithm:
-        // http://www.w3.org/TR/CSS21/tables.html#auto-table-layout
-
-        if (is_null($this->_state)) {
-            $this->get_min_max_width();
-        }
-
-        $cb = $frame->get_containing_block();
-        $style = $frame->get_style();
-
-        // This is slightly inexact, but should be okay.  Add half the
-        // border-spacing to the table as padding.  The other half is added to
-        // the cells themselves.
-        if ($style->border_collapse === "separate") {
-            list($h, $v) = $style->border_spacing;
-
-            $v = (float)$style->length_in_pt($v) / 2;
-            $h = (float)$style->length_in_pt($h) / 2;
-
-            $style->padding_left = (float)$style->length_in_pt($style->padding_left, $cb["w"]) + $h;
-            $style->padding_right = (float)$style->length_in_pt($style->padding_right, $cb["w"]) + $h;
-            $style->padding_top = (float)$style->length_in_pt($style->padding_top, $cb["h"]) + $v;
-            $style->padding_bottom = (float)$style->length_in_pt($style->padding_bottom, $cb["h"]) + $v;
-        }
-
-        $this->_assign_widths();
-
-        // Adjust left & right margins, if they are auto
-        $width = $style->width;
-        $left = $style->margin_left;
-        $right = $style->margin_right;
-
-        $diff = $cb["w"] - $width;
-
-        if ($left === "auto" && $right === "auto") {
-            if ($diff < 0) {
-                $left = 0;
-                $right = $diff;
-            } else {
-                $left = $right = $diff / 2;
-            }
-
-            $style->margin_left = sprintf("%Fpt", $left);
-            $style->margin_right = sprintf("%Fpt", $right);;
-        } else {
-            if ($left === "auto") {
-                $left = (float)$style->length_in_pt($cb["w"] - $right - $width, $cb["w"]);
-            }
-            if ($right === "auto") {
-                $left = (float)$style->length_in_pt($left, $cb["w"]);
-            }
-        }
-
-        list($x, $y) = $frame->get_position();
-
-        // Determine the content edge
-        $content_x = $x + (float)$left + (float)$style->length_in_pt(array($style->padding_left,
-                $style->border_left_width), $cb["w"]);
-        $content_y = $y + (float)$style->length_in_pt(array($style->margin_top,
-                $style->border_top_width,
-                $style->padding_top), $cb["h"]);
-
-        if (isset($cb["h"])) {
-            $h = $cb["h"];
-        } else {
-            $h = null;
-        }
-
-        $cellmap = $frame->get_cellmap();
-        $col =& $cellmap->get_column(0);
-        $col["x"] = $content_x;
-
-        $row =& $cellmap->get_row(0);
-        $row["y"] = $content_y;
-
-        $cellmap->assign_x_positions();
-
-        // Set the containing block of each child & reflow
-        foreach ($frame->get_children() as $child) {
-            // Bail if the page is full
-            if (!$page->in_nested_table() && $page->is_full()) {
-                break;
-            }
-
-            $child->set_containing_block($content_x, $content_y, $width, $h);
-            $child->reflow();
-
-            if (!$page->in_nested_table()) {
-                // Check if a split has occured
-                $page->check_page_break($child);
-            }
-
-        }
-
-        // Assign heights to our cells:
-        $style->height = $this->_calculate_height();
-
-        if ($style->border_collapse === "collapse") {
-            // Unset our borders because our cells are now using them
-            $style->border_style = "none";
-        }
-
-        $page->table_reflow_end();
-
-        // Debugging:
-        //echo ($this->_frame->get_cellmap());
-
-        if ($block && $style->float === "none" && $frame->is_in_flow()) {
-            $block->add_frame_to_line($frame);
-            $block->add_line();
-        }
-    }
-
-    /**
-     * @return array|null
-     */
-    function get_min_max_width()
-    {
-        if (!is_null($this->_min_max_cache)) {
-            return $this->_min_max_cache;
-        }
-
-        $style = $this->_frame->get_style();
-
-        $this->_frame->normalise();
-
-        // Add the cells to the cellmap (this will calcluate column widths as
-        // frames are added)
-        $this->_frame->get_cellmap()->add_frame($this->_frame);
-
-        // Find the min/max width of the table and sort the columns into
-        // absolute/percent/auto arrays
-        $this->_state = array();
-        $this->_state["min_width"] = 0;
-        $this->_state["max_width"] = 0;
-
-        $this->_state["percent_used"] = 0;
-        $this->_state["absolute_used"] = 0;
-        $this->_state["auto_min"] = 0;
-
-        $this->_state["absolute"] = array();
-        $this->_state["percent"] = array();
-        $this->_state["auto"] = array();
-
-        $columns =& $this->_frame->get_cellmap()->get_columns();
-        foreach (array_keys($columns) as $i) {
-            $this->_state["min_width"] += $columns[$i]["min-width"];
-            $this->_state["max_width"] += $columns[$i]["max-width"];
-
-            if ($columns[$i]["absolute"] > 0) {
-                $this->_state["absolute"][] = $i;
-                $this->_state["absolute_used"] += $columns[$i]["absolute"];
-            } else if ($columns[$i]["percent"] > 0) {
-                $this->_state["percent"][] = $i;
-                $this->_state["percent_used"] += $columns[$i]["percent"];
-            } else {
-                $this->_state["auto"][] = $i;
-                $this->_state["auto_min"] += $columns[$i]["min-width"];
-            }
-        }
-
-        // Account for margins & padding
-        $dims = array($style->border_left_width,
-            $style->border_right_width,
-            $style->padding_left,
-            $style->padding_right,
-            $style->margin_left,
-            $style->margin_right);
-
-        if ($style->border_collapse !== "collapse") {
-            list($dims[]) = $style->border_spacing;
-        }
-
-        $delta = (float)$style->length_in_pt($dims, $this->_frame->get_containing_block("w"));
-
-        $this->_state["min_width"] += $delta;
-        $this->_state["max_width"] += $delta;
-
-        return $this->_min_max_cache = array(
-            $this->_state["min_width"],
-            $this->_state["max_width"],
-            "min" => $this->_state["min_width"],
-            "max" => $this->_state["max_width"],
-        );
-    }
-
     protected function _assign_widths()
     {
         $style = $this->_frame->get_style();
@@ -585,5 +371,219 @@ class Table extends AbstractFrameReflower
         }
 
         return $height;
+    }
+
+    /**
+     * @param BlockFrameDecorator $block
+     */
+    function reflow(BlockFrameDecorator $block = null)
+    {
+        /** @var TableFrameDecorator */
+        $frame = $this->_frame;
+
+        // Check if a page break is forced
+        $page = $frame->get_root();
+        $page->check_forced_page_break($frame);
+
+        // Bail if the page is full
+        if ($page->is_full()) {
+            return;
+        }
+
+        // Let the page know that we're reflowing a table so that splits
+        // are suppressed (simply setting page-break-inside: avoid won't
+        // work because we may have an arbitrary number of block elements
+        // inside tds.)
+        $page->table_reflow_start();
+
+        // Collapse vertical margins, if required
+        $this->_collapse_margins();
+
+        $frame->position();
+
+        // Table layout algorithm:
+        // http://www.w3.org/TR/CSS21/tables.html#auto-table-layout
+
+        if (is_null($this->_state)) {
+            $this->get_min_max_width();
+        }
+
+        $cb = $frame->get_containing_block();
+        $style = $frame->get_style();
+
+        // This is slightly inexact, but should be okay.  Add half the
+        // border-spacing to the table as padding.  The other half is added to
+        // the cells themselves.
+        if ($style->border_collapse === "separate") {
+            list($h, $v) = $style->border_spacing;
+
+            $v = (float)$style->length_in_pt($v) / 2;
+            $h = (float)$style->length_in_pt($h) / 2;
+
+            $style->padding_left = (float)$style->length_in_pt($style->padding_left, $cb["w"]) + $h;
+            $style->padding_right = (float)$style->length_in_pt($style->padding_right, $cb["w"]) + $h;
+            $style->padding_top = (float)$style->length_in_pt($style->padding_top, $cb["h"]) + $v;
+            $style->padding_bottom = (float)$style->length_in_pt($style->padding_bottom, $cb["h"]) + $v;
+        }
+
+        $this->_assign_widths();
+
+        // Adjust left & right margins, if they are auto
+        $width = $style->width;
+        $left = $style->margin_left;
+        $right = $style->margin_right;
+
+        $diff = (float)$cb["w"] - (float)$width;
+
+        if ($left === "auto" && $right === "auto") {
+            if ($diff < 0) {
+                $left = 0;
+                $right = $diff;
+            } else {
+                $left = $right = $diff / 2;
+            }
+
+            $style->margin_left = sprintf("%Fpt", $left);
+            $style->margin_right = sprintf("%Fpt", $right);;
+        } else {
+            if ($left === "auto") {
+                $left = (float)$style->length_in_pt($cb["w"], $cb["w"]) - (float)$style->length_in_pt($right, $cb["w"]) - (float)$style->length_in_pt($width, $cb["w"]);
+            }
+            if ($right === "auto") {
+                $left = (float)$style->length_in_pt($left, $cb["w"]);
+            }
+        }
+
+        list($x, $y) = $frame->get_position();
+
+        // Determine the content edge
+        $content_x = $x + (float)$left + (float)$style->length_in_pt(array($style->padding_left,
+                $style->border_left_width), $cb["w"]);
+        $content_y = $y + (float)$style->length_in_pt(array($style->margin_top,
+                $style->border_top_width,
+                $style->padding_top), $cb["h"]);
+
+        if (isset($cb["h"])) {
+            $h = $cb["h"];
+        } else {
+            $h = null;
+        }
+
+        $cellmap = $frame->get_cellmap();
+        $col =& $cellmap->get_column(0);
+        $col["x"] = $content_x;
+
+        $row =& $cellmap->get_row(0);
+        $row["y"] = $content_y;
+
+        $cellmap->assign_x_positions();
+
+        // Set the containing block of each child & reflow
+        foreach ($frame->get_children() as $child) {
+            // Bail if the page is full
+            if (!$page->in_nested_table() && $page->is_full()) {
+                break;
+            }
+
+            $child->set_containing_block($content_x, $content_y, $width, $h);
+            $child->reflow();
+
+            if (!$page->in_nested_table()) {
+                // Check if a split has occured
+                $page->check_page_break($child);
+            }
+
+        }
+
+        // Assign heights to our cells:
+        $style->height = $this->_calculate_height();
+
+        if ($style->border_collapse === "collapse") {
+            // Unset our borders because our cells are now using them
+            $style->border_style = "none";
+        }
+
+        $page->table_reflow_end();
+
+        // Debugging:
+        //echo ($this->_frame->get_cellmap());
+
+        if ($block && $style->float === "none" && $frame->is_in_flow()) {
+            $block->add_frame_to_line($frame);
+            $block->add_line();
+        }
+    }
+
+    /**
+     * @return array|null
+     */
+    function get_min_max_width()
+    {
+        if (!is_null($this->_min_max_cache)) {
+            return $this->_min_max_cache;
+        }
+
+        $style = $this->_frame->get_style();
+
+        $this->_frame->normalise();
+
+        // Add the cells to the cellmap (this will calcluate column widths as
+        // frames are added)
+        $this->_frame->get_cellmap()->add_frame($this->_frame);
+
+        // Find the min/max width of the table and sort the columns into
+        // absolute/percent/auto arrays
+        $this->_state = array();
+        $this->_state["min_width"] = 0;
+        $this->_state["max_width"] = 0;
+
+        $this->_state["percent_used"] = 0;
+        $this->_state["absolute_used"] = 0;
+        $this->_state["auto_min"] = 0;
+
+        $this->_state["absolute"] = array();
+        $this->_state["percent"] = array();
+        $this->_state["auto"] = array();
+
+        $columns =& $this->_frame->get_cellmap()->get_columns();
+        foreach (array_keys($columns) as $i) {
+            $this->_state["min_width"] += $columns[$i]["min-width"];
+            $this->_state["max_width"] += $columns[$i]["max-width"];
+
+            if ($columns[$i]["absolute"] > 0) {
+                $this->_state["absolute"][] = $i;
+                $this->_state["absolute_used"] += $columns[$i]["absolute"];
+            } else if ($columns[$i]["percent"] > 0) {
+                $this->_state["percent"][] = $i;
+                $this->_state["percent_used"] += $columns[$i]["percent"];
+            } else {
+                $this->_state["auto"][] = $i;
+                $this->_state["auto_min"] += $columns[$i]["min-width"];
+            }
+        }
+
+        // Account for margins & padding
+        $dims = array($style->border_left_width,
+            $style->border_right_width,
+            $style->padding_left,
+            $style->padding_right,
+            $style->margin_left,
+            $style->margin_right);
+
+        if ($style->border_collapse !== "collapse") {
+            list($dims[]) = $style->border_spacing;
+        }
+
+        $delta = (float)$style->length_in_pt($dims, $this->_frame->get_containing_block("w"));
+
+        $this->_state["min_width"] += $delta;
+        $this->_state["max_width"] += $delta;
+
+        return $this->_min_max_cache = array(
+            $this->_state["min_width"],
+            $this->_state["max_width"],
+            "min" => $this->_state["min_width"],
+            "max" => $this->_state["max_width"],
+        );
     }
 }
