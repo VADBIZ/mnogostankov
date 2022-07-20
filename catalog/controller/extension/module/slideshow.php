@@ -24,6 +24,7 @@ class ControllerExtensionModuleSlideshow extends Controller {
 			}
 		}
 
+        $data['name'] = $setting['name'];
         $data['blue_menu'] = $setting['blue_menu'];
 
 		$data['module'] = $module++;

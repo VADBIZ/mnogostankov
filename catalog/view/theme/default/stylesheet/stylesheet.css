@@ -2542,7 +2542,7 @@ flex-wrap: wrap;
 	display: block;
 }
 
-@media (max-width: 780px) {
+@media (max-width: 767px) {
 	#search {
 		margin-bottom: 15px;
 	}
