@@ -44,7 +44,7 @@ class ControllerSaleContract extends Controller {
 		// Первую букву в верхний регистр.
 		$str = mb_substr($str, 0, 1) . mb_substr($str, 1, mb_strlen($str));
 
-		return $str . ' ';
+		return $str . ' ' . $value[1] . ' копеек ';
 	}
 
 //	echo str_price(0);      // Ноль рублей 00 копеек.
@@ -265,10 +265,10 @@ class ControllerSaleContract extends Controller {
 										}
 
 									$totalPriceProductValue = $priceTotal * $product['quantity'];
-									$totalPriceProduct = number_format($totalPriceProductValue, 0, ',', ' ');
+									$totalPriceProduct = number_format($totalPriceProductValue, 2, ',', ' ');
 									$totalPriceProductValueNDS = ($priceTotal * $product['quantity'] * 0.2) / 1.2;
-									$totalPriceProductNDS = number_format($totalPriceProductValueNDS, 0, ',', ' ');
-									$price_one = number_format($price, 0, ',', ' ');
+									$totalPriceProductNDS = number_format($totalPriceProductValueNDS, 2, ',', ' ');
+									$price_one = number_format($price, 2, ',', ' ');
 
 									$sumTotal += $totalPriceProductValue;
                                     $sumNDS += $totalPriceProductValueNDS;
