@@ -18,9 +18,9 @@
       <h1 class="verx">{{ heading_title }}</h1>
 
       {% if paragraphs %}
-          <div class="row">
+          <div class="row imagetiles">
               {% for paragraph in paragraphs %}
-                  <div class="col-xs-12 col-md-4 capture">
+                  <div class="col-xs-12 col-lg-3 col-md-3 col-sm-4 capture">
                       <img src="{{ paragraph.image }}" alt="" class="fluid img-thumbnail">
                   </div>
               {% endfor %}
@@ -32,17 +32,41 @@
 </div>
 <style>
     .capture {
-        text-align: center;
         margin-bottom: 10px;
     }
     .capture .img-thumbnail {
         max-height: 200px;
+        padding: 0;
+        margin: 4px 0;
     }
-    @media (max-width: 768px) {
+
+    /* Large desktops and laptops */
+    @media (min-width: 1200px) {
+
+    }
+
+    /* Landscape tablets and medium desktops */
+    @media (min-width: 992px) and (max-width: 1199px) {
+
+    }
+
+    /* Portrait tablets and small desktops */
+    @media (min-width: 768px) and (max-width: 991px) {
+
+    }
+
+    /* Landscape phones and portrait tablets */
+    @media (max-width: 767px) {
         .capture .img-thumbnail {
             min-width:100%;
             max-height: unset !important;
         }
     }
+
+    /* Portrait phones and smaller */
+    @media (max-width: 480px) {
+
+    }
+
 </style>
 {{ footer }}
