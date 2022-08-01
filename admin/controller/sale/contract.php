@@ -54,7 +54,6 @@ class ControllerSaleContract extends Controller {
 //	echo str_price(100000); // Сто тысяч рублей 00 копеек.
 
 	public function index() {
-
         require_once(DIR_SYSTEM . 'library/dompdf/autoload.inc.php');
 		$this->load->language('sale/contract');
 		$this->load->model('sale/order');
@@ -208,7 +207,6 @@ class ControllerSaleContract extends Controller {
                             $sumTotal = 0;
                             $sumNDS = 0;
 							foreach($order_products as $product){
-
 								$brand = $this->model_catalog_manufacturer->getManufacturer($product['product_info']['manufacturer_id']);
 								$price = $this->currency->format($this->tax->calculate($product['product_info']['price'], $product['product_info']['tax_class_id'], $this->config->get('config_tax')), "USD");
 
@@ -223,71 +221,55 @@ class ControllerSaleContract extends Controller {
 									$priceTotal = $price_discount;
 								}
 
-								$html .= '<tr>';
-									$html .= '<td>'.$i.'</td>';
-									$html .= '<td>'.$product['product_info']['name'].'<br><strong>'. (isset($brand['name']) ? $brand['name'] : '') .'</strong>';
+                                $name = $product['product_info']['name'].'<br><strong>'. (isset($brand['name']) ? $brand['name'] : '');
 
-										if (count($product['option']) > 0) {
-											$html .= "<br><br><strong>".$this->language->get('entry_option')."</strong>";
-											foreach ($product['option'] as $product_option) {
-												$product_options = $this->model_catalog_product->getProductOptions($product['product_id']);
+                                $html .= $this->trHtml($sumTotal, $sumNDS, $i, $name, $product['quantity'], $price, $price_discount);
 
-												$product_option_id = $product_option['product_option_id'];
-												$product_option_value_id = $product_option['product_option_value_id'];
+                                if (count($product['option']) > 0) {
+                                    $j = 1;
+                                    foreach ($product['option'] as $product_option) {
+                                        $product_options = $this->model_catalog_product->getProductOptions($product['product_id']);
 
-												$priceOption = "";
-												$priceOption_prefix = "";
+                                        $product_option_id = $product_option['product_option_id'];
+                                        $product_option_value_id = $product_option['product_option_value_id'];
 
-												foreach($product_options as $po) {
-													foreach($po['product_option_value'] as $popov) {
-														if (($po['product_option_id'] == $product_option_id) && ($popov['product_option_value_id'] == $product_option_value_id)) {
-															$priceOption = $popov['price'];
-															$priceOption_prefix = $popov['price_prefix'];
-														}
-													}
-												}
+                                        $priceOption = "";
+                                        $priceOption_prefix = "";
 
-												if ($order_info['currency_code'] == "USD") {
-													$priceOption = $priceOption / $getCurrency;
-												}
+                                        foreach($product_options as $po) {
+                                            foreach($po['product_option_value'] as $popov) {
+                                                if (($po['product_option_id'] == $product_option_id) && ($popov['product_option_value_id'] == $product_option_value_id)) {
+                                                    $priceOption = $popov['price'];
+                                                    $priceOption_prefix = $popov['price_prefix'];
+                                                }
+                                            }
+                                        }
 
-												$priceTotal += $priceOption;
-												$price += $priceOption;
+                                        $priceTotal += $priceOption;
+                                        $price += $priceOption;
 
-												$priceOption = $this->currency->format($priceOption, $this->config->get('config_currency')) . $currency;
+                                        $priceOption = $this->currency->format($priceOption, $this->config->get('config_currency')) * $currencyValue;
 
-												$option_name = $product_option['name'];
-												$option_value = $product_option['value'];
-												$option_price = " (".$priceOption_prefix.$priceOption.")";
-												$html .= "<br>".$option_name.": ".$option_value.$option_price;
+                                        $option_name = $product_option['name'];
+                                        $option_value = $product_option['value'];
 
-											}
-										}
+                                        $html .= $this->trHtml($sumTotal, $sumNDS, $i . '.' . $j, $option_value . ' (' . $option_name . ')', 1, $priceOption, 0);
+                                        $j++;
+                                    }
+                                }
 
-									$totalPriceProductValue = $priceTotal * $product['quantity'];
-									$totalPriceProduct = number_format($totalPriceProductValue, 2, ',', ' ');
-									$totalPriceProductValueNDS = ($priceTotal * $product['quantity'] * 0.2) / 1.2;
-									$totalPriceProductNDS = number_format($totalPriceProductValueNDS, 2, ',', ' ');
-									$price_one = number_format($price, 2, ',', ' ');
-
-									$sumTotal += $totalPriceProductValue;
-                                    $sumNDS += $totalPriceProductValueNDS;
-
-									$html .= '</td>';
-									$html .= '<td>'.$product['quantity'].'</td>';
-									$html .= '<td>'.$price_one.'</td>';
-									$html .= '<td>'.$product_discount.'</td>';
-									$html .= '<td>'.$totalPriceProduct.'</td>';
-								$html .= '</tr>';
-								$html .= '<tr>';
-									$html .= '<td colspan="5" style="text-align:right">Итого</td>';
-									$html .= '<td>'.$totalPriceProduct.'</td>';
-								$html .= '</tr>';
-								$html .= '<tr>';
-									$html .= '<td colspan="5" style="text-align:right">В т.ч. НДС 20%</td>';
-									$html .= '<td>'.$totalPriceProductNDS.'</td>';
-								$html .= '</tr>';
+                                $i++;
 							}
+
+							// Итого
+							$html .= '<tr>';
+                            $html .= '<td colspan="5" style="text-align:right">Итого</td>';
+                            $html .= '<td>'. number_format($sumTotal, 2, ',', ' ').'</td>';
+                            $html .= '</tr>';
+                            $html .= '<tr>';
+                            $html .= '<td colspan="5" style="text-align:right">В т.ч. НДС 20%</td>';
+                            $html .= '<td>'. number_format($sumNDS, 2, ',', ' ').'</td>';
+                            $html .= '</tr>';
 						$html .= '</tbody>';
 					$html .= '</table>';
 					if ($currency == "USD") {
@@ -295,23 +277,36 @@ class ControllerSaleContract extends Controller {
 					} else {
 						$html .= '<p>Итого: '.$this->str_price($sumTotal).' '.mb_strtolower($currency).'., в т.ч. НДС (20%) '.$this->str_price($sumNDS).mb_strtolower($currency).'.</p>';
 					}
-					$attribute_groups = $this->model_catalog_product->getProductAttributes($product['product_id']);
-					if (count($attribute_groups) > 0) {
-						$html .= '<h3 style="text-align:center">Технические характеристики:</h3>';
-						$html .= '<div class="attribute__groups">';
-							foreach($attribute_groups as $attribute_group) {
-								$attribute_id = $attribute_group["attribute_id"];
-								foreach ($this->model_catalog_attribute->getAttributeDescriptions($attribute_id) as $attribute) {
-									$attribute_name = $attribute['name'];
-									$html .= '<div class="attribute__groups-item">'.$attribute_name.': ';
-									foreach($attribute_group['product_attribute_description'] as $title) {
-										$html .= $title['text'];
-									}
-									$html .= '</div>';
-								}
-							}
-						$html .= '</div>';
-					}
+
+					// Технические характеристики
+					$flagH3 = true;
+                    foreach($order_products as $product) {
+                        $attribute_groups = $this->model_catalog_product->getProductAttributes($product['product_id']);
+                        if (count($attribute_groups) > 0) {
+
+                            // Показываем один раз в цикле
+                            if ($flagH3) {
+                                $html .= '<h3 style="text-align:center">Технические характеристики:</h3>';
+                                $flagH3 = false;
+                            }
+
+                            $html .= '<div class="attribute__groups">';
+                            $html .= "<p>Модель оборудования {$product['product_info']['model']}:</p>";
+                            foreach ($attribute_groups as $attribute_group) {
+                                $attribute_id = $attribute_group["attribute_id"];
+                                foreach ($this->model_catalog_attribute->getAttributeDescriptions($attribute_id) as $attribute) {
+                                    $attribute_name = $attribute['name'];
+                                    $html .= '<div class="attribute__groups-item">' . $attribute_name . ': ';
+                                    foreach ($attribute_group['product_attribute_description'] as $title) {
+                                        $html .= $title['text'];
+                                    }
+                                    $html .= '</div>';
+                                }
+                            }
+                            $html .= '</div>';
+                        }
+                    }
+
 					$html .= '<h3 style="text-align:center">1. Общие условия поставки:</h3>';
 						$html .= '<p class="ti">1.1. «'.$pact_title.'» опубликованы на сайте Поставщика <a href="'.$pact_link.'">'.$pact_link.'</a></p>';
 						$html .= '<p class="ti">1.2. «'.$pact_title.'» и настоящий Договор, подписанный Покупателем и Поставщиком, в совокупности являются заключенным сторонами Договором поставки.</p>';
@@ -415,4 +410,33 @@ class ControllerSaleContract extends Controller {
 			$order_info = array();
 		}
 	}
+
+	private function trHtml(&$sum, &$sumNds, $i, $name, $quantity, $price, $special) {
+        $priceFormat = number_format($price, 2, ',', ' ');
+        $specialFormat = ($special > 0 ? number_format($special, 2, ',', ' ') : '-');
+
+        if ($special > 0) {
+            $price = $special;
+        }
+
+        $total = $price * $quantity;
+        $nds = ($price * $quantity * 0.2) / 1.2;
+
+        $totalFormat = number_format($total, 2, ',', ' ');
+
+
+        $html = '<tr>';
+        $html .= "<td>{$i}</td>";
+        $html .= "<td>{$name}</td>";
+        $html .= "<td>{$quantity}</td>";
+        $html .= "<td>{$priceFormat}</td>";
+        $html .= "<td>{$specialFormat}</td>";
+        $html .= "<td>{$totalFormat}</td>";
+        $html .= '</tr>';
+
+        $sum += $total;
+        $sumNds += $nds;
+
+        return $html;
+    }
 }
