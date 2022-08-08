@@ -21,11 +21,36 @@
           <div class="row imagetiles">
               {% for paragraph in paragraphs %}
                   <div class="col-xs-12 col-lg-3 col-md-3 col-sm-4 capture">
-                      <img src="{{ paragraph.image }}" alt="" class="fluid img-thumbnail">
+                      <a href="#" class="pop">
+                        <img src="{{ paragraph.image }}" alt="" class="fluid img-thumbnail">
+                      </a>
                   </div>
               {% endfor %}
           </div>
       {% endif %}
+
+        <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <img src="" class="imagepreview" style="width: 100%;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            $(function() {
+                $('.pop').on('click', function(e) {
+                    e.preventDefault()
+                    $('.imagepreview').attr('src', $(this).find('img').attr('src'));
+                    $('#imagemodal').modal('show');
+                });
+            });
+        </script>
+
+
       {{ content_bottom }}</div>
     {{ column_right }}</div>
 </div>
