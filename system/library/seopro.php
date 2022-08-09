@@ -498,6 +498,7 @@ class SeoPro {
                     break;
                 case 'manufacturer_id':
                     $manufacturer_id = (int)$value;
+                    $queries[] = 'product/manufacturer/info';
                     $queries[] = 'manufacturer_id=' . $manufacturer_id;
                     $postfix = true;
                     unset($data[$key]);
