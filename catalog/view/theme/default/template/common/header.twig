@@ -194,15 +194,34 @@
                 <div class="today__currency">{{ today_currency }}</div>
             </div>
             <div class="col-sm-3 hidden-xs hidden-sm">
-                <!--<a class="btn btn-primary btn-block" href="{{ login }}">Вход | Регистрация</a>-->
-                <div class="col-sm-5" style="padding-left: 0">
-                    <a class="agree btn btn-primary btn-block" href="index.php?route=common/popups/contact">Контакты</a>
+                <div class="col-sm-12">
+                    <a class="phone" href="tel:+7 923 037 19 13">+7 923 037 19 13</a>
                 </div>
-                <div class="col-sm-7" style="padding-left: 0; padding-right: 0">
-                    <a class="agree btn btn-primary btn-block" href="index.php?route=common/popups">Заказать звонок</a>
+                <div class="col-sm-12">
+                    <a class="email" href="mailto:info@mnogo-stankov.ru">info@mnogo-stankov.ru</a>
                 </div>
             </div>
         </div>
     </div>
+    <style>
+       .phone {
+           font-family: 'Inter';
+           font-style: normal;
+           font-weight: 300;
+           font-size: 15px;
+           line-height: 140%;
+           color: #000;
+           float: right;
+       }
+       .email{
+           font-family: 'Inter';
+           font-style: normal;
+           font-weight: 300;
+           font-size: 15px;
+           line-height: 140%;
+           color: #000;
+           float: right;
+       }
+    </style>
     {{ menu }}
 </header>
